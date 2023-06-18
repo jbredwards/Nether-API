@@ -1,6 +1,8 @@
 package git.jbredwards.nether_api.api.audio;
 
-import net.minecraft.util.SoundEvent;
+import net.minecraft.client.audio.MusicTicker;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 
@@ -15,18 +17,15 @@ import javax.annotation.Nonnull;
 public interface IMusicType
 {
     /**
-     * @return the SoundEvent that gets played.
+     * @return the MusicType that gets played.
      */
     @Nonnull
-    SoundEvent getSoundEvent();
+    @SideOnly(Side.CLIENT)
+    MusicTicker.MusicType getMusicType();
 
     /**
-     * @return the minimum delay between playing music.
+     * @return whether this should replace the currently playing music.
      */
-    int getMinDelay();
-
-    /**
-     * @return the maximum delay between playing music.
-     */
-    int getMaxDelay();
+    @SideOnly(Side.CLIENT)
+    boolean replacesCurrentMusic(@Nonnull MusicTicker.MusicType currentlyPlaying);
 }

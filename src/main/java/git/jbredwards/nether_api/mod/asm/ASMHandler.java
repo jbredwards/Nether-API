@@ -19,7 +19,13 @@ public final class ASMHandler implements IFMLLoadingPlugin
     @Nonnull
     @Override
     public String[] getASMTransformerClass() {
-        return new String[0];
+        return new String[] {
+                //Modded
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerNetherExOverride", //Disable NetherEx's nether override
+                //Vanilla
+                "git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerMapGenCavesHell", //Ensures that nether caves can carve through any biome
+                "git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerWorldClient" //Handle biome ambient sounds and particles from this mod's end
+        };
     }
 
     // ==============
