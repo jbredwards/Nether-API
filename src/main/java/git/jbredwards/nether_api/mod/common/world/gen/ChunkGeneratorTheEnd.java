@@ -7,7 +7,7 @@ import net.minecraft.world.gen.ChunkGeneratorEnd;
 import javax.annotation.Nonnull;
 
 /**
- *
+ * TODO, will use GenLayer to determine the placement of end islands and their biomes (one biome per end island)
  * @author jbred
  *
  */

@@ -17,8 +17,8 @@ import java.util.List;
  */
 public enum NetherAPIRegistry implements INetherAPIRegistry
 {
-    END,
-    NETHER;
+    NETHER,
+    THE_END;
 
     @Nonnull final List<BiomeManager.BiomeEntry> biomes = new ArrayList<>();
     @Nonnull final List<MapGenSpawningStructure> structures = new ArrayList<>();

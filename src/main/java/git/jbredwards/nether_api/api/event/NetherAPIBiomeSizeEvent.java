@@ -22,7 +22,10 @@ import javax.annotation.Nonnull;
 public abstract class NetherAPIBiomeSizeEvent extends WorldTypeEvent
 {
     public int biomeSize;
-    public NetherAPIBiomeSizeEvent(@Nonnull WorldType worldTypeIn) { super(worldTypeIn); }
+    public NetherAPIBiomeSizeEvent(@Nonnull WorldType worldTypeIn, int biomeSizeIn) {
+        super(worldTypeIn);
+        biomeSize = biomeSizeIn;
+    }
 
     /**
      * Fired when determining the size of the biomes to generate for the End.<br>
@@ -40,7 +43,7 @@ public abstract class NetherAPIBiomeSizeEvent extends WorldTypeEvent
      */
     public static class End extends NetherAPIBiomeSizeEvent
     {
-        public End(@Nonnull WorldType worldTypeIn) { super(worldTypeIn); }
+        public End(@Nonnull WorldType worldTypeIn, int biomeSizeIn) { super(worldTypeIn, biomeSizeIn); }
     }
 
     /**
@@ -59,6 +62,6 @@ public abstract class NetherAPIBiomeSizeEvent extends WorldTypeEvent
      */
     public static class Nether extends NetherAPIBiomeSizeEvent
     {
-        public Nether(@Nonnull WorldType worldTypeIn) { super(worldTypeIn); }
+        public Nether(@Nonnull WorldType worldTypeIn, int biomeSizeIn) { super(worldTypeIn, biomeSizeIn); }
     }
 }

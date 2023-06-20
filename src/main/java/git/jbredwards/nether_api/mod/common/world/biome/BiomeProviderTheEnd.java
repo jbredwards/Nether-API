@@ -19,7 +19,8 @@ public class BiomeProviderTheEnd extends BiomeProviderNetherAPI
     @Nonnull
     @Override
     public GenLayer[] getBiomeGenerators(@Nonnull WorldType worldType, long seed) {
-
+        //TODO
+        return null;
     }
 
     @Nonnull

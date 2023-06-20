@@ -15,9 +15,7 @@ import javax.annotation.Nonnull;
  */
 public class GenLayerNetherBiomes extends GenLayer
 {
-    public GenLayerNetherBiomes(long seed) {
-        super(seed);
-    }
+    public GenLayerNetherBiomes(long seed) { super(seed); }
 
     @Nonnull
     @Override
