@@ -24,16 +24,17 @@ public final class NetherGenerationUtils
     /**
      * At the given x and z positions, replaces "stateToFill" with the provided top and filler blocks. Also generates the random gravel and soul sand for the biome.
      */
-    public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn) {
-        final boolean soulSand = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesSoulSandGenerate()) && soulSandNoise[z + (x << 4)] + rand.nextDouble() * 0.2 > 0;
-        final boolean gravel = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesGravelGenerate()) && gravelNoise[z + (x << 4)] + rand.nextDouble() * 0.2 > 0;
-        final int depth = (int)(depthBuffer[z + (x << 4)] / 3 + 3 + rand.nextDouble() * 0.25);
+    public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn, @Nonnull IBlockState liquidBlockIn) {
+        final boolean soulSand = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesSoulSandGenerate()) && soulSandNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
+        final boolean gravel = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesGravelGenerate()) && gravelNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
+        final int depth = (int)(depthBuffer[x << 4 | z] / 3 + 3 + rand.nextDouble() * 0.25);
         int depthRemaining = -1;
 
         final int seaLevel = world.getSeaLevel() + 1;
         IBlockState topBlock = topBlockIn;
         IBlockState fillerBlock = fillerBlockIn;
 
+        IBlockState prevCheckState = primer.getBlockState(x, 128, z);
         for(int y = 127; y >= 0; --y) {
             final IBlockState checkState = primer.getBlockState(x, y, z);
             if(checkState.getMaterial() != Material.AIR) {
@@ -52,11 +53,11 @@ public final class NetherGenerationUtils
                         }
 
                         if(y < seaLevel && topBlock.getMaterial() == Material.AIR) {
-                            topBlock = Blocks.LAVA.getDefaultState();
+                            topBlock = liquidBlockIn;
                         }
 
                         depthRemaining = depth;
-                        if(y >= seaLevel - 1) primer.setBlockState(x, y, z, topBlock);
+                        if(prevCheckState.getMaterial() == Material.AIR) primer.setBlockState(x, y, z, topBlock);
                         else primer.setBlockState(x, y, z, fillerBlock);
                     }
 
@@ -68,10 +69,11 @@ public final class NetherGenerationUtils
             }
 
             else depthRemaining = -1;
+            prevCheckState = checkState;
         }
     }
 
-    public static void generateVanillaNetherFeatures(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures, boolean canSupportFortress) {
+    public static void generateVanillaNetherFeatures(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures) {
 
     }
 }

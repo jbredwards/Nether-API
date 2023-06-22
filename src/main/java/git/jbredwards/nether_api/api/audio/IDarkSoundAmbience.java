@@ -10,12 +10,12 @@ package git.jbredwards.nether_api.api.audio;
 public interface IDarkSoundAmbience extends ISoundAmbience
 {
     /**
-     * @return
+     * @return the radius that can be scanned for light values.
      */
     int getLightSearchRadius();
 
     /**
-     * @return
+     * @return the general distance away from the player where the sound will be played.
      */
     double getSoundOffset();
 }

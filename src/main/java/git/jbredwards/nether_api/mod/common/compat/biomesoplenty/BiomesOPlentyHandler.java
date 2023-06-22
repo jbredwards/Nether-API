@@ -19,11 +19,16 @@ public final class BiomesOPlentyHandler
 {
     public static void registerBiomes(@Nonnull INetherAPIRegistry registry, @Nonnull MinecraftServer server) {
         if(NetherAPIConfig.persistentBOPHellBiomes || server.getEntityWorld().getWorldType() instanceof WorldTypeBOP) { //only use BOP biomes if the world type allows it
-            BOPBiomes.corrupted_sands.toJavaUtil().ifPresent(biome -> registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
-            BOPBiomes.fungi_forest.toJavaUtil().ifPresent(biome -> registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
-            BOPBiomes.phantasmagoric_inferno.toJavaUtil().ifPresent(biome -> registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
-            BOPBiomes.undergarden.toJavaUtil().ifPresent(biome -> registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
-            BOPBiomes.visceral_heap.toJavaUtil().ifPresent(biome -> registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
+            BOPBiomes.corrupted_sands.toJavaUtil().ifPresent(biome ->
+                    registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
+            BOPBiomes.fungi_forest.toJavaUtil().ifPresent(biome ->
+                    registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
+            BOPBiomes.phantasmagoric_inferno.toJavaUtil().ifPresent(biome ->
+                    registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
+            BOPBiomes.undergarden.toJavaUtil().ifPresent(biome ->
+                    registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
+            BOPBiomes.visceral_heap.toJavaUtil().ifPresent(biome ->
+                    registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
         }
     }
 }

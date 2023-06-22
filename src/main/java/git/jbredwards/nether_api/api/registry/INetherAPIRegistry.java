@@ -24,7 +24,7 @@ public interface INetherAPIRegistry
     /**
      * @return an immutable list containing all the structure handlers in the generation list.
      */
-    List<MapGenSpawningStructure> getStructures();
+    List<MapGenSpawningStructure> getStructureHandlers();
 
     /**
      * Adds the Biome to the generation list, with the provided weight.
@@ -41,13 +41,13 @@ public interface INetherAPIRegistry
      * Adds the structure handler to the generation list. Structures do not have to be registered in order to generate,
      * but do if you want them to be able to spawn mobs within its area (like nether fortresses do).
      */
-    void registerStructure(@Nonnull MapGenSpawningStructure structure);
+    void registerStructure(@Nonnull MapGenSpawningStructure structureHandler);
 
     /**
      * Removes the structure handler from the generation list if present.
      * @return true if the structure handler was removed from the generation list.
      */
-    boolean removeStructure(@Nonnull MapGenSpawningStructure structure);
+    boolean removeStructure(@Nonnull MapGenSpawningStructure structureHandler);
 
     /**
      * Removes all the biomes and structures from the Nether generation list.

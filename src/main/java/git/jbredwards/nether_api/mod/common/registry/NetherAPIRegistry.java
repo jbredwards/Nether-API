@@ -21,7 +21,7 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
     THE_END;
 
     @Nonnull final List<BiomeManager.BiomeEntry> biomes = new ArrayList<>();
-    @Nonnull final List<MapGenSpawningStructure> structures = new ArrayList<>();
+    @Nonnull final List<MapGenSpawningStructure> structureHandlers = new ArrayList<>();
 
     @Override
     public void registerBiome(@Nonnull Biome biome, int weight) {
@@ -43,21 +43,21 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
     public List<BiomeManager.BiomeEntry> getBiomes() { return Collections.unmodifiableList(biomes); }
 
     @Override
-    public void registerStructure(@Nonnull MapGenSpawningStructure structure) {
-        removeStructure(structure);
-        structures.add(structure);
+    public void registerStructure(@Nonnull MapGenSpawningStructure structureHandler) {
+        removeStructure(structureHandler);
+        structureHandlers.add(structureHandler);
     }
 
     @Override
-    public boolean removeStructure(@Nonnull MapGenSpawningStructure structure) { return structures.remove(structure); }
+    public boolean removeStructure(@Nonnull MapGenSpawningStructure structureHandler) { return structureHandlers.remove(structureHandler); }
 
     @Nonnull
     @Override
-    public List<MapGenSpawningStructure> getStructures() { return Collections.unmodifiableList(structures); }
+    public List<MapGenSpawningStructure> getStructureHandlers() { return Collections.unmodifiableList(structureHandlers); }
 
     @Override
     public void clear() {
         biomes.clear();
-        structures.clear();
+        structureHandlers.clear();
     }
 }

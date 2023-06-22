@@ -2,6 +2,7 @@ package git.jbredwards.nether_api.api.biome;
 
 import git.jbredwards.nether_api.api.audio.IMusicType;
 import git.jbredwards.nether_api.api.audio.impl.VanillaMusicType;
+import git.jbredwards.nether_api.api.block.INetherCarvable;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.audio.MusicTicker;
@@ -16,6 +17,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -25,7 +28,7 @@ import java.util.Random;
  * @author jbred
  *
  */
-public interface INetherBiome
+public interface INetherBiome extends INetherCarvable
 {
     @Nonnull
     IBlockState getTopBlock();
@@ -33,11 +36,14 @@ public interface INetherBiome
     @Nonnull
     IBlockState getFillerBlock();
 
+    @Nonnull
+    IBlockState getLiquidBlock();
+
     /**
      * At the given x and z positions, this replaces "stateToFill" with the provided top and filler blocks.
      */
-    default void buildSurface(@Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer) {
-        NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, Blocks.NETHERRACK.getDefaultState(), getTopBlock(), getFillerBlock());
+    default void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer) {
+        NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, Blocks.NETHERRACK.getDefaultState(), getTopBlock(), getFillerBlock(), getLiquidBlock());
     }
 
     /**
@@ -53,10 +59,24 @@ public interface INetherBiome
     default boolean canGenerateNetherFortress() { return true; }
 
     /**
+     * @return true if a nether cave can generate through this block.
+     */
+    @Override
+    default boolean canNetherCarveThrough(@Nonnull IBlockState state, @Nonnull ChunkPrimer primer, int x, int y, int z) {
+        return getTopBlock() == state || getFillerBlock() == state;
+    }
+
+    /**
      * @return all possible biomes that can spawn inside this one.
      */
     @Nonnull
-    default BiomeManager.BiomeEntry[] getSubBiomes() { return new BiomeManager.BiomeEntry[0]; }
+    default List<BiomeManager.BiomeEntry> getSubBiomes() { return Collections.emptyList(); }
+
+    /**
+     * @return all possible biomes that can spawn along the edge of this one.
+     */
+    @Nonnull
+    default List<BiomeManager.BiomeEntry> getEdgeBiomes(int neighborBiomeId) { return Collections.emptyList(); }
 
     /**
      * It's also recommended to override {@link net.minecraft.world.biome.Biome#getSkyColorByTemp Biome.getSkyColorByTemp()} for the best result.
