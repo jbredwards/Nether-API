@@ -63,12 +63,18 @@ public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INe
 
     @Override
     public void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer) {
-        NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).generateTerrain(world, rand, primer, chunkX << 4 | x, chunkZ << 4 | z, 0); //this isn't the overworld, so don't provide an overworld noise value (isn't used by BOP for nether generation anyway)
+        final int prevSeaLevel = world.getSeaLevel();
+        world.setSeaLevel(31);
+        NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).generateTerrain(world, rand, primer, chunkX << 4 | x, chunkZ << 4 | z, 0);
+        world.setSeaLevel(prevSeaLevel);
     }
 
     //heavily copied from ChunkGeneratorNetherEx to ensure NetherEx biomes generate as authentically as possible
     @Override
     public void decorate(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures) {
+        final int prevSeaLevel = world.getSeaLevel();
+        world.setSeaLevel(31);
+
         final int chunkX = pos.getX() >> 4;
         final int chunkZ = pos.getZ() >> 4;
         final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
@@ -86,5 +92,7 @@ public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INe
         LibExEventFactory.onPreOreGen(world, rand, pos);
         LibExEventFactory.onOreGen(world, rand, new WorldGenMinable(Blocks.AIR.getDefaultState(), 0, BlockMatcher.forBlock(Blocks.AIR)), pos, OreGenEvent.GenerateMinable.EventType.CUSTOM);
         LibExEventFactory.onPostOreGen(world, rand, pos);
+
+        world.setSeaLevel(prevSeaLevel);
     }
 }

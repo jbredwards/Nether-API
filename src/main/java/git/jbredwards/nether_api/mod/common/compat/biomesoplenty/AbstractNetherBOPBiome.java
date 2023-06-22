@@ -54,14 +54,12 @@ public abstract class AbstractNetherBOPBiome extends BOPHellBiome implements INe
     @Override
     public void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer) {
         NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), getLiquidBlock());
-        genTerrainBlocks(world, rand, primer, chunkX << 4 | x, chunkZ << 4 | z, 0); //this isn't the overworld, so don't provide an overworld noise value (isn't used by BOP for nether generation anyway)
+        genTerrainBlocks(world, rand, primer, chunkZ << 4 | z, chunkX << 4 | x, 1); //BOP swaps the x and z coords (for some reason??? it caused me a lot of pain until I realized ;-;)
     }
 
     //heavily copied from ChunkGeneratorHellBOP to ensure BOP biomes generate as authentically as possible
     @Override
     public void decorate(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures) {
-        final boolean prevLogging = ForgeModContainer.logCascadingWorldGeneration;
-        ForgeModContainer.logCascadingWorldGeneration = false;
         final int chunkX = pos.getX() >> 4;
         final int chunkZ = pos.getZ() >> 4;
 
@@ -120,13 +118,11 @@ public abstract class AbstractNetherBOPBiome extends BOPHellBiome implements INe
 
         if (TerrainGen.populate(chunkGenerator, world, rand, chunkX, chunkZ, false, PopulateChunkEvent.Populate.EventType.NETHER_LAVA2))
             for (int j2 = 0; j2 < 16; ++j2) {
-                new WorldGenHellLava(Blocks.FLOWING_LAVA, true).generate(world, rand, pos.add(rand.nextInt(16), rand.nextInt(108) + 10, rand.nextInt(16)));
+                new WorldGenHellLava(Blocks.FLOWING_LAVA, true).generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(108) + 10, rand.nextInt(16) + 8));
             }
 
         // this should already be called during biome decoration (Vanilla doesn't usually call this for the Nether
         // though, since the decoration method is empty)
         //MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(world, rand, pos));
-
-        ForgeModContainer.logCascadingWorldGeneration = prevLogging;
     }
 }

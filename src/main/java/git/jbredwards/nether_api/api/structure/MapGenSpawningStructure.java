@@ -10,11 +10,13 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 /**
+ * Default implementation of {@link ISpawningStructure}.
  *
+ * @since 1.0.0
  * @author jbred
  *
  */
-public abstract class MapGenSpawningStructure extends MapGenStructure
+public abstract class MapGenSpawningStructure extends MapGenStructure implements ISpawningStructure
 {
     @Nonnull
     public final Map<EnumCreatureType, List<Biome.SpawnListEntry>> spawnableCreatures = new EnumMap<>(EnumCreatureType.class);
@@ -23,6 +25,7 @@ public abstract class MapGenSpawningStructure extends MapGenStructure
     }
 
     @Nonnull
+    @Override
     public List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull EnumCreatureType type, @Nonnull World world, @Nonnull BlockPos pos) {
         if(!spawnableCreatures.isEmpty()) {
             final List<Biome.SpawnListEntry> creatures = spawnableCreatures.computeIfAbsent(type, typeIn -> new LinkedList<>());

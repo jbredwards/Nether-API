@@ -23,6 +23,7 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 //Modded
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBiomesOPlentyBiomes", //Change Biomes O' Plenty's nether biome super classes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBiomesOPlentyDecorator", //Allow BOP nether features to always generate in the nether
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerLibraryExCascadingFix", //Fix cascading world gen problems with LibraryEx
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerNetherEXBiomes", //Change NetherEx's nether biome super classes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerNetherExOverride", //Disable NetherEx's nether override
                 //Vanilla

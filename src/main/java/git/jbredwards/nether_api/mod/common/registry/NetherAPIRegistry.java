@@ -1,8 +1,8 @@
 package git.jbredwards.nether_api.mod.common.registry;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
-import git.jbredwards.nether_api.api.structure.MapGenSpawningStructure;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.BiomeManager;
 
 import javax.annotation.Nonnull;
@@ -21,7 +21,7 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
     THE_END;
 
     @Nonnull final List<BiomeManager.BiomeEntry> biomes = new ArrayList<>();
-    @Nonnull final List<MapGenSpawningStructure> structureHandlers = new ArrayList<>();
+    @Nonnull final List<MapGenStructure> structureHandlers = new ArrayList<>();
 
     @Override
     public void registerBiome(@Nonnull Biome biome, int weight) {
@@ -43,17 +43,17 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
     public List<BiomeManager.BiomeEntry> getBiomes() { return Collections.unmodifiableList(biomes); }
 
     @Override
-    public void registerStructure(@Nonnull MapGenSpawningStructure structureHandler) {
+    public void registerStructure(@Nonnull MapGenStructure structureHandler) {
         removeStructure(structureHandler);
         structureHandlers.add(structureHandler);
     }
 
     @Override
-    public boolean removeStructure(@Nonnull MapGenSpawningStructure structureHandler) { return structureHandlers.remove(structureHandler); }
+    public boolean removeStructure(@Nonnull MapGenStructure structureHandler) { return structureHandlers.remove(structureHandler); }
 
     @Nonnull
     @Override
-    public List<MapGenSpawningStructure> getStructureHandlers() { return Collections.unmodifiableList(structureHandlers); }
+    public List<MapGenStructure> getStructureHandlers() { return Collections.unmodifiableList(structureHandlers); }
 
     @Override
     public void clear() {

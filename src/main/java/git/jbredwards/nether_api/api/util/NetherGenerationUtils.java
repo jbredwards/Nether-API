@@ -57,19 +57,33 @@ public final class NetherGenerationUtils
                         }
 
                         depthRemaining = depth;
-                        if(prevCheckState.getMaterial() == Material.AIR) primer.setBlockState(x, y, z, topBlock);
-                        else primer.setBlockState(x, y, z, fillerBlock);
+                        if(prevCheckState.getMaterial() == Material.AIR) {
+                            primer.setBlockState(x, y, z, topBlock);
+                            prevCheckState = topBlock;
+                        }
+
+                        else {
+                            primer.setBlockState(x, y, z, fillerBlock);
+                            prevCheckState = fillerBlock;
+                        }
                     }
 
                     else if(depthRemaining > 0) {
                         --depthRemaining;
                         primer.setBlockState(x, y, z, fillerBlock);
+                        prevCheckState = fillerBlock;
                     }
+
+                    else prevCheckState = checkState;
                 }
+
+                else prevCheckState = checkState;
             }
 
-            else depthRemaining = -1;
-            prevCheckState = checkState;
+            else {
+                depthRemaining = -1;
+                prevCheckState = checkState;
+            }
         }
     }
 

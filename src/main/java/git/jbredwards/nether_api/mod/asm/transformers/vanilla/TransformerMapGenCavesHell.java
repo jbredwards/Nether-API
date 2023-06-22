@@ -1,6 +1,5 @@
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
-import git.jbredwards.nether_api.api.biome.INetherBiome;
 import git.jbredwards.nether_api.api.block.INetherCarvable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -117,7 +116,7 @@ public final class TransformerMapGenCavesHell implements IClassTransformer, Opco
         public static boolean canCarveThrough(@Nonnull IBlockState state, @Nonnull ChunkPrimer primer, int x, int y, int z, @Nonnull Biome biome) {
             if(state.getBlock() instanceof INetherCarvable) return ((INetherCarvable)state.getBlock()).canNetherCarveThrough(state, primer, x, y, z);
             return state.getBlock() == Blocks.NETHERRACK || state.getBlock() == Blocks.SOUL_SAND //built-in
-                    || biome instanceof INetherBiome && ((INetherBiome)biome).canNetherCarveThrough(state, primer, x, y, z);
+                    || biome instanceof INetherCarvable && ((INetherCarvable)biome).canNetherCarveThrough(state, primer, x, y, z);
         }
     }
 }

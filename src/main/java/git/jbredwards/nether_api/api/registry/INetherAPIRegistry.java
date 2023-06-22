@@ -1,7 +1,7 @@
 package git.jbredwards.nether_api.api.registry;
 
-import git.jbredwards.nether_api.api.structure.MapGenSpawningStructure;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.BiomeManager;
 
 import javax.annotation.Nonnull;
@@ -24,7 +24,7 @@ public interface INetherAPIRegistry
     /**
      * @return an immutable list containing all the structure handlers in the generation list.
      */
-    List<MapGenSpawningStructure> getStructureHandlers();
+    List<MapGenStructure> getStructureHandlers();
 
     /**
      * Adds the Biome to the generation list, with the provided weight.
@@ -41,13 +41,13 @@ public interface INetherAPIRegistry
      * Adds the structure handler to the generation list. Structures do not have to be registered in order to generate,
      * but do if you want them to be able to spawn mobs within its area (like nether fortresses do).
      */
-    void registerStructure(@Nonnull MapGenSpawningStructure structureHandler);
+    void registerStructure(@Nonnull MapGenStructure structureHandler);
 
     /**
      * Removes the structure handler from the generation list if present.
      * @return true if the structure handler was removed from the generation list.
      */
-    boolean removeStructure(@Nonnull MapGenSpawningStructure structureHandler);
+    boolean removeStructure(@Nonnull MapGenStructure structureHandler);
 
     /**
      * Removes all the biomes and structures from the Nether generation list.

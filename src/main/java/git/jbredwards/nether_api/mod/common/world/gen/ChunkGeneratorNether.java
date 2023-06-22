@@ -1,7 +1,7 @@
 package git.jbredwards.nether_api.mod.common.world.gen;
 
 import git.jbredwards.nether_api.api.biome.INetherBiome;
-import git.jbredwards.nether_api.api.structure.MapGenSpawningStructure;
+import git.jbredwards.nether_api.api.structure.ISpawningStructure;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
@@ -16,6 +16,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.ChunkGeneratorHell;
+import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.event.ForgeEventFactory;
 
@@ -52,8 +53,8 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
         gravelNoise = slowsandGravelNoiseGen.generateNoiseOctaves(gravelNoise, originX, 109, originZ, 16, 1, 16, 0.03125, 1, 0.03125);
         depthBuffer = netherrackExculsivityNoiseGen.generateNoiseOctaves(depthBuffer, originX, originZ, 0, 16, 16, 1, 0.0625, 0.0625, 0.0625);
 
-        for(int posX = 0; posX < 16; posX++) {
-            for(int posZ = 0; posZ < 16; posZ++) {
+        for(int posZ = 0; posZ < 16; posZ++) {
+            for(int posX = 0; posX < 16; posX++) {
                 //generate the bedrock
                 for(int posY = 4; posY >= 0; posY--) {
                     if(posY <= rand.nextInt(5)) primer.setBlockState(posX, posY, posZ, BEDROCK);
@@ -61,9 +62,13 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
                 }
 
                 //replace netherrack top and filler blocks, and generate random soul sand & gravel
-                final Biome biome = biomesForGeneration[(posZ << 4) + posX];
+                final Biome biome = biomesForGeneration[posZ << 4 | posX];
                 if(biome instanceof INetherBiome) ((INetherBiome)biome).buildSurface(this, world, rand, chunkX, chunkZ, primer, posX, posZ, slowsandNoise, gravelNoise, depthBuffer);
                 else NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, posX, posZ, slowsandNoise, gravelNoise, depthBuffer, NETHERRACK, biome.topBlock, biome.fillerBlock, LAVA);
+
+                //debugging
+                //final Biome biome = biomesForGeneration[posZ << 4 | posX];
+                //primer.setBlockState(posX, 5, posZ, biome.topBlock);
             }
         }
     }
@@ -97,7 +102,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
     @Override
     public void populate(int chunkX, int chunkZ) {
         //ensure forge's fix is active when this runs, otherwise the console gets spammed
-        //if you're using this mod, you don't care about the nether being identical to vanilla 1.12 lol
+        //if you're using this mod, you don't care about the nether being 1:1 with vanilla 1.12 lol
         final boolean prevFixVanillaCascading = ForgeModContainer.fixVanillaCascading;
         ForgeModContainer.fixVanillaCascading = true;
 
@@ -130,9 +135,11 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
                 return genNetherBridge.getSpawnList();
 
             //modded
-            for(final MapGenSpawningStructure structure : NetherAPIRegistry.NETHER.getStructureHandlers()) {
-                final List<Biome.SpawnListEntry> possibleCreatures = structure.getPossibleCreatures(creatureType, world, pos);
-                if(!possibleCreatures.isEmpty()) return possibleCreatures;
+            for(final MapGenStructure structure : NetherAPIRegistry.NETHER.getStructureHandlers()) {
+                if(structure instanceof ISpawningStructure) {
+                    final List<Biome.SpawnListEntry> possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
+                    if(!possibleCreatures.isEmpty()) return possibleCreatures;
+                }
             }
         }
 
@@ -148,7 +155,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
                 return genNetherBridge.getNearestStructurePos(worldIn, position, findUnexplored);
 
             //modded
-            for(final MapGenSpawningStructure structure : NetherAPIRegistry.NETHER.getStructureHandlers())
+            for(final MapGenStructure structure : NetherAPIRegistry.NETHER.getStructureHandlers())
                 if(structure.getStructureName().equals(structureName))
                     return structure.getNearestStructurePos(worldIn, position, findUnexplored);
         }
@@ -160,7 +167,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
     public boolean isInsideStructure(@Nonnull World worldIn, @Nonnull String structureName, @Nonnull BlockPos pos) {
         if(generateStructures) {
             if("Fortress".equals(structureName) && genNetherBridge != null) return genNetherBridge.isInsideStructure(pos);
-            for(final MapGenSpawningStructure structure : NetherAPIRegistry.NETHER.getStructureHandlers())
+            for(final MapGenStructure structure : NetherAPIRegistry.NETHER.getStructureHandlers())
                 if(structure.getStructureName().equals(structureName)) return structure.isInsideStructure(pos);
         }
 
