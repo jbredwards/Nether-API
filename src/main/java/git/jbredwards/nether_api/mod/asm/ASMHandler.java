@@ -21,6 +21,8 @@ public final class ASMHandler implements IFMLLoadingPlugin
     public String[] getASMTransformerClass() {
         return new String[] {
                 //Modded
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBetterNetherFirefly", //Fix BetterNether firefly spawning code
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBetterNetherGenerator", //Allow BetterNether to use real biomes instead of pseudo-biomes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBiomesOPlentyBiomes", //Change Biomes O' Plenty's nether biome super classes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBiomesOPlentyDecorator", //Allow BOP nether features to always generate in the nether
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerLibraryExCascadingFix", //Fix cascading world gen problems with LibraryEx
@@ -31,6 +33,8 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 "git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerWorldClient" //Handle biome ambient sounds and particles from this mod's end
         };
     }
+
+
 
     // ==============
     // NOT APPLICABLE

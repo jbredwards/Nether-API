@@ -1,6 +1,8 @@
 package git.jbredwards.nether_api.mod.common.compat.netherex;
 
 import git.jbredwards.nether_api.api.biome.INetherBiome;
+import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
+import git.jbredwards.nether_api.api.block.INetherCarvable;
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.event.LibExEventFactory;
 import logictechcorp.libraryex.world.biome.data.BiomeData;
@@ -34,23 +36,17 @@ import java.util.stream.Collectors;
  *
  */
 @SuppressWarnings("unused") //used via asm
-public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INetherBiome
+public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INetherBiome, INetherBiomeProvider, INetherCarvable
 {
     public AbstractNetherExBiome(@Nonnull IModData data, @Nonnull BiomeProperties properties, @Nonnull String name) {
         super(data, properties, name);
     }
 
-    @Nonnull
     @Override
-    public IBlockState getTopBlock() { return NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).getBiomeBlock(BiomeData.BlockType.SURFACE_BLOCK); }
-
-    @Nonnull
-    @Override
-    public IBlockState getFillerBlock() { return NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).getBiomeBlock(BiomeData.BlockType.SUBSURFACE_BLOCK); }
-
-    @Nonnull
-    @Override
-    public IBlockState getLiquidBlock() { return NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).getBiomeBlock(BiomeData.BlockType.LIQUID_BLOCK); }
+    public boolean canNetherCarveThrough(@Nonnull IBlockState state, @Nonnull ChunkPrimer primer, int x, int y, int z) {
+        final BiomeData biomeData = NetherEx.BIOME_DATA_MANAGER.getBiomeData(this);
+        return state == biomeData.getBiomeBlock(BiomeData.BlockType.SURFACE_BLOCK) || state == biomeData.getBiomeBlock(BiomeData.BlockType.SUBSURFACE_BLOCK);
+    }
 
     @Nonnull
     @Override
@@ -62,19 +58,16 @@ public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INe
     }
 
     @Override
-    public void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer) {
+    public void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise) {
         final int prevSeaLevel = world.getSeaLevel();
-        world.setSeaLevel(31);
-        NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).generateTerrain(world, rand, primer, chunkX << 4 | x, chunkZ << 4 | z, 0);
+        world.setSeaLevel(31); //temporarily set sea level to match hardcoded lava height, otherwise NetherEx generation breaks
+        NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).generateTerrain(world, rand, primer, chunkX << 4 | x, chunkZ << 4 | z, terrainNoise);
         world.setSeaLevel(prevSeaLevel);
     }
 
     //heavily copied from ChunkGeneratorNetherEx to ensure NetherEx biomes generate as authentically as possible
     @Override
     public void decorate(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures) {
-        final int prevSeaLevel = world.getSeaLevel();
-        world.setSeaLevel(31);
-
         final int chunkX = pos.getX() >> 4;
         final int chunkZ = pos.getZ() >> 4;
         final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
@@ -92,7 +85,5 @@ public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INe
         LibExEventFactory.onPreOreGen(world, rand, pos);
         LibExEventFactory.onOreGen(world, rand, new WorldGenMinable(Blocks.AIR.getDefaultState(), 0, BlockMatcher.forBlock(Blocks.AIR)), pos, OreGenEvent.GenerateMinable.EventType.CUSTOM);
         LibExEventFactory.onPostOreGen(world, rand, pos);
-
-        world.setSeaLevel(prevSeaLevel);
     }
 }

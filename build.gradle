@@ -29,6 +29,7 @@ minecraft {
 dependencies {
     //optional
     deobfProvided 'curse.maven:biomes-o-plenty-220318:2842510'
+    deobfProvided 'com.github.jbredwards:BetterNether-Continuation:patch-1-SNAPSHOT'
     deobfProvided 'com.github.jbredwards:LibraryEx-JitPack-Fix:1.12.x-SNAPSHOT'
     deobfProvided 'com.github.jbredwards:NetherEx-JitPack-Fix:1.12.x-SNAPSHOT'
 }
@@ -67,6 +68,21 @@ processResources {
     }
 }
 
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+artifacts {
+    archives deobfJar
+    archives sourcesJar
+}
+
 //for applying asm outside dev environment
 jar {
     manifest {
@@ -75,6 +91,16 @@ jar {
                 'FMLCorePluginContainsFMLMod': 'true',
                 'FMLAT': 'nether_api_at.cfg'
         )
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+            artifact deobfJar
+            artifact sourcesJar
+        }
     }
 }
 

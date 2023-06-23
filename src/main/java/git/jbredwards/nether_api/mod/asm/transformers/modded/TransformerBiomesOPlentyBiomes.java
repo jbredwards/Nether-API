@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
  * @author jbred
  *
  */
-@SuppressWarnings("unused")
 public final class TransformerBiomesOPlentyBiomes implements IClassTransformer
 {
     @Nonnull

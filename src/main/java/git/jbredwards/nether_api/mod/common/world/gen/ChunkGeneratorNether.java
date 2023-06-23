@@ -16,6 +16,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.ChunkGeneratorHell;
+import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -32,9 +33,13 @@ import java.util.List;
 public class ChunkGeneratorNether extends ChunkGeneratorHell
 {
     @Nonnull
+    protected final NoiseGeneratorPerlin terrainNoiseGen;
+
+    @Nonnull
     protected Biome[] biomesForGeneration = new Biome[0];
     public ChunkGeneratorNether(@Nonnull World worldIn, boolean generateStructures, long seed) {
         super(worldIn, generateStructures, seed);
+        terrainNoiseGen = new NoiseGeneratorPerlin(rand, 4);
     }
 
     @Override
@@ -53,8 +58,9 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
         gravelNoise = slowsandGravelNoiseGen.generateNoiseOctaves(gravelNoise, originX, 109, originZ, 16, 1, 16, 0.03125, 1, 0.03125);
         depthBuffer = netherrackExculsivityNoiseGen.generateNoiseOctaves(depthBuffer, originX, originZ, 0, 16, 16, 1, 0.0625, 0.0625, 0.0625);
 
-        for(int posZ = 0; posZ < 16; posZ++) {
-            for(int posX = 0; posX < 16; posX++) {
+        final double[] terrainNoise = terrainNoiseGen.getRegion(null, originX, originZ, 16, 16, 0.0625, 0.0625, 1);
+        for(int posX = 0; posX < 16; posX++) {
+            for(int posZ = 0; posZ < 16; posZ++) {
                 //generate the bedrock
                 for(int posY = 4; posY >= 0; posY--) {
                     if(posY <= rand.nextInt(5)) primer.setBlockState(posX, posY, posZ, BEDROCK);
@@ -63,7 +69,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
 
                 //replace netherrack top and filler blocks, and generate random soul sand & gravel
                 final Biome biome = biomesForGeneration[posZ << 4 | posX];
-                if(biome instanceof INetherBiome) ((INetherBiome)biome).buildSurface(this, world, rand, chunkX, chunkZ, primer, posX, posZ, slowsandNoise, gravelNoise, depthBuffer);
+                if(biome instanceof INetherBiome) ((INetherBiome)biome).buildSurface(this, world, rand, chunkX, chunkZ, primer, posX, posZ, slowsandNoise, gravelNoise, depthBuffer, terrainNoise[posZ << 4 | posX]);
                 else NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, posX, posZ, slowsandNoise, gravelNoise, depthBuffer, NETHERRACK, biome.topBlock, biome.fillerBlock, LAVA);
 
                 //debugging

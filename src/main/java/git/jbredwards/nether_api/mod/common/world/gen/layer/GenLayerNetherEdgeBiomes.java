@@ -1,6 +1,6 @@
 package git.jbredwards.nether_api.mod.common.world.gen.layer;
 
-import git.jbredwards.nether_api.api.biome.INetherBiome;
+import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.layer.GenLayer;
@@ -70,8 +70,8 @@ public class GenLayerNetherEdgeBiomes extends GenLayer
     protected boolean handleNeighborBiome(@Nonnull int[] out, int index, int neighborId) {
         if(out[index] != neighborId) {
             final Biome biome = Biome.getBiomeForId(out[index]);
-            if(biome instanceof INetherBiome) {
-                final List<BiomeManager.BiomeEntry> edgeBiomes = ((INetherBiome)biome).getEdgeBiomes(neighborId);
+            if(biome instanceof INetherBiomeProvider) {
+                final List<BiomeManager.BiomeEntry> edgeBiomes = ((INetherBiomeProvider)biome).getEdgeBiomes(neighborId);
                 if(!edgeBiomes.isEmpty()) {
                     final int totalWeight = WeightedRandom.getTotalWeight(edgeBiomes);
                     final Biome edgeBiome = WeightedRandom.getRandomItem(edgeBiomes, nextInt(totalWeight)).biome;

@@ -12,7 +12,6 @@ import javax.annotation.Nonnull;
  * @author jbred
  *
  */
-@SuppressWarnings("unused")
 public final class TransformerNetherExOverride implements IClassTransformer
 {
     @Nonnull

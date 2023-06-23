@@ -27,7 +27,6 @@ import java.util.Random;
  * @author jbred
  *
  */
-@SuppressWarnings("unused")
 public final class TransformerWorldClient implements IClassTransformer, Opcodes
 {
     @Nonnull
@@ -82,6 +81,7 @@ public final class TransformerWorldClient implements IClassTransformer, Opcodes
         return basicClass;
     }
 
+    @SuppressWarnings("unused")
     public static final class Hooks
     {
         @SideOnly(Side.CLIENT)

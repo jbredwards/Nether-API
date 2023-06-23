@@ -6,7 +6,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
 import javax.annotation.Nonnull;
 
 /**
- * Having your block implement this allows it to have custom behavior when a nether cave generates through it.
+ * Having your Block (or Biome) implement this allows it to have custom behavior when a nether cave generates through it.
  * One use for this would be to allow nether caves to generate through your blocks.
  *
  * @since 1.0.0

@@ -18,7 +18,6 @@ import javax.annotation.Nonnull;
  * @author jbred
  *
  */
-@SuppressWarnings("unused")
 public final class TransformerBiomesOPlentyDecorator implements IClassTransformer, Opcodes
 {
     @Nonnull
@@ -60,6 +59,7 @@ public final class TransformerBiomesOPlentyDecorator implements IClassTransforme
         return basicClass;
     }
 
+    @SuppressWarnings("unused")
     public static final class Hooks
     {
         public static boolean orNonNether(boolean contains, @Nonnull Object event) {

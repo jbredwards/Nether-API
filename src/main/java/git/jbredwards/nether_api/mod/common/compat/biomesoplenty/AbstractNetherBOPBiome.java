@@ -2,8 +2,8 @@ package git.jbredwards.nether_api.mod.common.compat.biomesoplenty;
 
 import biomesoplenty.common.biome.nether.BOPHellBiome;
 import git.jbredwards.nether_api.api.biome.INetherBiome;
+import git.jbredwards.nether_api.api.block.INetherCarvable;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
-import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockMatcher;
 import net.minecraft.init.Blocks;
@@ -12,7 +12,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.*;
-import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent;
@@ -28,33 +27,21 @@ import java.util.Random;
  *
  */
 @SuppressWarnings("unused") //used via asm
-public abstract class AbstractNetherBOPBiome extends BOPHellBiome implements INetherBiome
+public abstract class AbstractNetherBOPBiome extends BOPHellBiome implements INetherBiome, INetherCarvable
 {
     public AbstractNetherBOPBiome(@Nonnull String idName, @Nonnull PropsBuilder defaultBuilder) {
         super(idName, defaultBuilder);
     }
 
-    @Nonnull
-    @Override
-    public IBlockState getTopBlock() { return topBlock; }
-
-    @Nonnull
-    @Override
-    public IBlockState getFillerBlock() { return fillerBlock; }
-
-    @Nonnull
-    @Override
-    public IBlockState getLiquidBlock() { return Blocks.LAVA.getDefaultState(); }
-
     @Override
     public boolean canNetherCarveThrough(@Nonnull IBlockState state, @Nonnull ChunkPrimer primer, int x, int y, int z) {
-        return getTopBlock() == state || getFillerBlock() == state || wallBlock == state || roofTopBlock == state || roofFillerBlock == state;
+        return topBlock == state || fillerBlock == state || wallBlock == state || roofTopBlock == state || roofFillerBlock == state;
     }
 
     @Override
-    public void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer) {
-        NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), getLiquidBlock());
-        genTerrainBlocks(world, rand, primer, chunkZ << 4 | z, chunkX << 4 | x, 1); //BOP swaps the x and z coords (for some reason??? it caused me a lot of pain until I realized ;-;)
+    public void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise) {
+        NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), Blocks.LAVA.getDefaultState());
+        genTerrainBlocks(world, rand, primer, chunkZ << 4 | z, chunkX << 4 | x, terrainNoise); //BOP swaps the x and z coords (for some reason??? it caused me a lot of pain until I realized ;-;)
     }
 
     //heavily copied from ChunkGeneratorHellBOP to ensure BOP biomes generate as authentically as possible

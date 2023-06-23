@@ -21,7 +21,6 @@ import javax.annotation.Nonnull;
  * @author jbred
  *
  */
-@SuppressWarnings("unused")
 public final class TransformerMapGenCavesHell implements IClassTransformer, Opcodes
 {
     @Nonnull
@@ -106,6 +105,7 @@ public final class TransformerMapGenCavesHell implements IClassTransformer, Opco
         return basicClass;
     }
 
+    @SuppressWarnings("unused")
     public static final class Hooks
     {
         @Nonnull
