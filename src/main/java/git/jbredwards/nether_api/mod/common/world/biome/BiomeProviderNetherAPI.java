@@ -40,11 +40,11 @@ public abstract class BiomeProviderNetherAPI extends BiomeProvider
     @Nonnull
     @Override
     public Biome[] getBiomesForGeneration(@Nullable Biome[] listToReuse, int x, int z, int width, int height) {
+        IntCache.resetIntCache();
         final int size = width * height;
         if(listToReuse == null || listToReuse.length < size) listToReuse = new Biome[size];
 
         //get biomes from GenLayer
-        IntCache.resetIntCache();
         final int[] biomeIds = genBiomes.getInts(x, z, width, height);
         for(int i = 0; i < size; i++) {
             final int biomeId = biomeIds[i];
@@ -57,6 +57,7 @@ public abstract class BiomeProviderNetherAPI extends BiomeProvider
     @Nonnull
     @Override
     public Biome[] getBiomes(@Nullable Biome[] listToReuse, int x, int z, int width, int height, boolean cacheFlag) {
+        IntCache.resetIntCache();
         final int size = width * height;
         if(listToReuse == null || listToReuse.length < size) listToReuse = new Biome[size];
 
@@ -68,7 +69,6 @@ public abstract class BiomeProviderNetherAPI extends BiomeProvider
         }
 
         //get biomes from GenLayer
-        IntCache.resetIntCache();
         final int[] biomeIds = biomeIndexLayer.getInts(x, z, width, height);
         for(int i = 0; i < size; i++) {
             final int biomeId = biomeIds[i];

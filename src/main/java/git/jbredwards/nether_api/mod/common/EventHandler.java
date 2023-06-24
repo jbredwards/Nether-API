@@ -5,6 +5,7 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import git.jbredwards.nether_api.mod.common.compat.biomesoplenty.BiomesOPlentyHandler;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.minecraft.init.Biomes;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -23,7 +24,7 @@ final class EventHandler
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     static void registerHardcodedNether(@Nonnull NetherAPIRegistryEvent.Nether event) {
         //vanilla
-        event.registry.registerBiome(Biomes.HELL, 30);
+        event.registry.registerBiome(Biomes.HELL, NetherAPIConfig.hellWeight);
 
         //built-in supported mods, other mods must use the event themselves
         if(NetherAPI.isBetterNetherLoaded) BetterNetherHandler.registerBiomes(event.registry);

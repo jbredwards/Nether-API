@@ -66,7 +66,7 @@ public final class TransformerBiomesOPlentyDecorator implements IClassTransforme
             if(!contains) return false;
 
             final World world = event instanceof DecorateBiomeEvent ? ((DecorateBiomeEvent)event).getWorld() : ((OreGenEvent)event).getWorld();
-            return !NetherAPIConfig.persistentBOPHellBiomes || world.provider.getDimension() != DimensionType.NETHER.getId();
+            return NetherAPIConfig.dependentBOPHellBiomes || world.provider.getDimension() != DimensionType.NETHER.getId();
         }
     }
 }

@@ -14,8 +14,12 @@ import javax.annotation.Nonnull;
 public final class NetherAPIConfig
 {
     @Config.RequiresWorldRestart
-    @Config.LangKey("config.nether_api.compat.bop.persistentHellBiomes")
-    public static boolean persistentBOPHellBiomes = false;
+    @Config.LangKey("config.nether_api.compat.bop.dependentHellBiomes")
+    public static boolean dependentBOPHellBiomes = true;
+
+    @Config.RequiresWorldRestart
+    @Config.LangKey("config.nether_api.hellWeight")
+    public static int hellWeight = 30;
 
     @SubscribeEvent
     static void sync(@Nonnull ConfigChangedEvent.OnConfigChangedEvent event) {

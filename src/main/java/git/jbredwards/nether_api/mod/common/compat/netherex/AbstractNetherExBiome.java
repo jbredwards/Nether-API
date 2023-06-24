@@ -3,6 +3,7 @@ package git.jbredwards.nether_api.mod.common.compat.netherex;
 import git.jbredwards.nether_api.api.biome.INetherBiome;
 import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
 import git.jbredwards.nether_api.api.block.INetherCarvable;
+import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import logictechcorp.libraryex.IModData;
 import logictechcorp.libraryex.event.LibExEventFactory;
 import logictechcorp.libraryex.world.biome.data.BiomeData;
@@ -15,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -58,18 +58,19 @@ public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INe
     }
 
     @Override
-    public void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise) {
-        final int prevSeaLevel = world.getSeaLevel();
-        world.setSeaLevel(31); //temporarily set sea level to match hardcoded lava height, otherwise NetherEx generation breaks
-        NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).generateTerrain(world, rand, primer, chunkX << 4 | x, chunkZ << 4 | z, terrainNoise);
-        world.setSeaLevel(prevSeaLevel);
+    public void buildSurface(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise) {
+        final int prevSeaLevel = chunkGenerator.getWorld().getSeaLevel();
+        chunkGenerator.getWorld().setSeaLevel(31); //temporarily set sea level to match hardcoded lava height, otherwise NetherEx generation breaks
+        NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).generateTerrain(chunkGenerator.getWorld(), chunkGenerator.getRand(), primer, chunkX << 4 | x, chunkZ << 4 | z, terrainNoise);
+        chunkGenerator.getWorld().setSeaLevel(prevSeaLevel);
     }
 
     //heavily copied from ChunkGeneratorNetherEx to ensure NetherEx biomes generate as authentically as possible
     @Override
-    public void decorate(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures) {
-        final int chunkX = pos.getX() >> 4;
-        final int chunkZ = pos.getZ() >> 4;
+    public void populate(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ) {
+        final World world = chunkGenerator.getWorld();
+        final Random rand = chunkGenerator.getRand();
+        final BlockPos pos = new BlockPos(chunkX << 4, 0, chunkZ << 4);
         final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
         
         ForgeEventFactory.onChunkPopulate(true, chunkGenerator, world, rand, chunkX, chunkZ, false);

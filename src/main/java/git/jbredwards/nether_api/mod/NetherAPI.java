@@ -45,7 +45,7 @@ public final class NetherAPI
     // Fix BetterNether firefly
     @Mod.EventHandler
     static void init(@Nonnull FMLInitializationEvent event) {
-        if(isBetterNetherLoaded) BetterNetherHandler.resetFireflyBiomes();
+        if(isBetterNetherLoaded) BetterNetherHandler.removeOrFixEntitySpawnBiomes();
     }
 
     // Register Nether handler

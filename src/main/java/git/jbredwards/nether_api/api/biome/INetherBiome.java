@@ -2,20 +2,16 @@ package git.jbredwards.nether_api.api.biome;
 
 import git.jbredwards.nether_api.api.audio.IMusicType;
 import git.jbredwards.nether_api.api.audio.impl.VanillaMusicType;
-import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
+import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 /**
@@ -30,19 +26,14 @@ public interface INetherBiome
     /**
      * At the given x and z positions, this replaces "stateToFill" with the provided top and filler blocks.
      */
-    void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise);
+    void buildSurface(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise);
 
     /**
      * Called instead of vanilla's {@link net.minecraft.world.biome.Biome#decorate(World, Random, BlockPos) Biome::decorate} method.
      */
-    default void decorate(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures) {
-        NetherGenerationUtils.generateVanillaNetherFeatures(world, rand, pos, generateStructures);
+    default void populate(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ) {
+        chunkGenerator.populateWithVanilla(chunkX, chunkZ);
     }
-
-    /**
-     * @return whether this biome can initiate the generation of Nether Fortresses.
-     */
-    default boolean canGenerateNetherFortress() { return true; }
 
     /**
      * It's also recommended to override {@link net.minecraft.world.biome.Biome#getSkyColorByTemp Biome.getSkyColorByTemp()} for the best result.

@@ -1,0 +1,5 @@
+// Config
+config.nether_api.compat.bop.dependentHellBiomes=BOP Nether Biome World-Type Dependency
+config.nether_api.compat.bop.dependentHellBiomes.tooltip=Nether biomes from the Biomes O' Plenty's mod can only spawn if the world-type is set to "Biomes O' Plenty".
+config.nether_api.hellWeight=Vanilla's Hell Biome Generation Weight
+config.nether_api.hellWeight.tooltip=The generation weight of Vanilla's Hell biome. The higher this value is, the higher chance the biome has of spawning compared to others.

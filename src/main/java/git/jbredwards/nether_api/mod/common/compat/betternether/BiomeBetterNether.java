@@ -48,7 +48,9 @@ public final class BiomeBetterNether extends BiomeHell implements INetherBiomePr
         //return a list of valid sub-biomes
         return subBiomes.stream()
                 .filter(netherBiomeIn -> BetterNetherHandler.getWeight(netherBiomeIn) > 0)
-                .map(netherBiomeIn -> netherBiomeIn == netherBiome ? createBiomeEntry() : BetterNetherHandler.getBiomeFromLookup(netherBiomeIn).createBiomeEntry())
+                .map(netherBiomeIn -> netherBiomeIn == netherBiome
+                        ? new BiomeManager.BiomeEntry(this, 1000) //BetterNether sub-biomes have "chance in 1000" of spawning
+                        : BetterNetherHandler.getBiomeFromLookup(netherBiomeIn).createBiomeEntry())
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 

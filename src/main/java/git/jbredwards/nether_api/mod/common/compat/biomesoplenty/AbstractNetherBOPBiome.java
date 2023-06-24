@@ -4,13 +4,13 @@ import biomesoplenty.common.biome.nether.BOPHellBiome;
 import git.jbredwards.nether_api.api.biome.INetherBiome;
 import git.jbredwards.nether_api.api.block.INetherCarvable;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
+import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockMatcher;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.*;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
@@ -39,16 +39,17 @@ public abstract class AbstractNetherBOPBiome extends BOPHellBiome implements INe
     }
 
     @Override
-    public void buildSurface(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise) {
-        NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), Blocks.LAVA.getDefaultState());
-        genTerrainBlocks(world, rand, primer, chunkZ << 4 | z, chunkX << 4 | x, terrainNoise); //BOP swaps the x and z coords (for some reason??? it caused me a lot of pain until I realized ;-;)
+    public void buildSurface(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise) {
+        NetherGenerationUtils.buildSurfaceAndSoulSandGravel(chunkGenerator.getWorld(), chunkGenerator.getRand(), primer, x, z, soulSandNoise, gravelNoise, depthBuffer, Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), Blocks.NETHERRACK.getDefaultState(), Blocks.LAVA.getDefaultState());
+        genTerrainBlocks(chunkGenerator.getWorld(), chunkGenerator.getRand(), primer, chunkZ << 4 | z, chunkX << 4 | x, terrainNoise); //BOP swaps the x and z coords (for some reason??? it caused me a lot of pain until I realized ;-;)
     }
 
     //heavily copied from ChunkGeneratorHellBOP to ensure BOP biomes generate as authentically as possible
     @Override
-    public void decorate(@Nonnull IChunkGenerator chunkGenerator, @Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures) {
-        final int chunkX = pos.getX() >> 4;
-        final int chunkZ = pos.getZ() >> 4;
+    public void populate(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ) {
+        final World world = chunkGenerator.getWorld();
+        final Random rand = chunkGenerator.getRand();
+        final BlockPos pos = new BlockPos(chunkX << 4, 0, chunkZ << 4);
 
         ForgeEventFactory.onChunkPopulate(true, chunkGenerator, world, rand, chunkX, chunkZ, false);
         if (TerrainGen.populate(chunkGenerator, world, rand, chunkX, chunkZ, false, PopulateChunkEvent.Populate.EventType.NETHER_LAVA))

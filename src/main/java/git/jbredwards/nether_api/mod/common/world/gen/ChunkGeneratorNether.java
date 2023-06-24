@@ -3,6 +3,7 @@ package git.jbredwards.nether_api.mod.common.world.gen;
 import git.jbredwards.nether_api.api.biome.INetherBiome;
 import git.jbredwards.nether_api.api.structure.ISpawningStructure;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
+import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
@@ -24,13 +25,14 @@ import net.minecraftforge.event.ForgeEventFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Random;
 
 /**
  *
  * @author jbred
  *
  */
-public class ChunkGeneratorNether extends ChunkGeneratorHell
+public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherAPIChunkGenerator
 {
     @Nonnull
     protected final NoiseGeneratorPerlin terrainNoiseGen;
@@ -69,12 +71,13 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
 
                 //replace netherrack top and filler blocks, and generate random soul sand & gravel
                 final Biome biome = biomesForGeneration[posZ << 4 | posX];
-                if(biome instanceof INetherBiome) ((INetherBiome)biome).buildSurface(this, world, rand, chunkX, chunkZ, primer, posX, posZ, slowsandNoise, gravelNoise, depthBuffer, terrainNoise[posZ << 4 | posX]);
+                if(biome instanceof INetherBiome) ((INetherBiome)biome).buildSurface(this, chunkX, chunkZ, primer, posX, posZ, slowsandNoise, gravelNoise, depthBuffer, terrainNoise[posZ << 4 | posX]);
                 else NetherGenerationUtils.buildSurfaceAndSoulSandGravel(world, rand, primer, posX, posZ, slowsandNoise, gravelNoise, depthBuffer, NETHERRACK, biome.topBlock, biome.fillerBlock, LAVA);
 
                 //debugging
                 //final Biome biome = biomesForGeneration[posZ << 4 | posX];
-                //primer.setBlockState(posX, 5, posZ, biome.topBlock);
+                //primer.setBlockState(posX, 9, posZ, biome.topBlock);
+                //primer.setBlockState(posX, 8, posZ, BEDROCK);
             }
         }
     }
@@ -90,7 +93,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
         buildSurfaces(x, z, primer);
 
         genNetherCaves.generate(world, x, z, primer);
-        if(generateStructures) {
+        if(areStructuresEnabled()) {
             if(genNetherBridge != null) genNetherBridge.generate(world, x, z, primer);
             NetherAPIRegistry.NETHER.getStructureHandlers().forEach(structure -> structure.generate(world, x, z, primer));
         }
@@ -117,12 +120,12 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
         final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
 
         NetherAPIRegistry.NETHER.getStructureHandlers().forEach(structure -> structure.generateStructure(world, rand, chunkPos));
-        if(!(biome instanceof INetherBiome)) super.populate(chunkX, chunkZ);
+        if(!(biome instanceof INetherBiome)) populateWithVanilla(chunkX, chunkZ);
         else { //allow mods to populate chunks differently
             BlockFalling.fallInstantly = true;
 
-            if(genNetherBridge != null && ((INetherBiome)biome).canGenerateNetherFortress()) genNetherBridge.generateStructure(world, rand, chunkPos);
-            ((INetherBiome)biome).decorate(this, world, rand, pos, generateStructures);
+            if(genNetherBridge != null) genNetherBridge.generateStructure(world, rand, chunkPos);
+            ((INetherBiome)biome).populate(this, chunkX, chunkZ);
 
             BlockFalling.fallInstantly = false;
         }
@@ -134,7 +137,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
     @Nonnull
     @Override
     public List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull EnumCreatureType creatureType, @Nonnull BlockPos pos) {
-        if(generateStructures) {
+        if(areStructuresEnabled()) {
             //vanilla
             if(creatureType == EnumCreatureType.MONSTER && genNetherBridge != null
             && (genNetherBridge.isInsideStructure(pos) || genNetherBridge.isPositionInStructure(world, pos) && world.getBlockState(pos.down()).getBlock() == Blocks.NETHER_BRICK))
@@ -155,7 +158,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
     @Nullable
     @Override
     public BlockPos getNearestStructurePos(@Nonnull World worldIn, @Nonnull String structureName, @Nonnull BlockPos position, boolean findUnexplored) {
-        if(generateStructures) {
+        if(areStructuresEnabled()) {
             //vanilla
             if("Fortress".equals(structureName) && genNetherBridge != null)
                 return genNetherBridge.getNearestStructurePos(worldIn, position, findUnexplored);
@@ -171,7 +174,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
 
     @Override
     public boolean isInsideStructure(@Nonnull World worldIn, @Nonnull String structureName, @Nonnull BlockPos pos) {
-        if(generateStructures) {
+        if(areStructuresEnabled()) {
             if("Fortress".equals(structureName) && genNetherBridge != null) return genNetherBridge.isInsideStructure(pos);
             for(final MapGenStructure structure : NetherAPIRegistry.NETHER.getStructureHandlers())
                 if(structure.getStructureName().equals(structureName)) return structure.isInsideStructure(pos);
@@ -182,9 +185,23 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell
 
     @Override
     public void recreateStructures(@Nonnull Chunk chunkIn, int x, int z) {
-        if(generateStructures) {
+        if(areStructuresEnabled()) {
             genNetherBridge.generate(world, x, z, null);
             NetherAPIRegistry.NETHER.getStructureHandlers().forEach(structure -> structure.generate(world, x, z, null));
         }
     }
+
+    @Nonnull
+    @Override
+    public World getWorld() { return world; }
+
+    @Nonnull
+    @Override
+    public Random getRand() { return rand; }
+
+    @Override
+    public boolean areStructuresEnabled() { return generateStructures; }
+
+    @Override
+    public void populateWithVanilla(int chunkX, int chunkZ) { super.populate(chunkX, chunkZ); }
 }

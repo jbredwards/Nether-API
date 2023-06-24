@@ -5,7 +5,6 @@ import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 
@@ -85,9 +84,5 @@ public final class NetherGenerationUtils
                 prevCheckState = checkState;
             }
         }
-    }
-
-    public static void generateVanillaNetherFeatures(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, boolean generateStructures) {
-
     }
 }
