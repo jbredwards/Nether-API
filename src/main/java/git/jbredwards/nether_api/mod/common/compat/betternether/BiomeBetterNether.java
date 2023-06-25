@@ -2,7 +2,6 @@ package git.jbredwards.nether_api.mod.common.compat.betternether;
 
 import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeHell;
 import net.minecraftforge.common.BiomeManager;
@@ -32,10 +31,6 @@ public final class BiomeBetterNether extends BiomeHell implements INetherBiomePr
         super(new BiomeProperties(netherBiomeIn.getName()).setTemperature(2).setRainfall(0).setRainDisabled());
         setRegistryName(NetherAPI.MODID, "betternether_" + netherBiomeIn.getClass().getSimpleName());
         netherBiome = netherBiomeIn;
-
-        //unused, but let's be safe
-        topBlock = Blocks.NETHERRACK.getDefaultState();
-        fillerBlock = topBlock;
     }
 
     @Nonnull
