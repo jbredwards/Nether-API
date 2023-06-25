@@ -52,7 +52,7 @@ public final class TransformerMapGenCavesHell implements IClassTransformer, Opco
                          * double d8 = ((double)(j3 + p_180704_4_ * 16) + 0.5D - p_180704_10_) / d2;
                          * Biome biome = Hooks.getBiome(this.world, p_180704_3_, p_180704_4_, i3, j3);
                          */
-                        if(insn.getOpcode() == DSTORE && ((VarInsnNode)insn).var == 57) {
+                        if(insn.getOpcode() == DSTORE && ((VarInsnNode)insn).var == (FMLLaunchHandler.isDeobfuscatedEnvironment() ? 57 : 56)) {
                             final InsnList list = new InsnList();
                             list.add(new VarInsnNode(ALOAD, 0));
                             list.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/gen/MapGenBase", FMLLaunchHandler.isDeobfuscatedEnvironment() ? "world" : "field_75039_c", "Lnet/minecraft/world/World;"));
@@ -78,7 +78,7 @@ public final class TransformerMapGenCavesHell implements IClassTransformer, Opco
                          *     ...
                          * }
                          */
-                        else if(insn.getOpcode() == ALOAD && ((VarInsnNode)insn).var == 59) {
+                        else if(insn.getOpcode() == ALOAD && ((VarInsnNode)insn).var == (FMLLaunchHandler.isDeobfuscatedEnvironment() ? 59 : 61)) {
                             method.instructions.remove(insn.getNext());
                             method.instructions.remove(insn.getNext());
 
@@ -87,7 +87,7 @@ public final class TransformerMapGenCavesHell implements IClassTransformer, Opco
                             method.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/asm/transformers/vanilla/TransformerMapGenCavesHell$Hooks", "canCarveThrough", "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/chunk/ChunkPrimer;IIILnet/minecraft/world/biome/Biome;)Z", false));
                             method.instructions.insert(insn, new VarInsnNode(ALOAD, 62));
                             method.instructions.insert(insn, new VarInsnNode(ILOAD, 53));
-                            method.instructions.insert(insn, new VarInsnNode(ILOAD, 56));
+                            method.instructions.insert(insn, new VarInsnNode(ILOAD, FMLLaunchHandler.isDeobfuscatedEnvironment() ? 56 : 58));
                             method.instructions.insert(insn, new VarInsnNode(ILOAD, 50));
                             method.instructions.insert(insn, new VarInsnNode(ALOAD, 5));
                             break methods;
