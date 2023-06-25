@@ -21,10 +21,13 @@ import javax.annotation.Nonnull;
  */
 public final class TransformerBetterNetherGenerator implements IClassTransformer, Opcodes
 {
+    //exists because BetterNether-Continuation has built-in support
+    public static boolean isEnabled = true;
+
     @Nonnull
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        if(transformedName.equals("paulevs.betternether.world.BNWorldGenerator")) {
+        if(isEnabled && transformedName.equals("paulevs.betternether.world.BNWorldGenerator")) {
             final ClassNode classNode = new ClassNode();
             new ClassReader(basicClass).accept(classNode, ClassReader.SKIP_FRAMES);
 
