@@ -26,7 +26,7 @@ public final class NetherAPI
 {
     // Mod Constants
     @Nonnull
-    public static final String MODID = "nether_api", NAME = "Nether API", VERSION = "1.0.0", DEPENDENCIES =
+    public static final String MODID = "nether_api", NAME = "Nether API", VERSION = "1.0.1", DEPENDENCIES =
             // Minimum supported mod versions, since earlier versions may cause ASM problems
             "after:betternether@[0.1.8.6,);after:biomesoplenty@[7.0.1.2444,);after:netherex@[2.2.5,);";
 

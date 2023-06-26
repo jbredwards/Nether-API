@@ -15,7 +15,7 @@ public final class TransformerBiomesOPlentyBiomes implements IClassTransformer
     @Nonnull
     @Override
     public byte[] transform(@Nonnull String name, @Nonnull String transformedName, @Nonnull byte[] basicClass) {
-        if(!transformedName.equals("git.jbredwards.nether_api.mod.common.compat.biomesoplenty.AbstractNetherBOPBiome")) {
+        if(transformedName.startsWith("biomesoplenty")) {
             final ClassReader reader = new ClassReader(basicClass);
             if("biomesoplenty/common/biome/nether/BOPHellBiome".equals(reader.getSuperName())) {
                 final ClassWriter writer = new ClassWriter(0);

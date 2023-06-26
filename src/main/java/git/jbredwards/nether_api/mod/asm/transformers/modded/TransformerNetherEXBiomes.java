@@ -15,7 +15,7 @@ public final class TransformerNetherEXBiomes implements IClassTransformer
     @Nonnull
     @Override
     public byte[] transform(@Nonnull String name, @Nonnull String transformedName, @Nonnull byte[] basicClass) {
-        if(!transformedName.equals("git.jbredwards.nether_api.mod.common.compat.netherex.AbstractNetherExBiome")) {
+        if(transformedName.startsWith("logictechcorp")) {
             final ClassReader reader = new ClassReader(basicClass);
             if("logictechcorp/netherex/world/biome/BiomeNetherEx".equals(reader.getSuperName())) {
                 final ClassWriter writer = new ClassWriter(0);
