@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2023. jbredwards
+ * All rights reserved.
+ */
+
 package git.jbredwards.nether_api.mod.client.audio;
 
 import git.jbredwards.nether_api.api.audio.IMusicType;

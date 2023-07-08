@@ -1,6 +1,13 @@
+/*
+ * Copyright (c) 2023. jbredwards
+ * All rights reserved.
+ */
+
 package git.jbredwards.nether_api.mod.common.compat.betternether;
 
 import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
+import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
+import git.jbredwards.nether_api.api.registry.INetherAPIRegistryListener;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeHell;
@@ -13,6 +20,7 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 /**
@@ -20,17 +28,21 @@ import java.util.stream.Collectors;
  * @author jbred
  *
  */
-public final class BiomeBetterNether extends BiomeHell implements INetherBiomeProvider
+public final class BiomeBetterNether extends BiomeHell implements INetherBiomeProvider, INetherAPIRegistryListener
 {
-    @Nonnull
-    private static final Field SUBBIOMES_FIELD = ObfuscationReflectionHelper.findField(NetherBiome.class, "subbiomes");
+    @Nonnull private static final Field SUBBIOMES_FIELD = ObfuscationReflectionHelper.findField(NetherBiome.class, "subbiomes");
+    int cachedWeight = -1;
 
     @Nonnull
     public final NetherBiome netherBiome;
-    BiomeBetterNether(@Nonnull NetherBiome netherBiomeIn) {
+    public final int netherBiomeId;
+
+    BiomeBetterNether(@Nonnull NetherBiome netherBiomeIn, int netherBiomeIdIn) {
         super(new BiomeProperties(netherBiomeIn.getName()).setTemperature(2).setRainfall(0).setRainDisabled());
         setRegistryName(NetherAPI.MODID, "betternether_" + netherBiomeIn.getClass().getSimpleName());
+
         netherBiome = netherBiomeIn;
+        netherBiomeId = netherBiomeIdIn;
     }
 
     @Nonnull
@@ -42,7 +54,7 @@ public final class BiomeBetterNether extends BiomeHell implements INetherBiomePr
 
         //return a list of valid sub-biomes
         return subBiomes.stream()
-                .filter(netherBiomeIn -> BetterNetherHandler.getWeight(netherBiomeIn) > 0)
+                .filter(netherBiomeIn -> BetterNetherHandler.getWeight(BetterNetherHandler.getBiomeFromLookup(netherBiomeIn)) > 0)
                 .map(netherBiomeIn -> netherBiomeIn == netherBiome
                         ? new BiomeManager.BiomeEntry(this, 1000) //BetterNether sub-biomes have "chance in 1000" of spawning
                         : BetterNetherHandler.getBiomeFromLookup(netherBiomeIn).createBiomeEntry())
@@ -75,6 +87,16 @@ public final class BiomeBetterNether extends BiomeHell implements INetherBiomePr
         catch(IllegalAccessException e) { throw new RuntimeException(e); }
     }
 
+    @Override
+    public void onAddedToRegistry(@Nonnull INetherAPIRegistry registry, @Nonnull OptionalInt newWeight) {
+        if(newWeight.isPresent()) cachedWeight = newWeight.getAsInt();
+    }
+
+    @Override
+    public void onRemovedFromRegistry(@Nonnull INetherAPIRegistry registry, @Nonnull OptionalInt oldWeight) {
+        cachedWeight = -1;
+    }
+
     @Nonnull
-    public BiomeManager.BiomeEntry createBiomeEntry() { return new BiomeManager.BiomeEntry(this, BetterNetherHandler.getWeight(netherBiome)); }
+    public BiomeManager.BiomeEntry createBiomeEntry() { return new BiomeManager.BiomeEntry(this, BetterNetherHandler.getWeight(this)); }
 }

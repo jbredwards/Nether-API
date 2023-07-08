@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2023. jbredwards
+ * All rights reserved.
+ */
+
 package git.jbredwards.nether_api.mod.asm;
 
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
@@ -21,6 +26,7 @@ public final class ASMHandler implements IFMLLoadingPlugin
     public String[] getASMTransformerClass() {
         return new String[] {
                 //Modded
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBetterNetherConfigLoader", //Prevent BetterNether from resetting its enabled biomes config cache
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBetterNetherFirefly", //Fix BetterNether firefly spawning code
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBetterNetherGenerator", //Allow BetterNether to use real biomes instead of pseudo-biomes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBiomesOPlentyBiomes", //Change Biomes O' Plenty's nether biome super classes

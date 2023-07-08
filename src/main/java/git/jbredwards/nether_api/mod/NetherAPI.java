@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2023. jbredwards
+ * All rights reserved.
+ */
+
 package git.jbredwards.nether_api.mod;
 
 import git.jbredwards.nether_api.api.event.NetherAPIRegistryEvent;
@@ -26,7 +31,7 @@ public final class NetherAPI
 {
     // Mod Constants
     @Nonnull
-    public static final String MODID = "nether_api", NAME = "Nether API", VERSION = "1.0.1", DEPENDENCIES =
+    public static final String MODID = "nether_api", NAME = "Nether API", VERSION = "1.1.0", DEPENDENCIES =
             // Minimum supported mod versions, since earlier versions may cause ASM problems
             "after:betternether@[0.1.8.6,);after:biomesoplenty@[7.0.1.2444,);after:netherex@[2.2.5,);";
 

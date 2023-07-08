@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2023. jbredwards
+ * All rights reserved.
+ */
+
 package git.jbredwards.nether_api.mod.common.compat.biomesoplenty;
 
 import biomesoplenty.common.biome.nether.BOPHellBiome;
