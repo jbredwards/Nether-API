@@ -32,13 +32,13 @@ import javax.annotation.Nullable;
 @Mod.EventBusSubscriber(modid = NetherAPI.MODID, value = Side.CLIENT)
 public final class NetherMusicHandler
 {
-    @Nonnull static Minecraft mc = Minecraft.getMinecraft();
+    @Nonnull static final Minecraft mc = Minecraft.getMinecraft();
     @Nullable static MusicTicker.MusicType currentType;
 
     @Nullable
     public static MusicTicker.MusicType getMusicType() {
         if(currentType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) currentType = null;
-        final Biome biome = Minecraft.getMinecraft().world.getBiome(new BlockPos(ActiveRenderInfo.getCameraPosition()));
+        final Biome biome = mc.world.getBiome(new BlockPos(ActiveRenderInfo.projectViewFromEntity(mc.player, mc.getRenderPartialTicks())));
         if(biome instanceof INetherBiome) {
             final IMusicType musicType = ((INetherBiome)biome).getMusicType();
             if(currentType == null) currentType = musicType.getMusicType();
@@ -51,6 +51,6 @@ public final class NetherMusicHandler
 
     @SubscribeEvent
     static void resetCurrentMusicType(@Nonnull TickEvent.ClientTickEvent event) {
-        if(currentType != null && (mc.player == null || mc.player.dimension != DimensionType.NETHER.getId())) currentType = null;
+        if(event.phase == TickEvent.Phase.START && currentType != null && (mc.player == null || mc.player.dimension != DimensionType.NETHER.getId())) currentType = null;
     }
 }

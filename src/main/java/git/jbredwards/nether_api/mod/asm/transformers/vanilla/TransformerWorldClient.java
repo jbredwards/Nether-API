@@ -6,6 +6,7 @@
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
+import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
@@ -13,7 +14,6 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -92,18 +92,15 @@ public final class TransformerWorldClient implements IClassTransformer, Opcodes
         @SideOnly(Side.CLIENT)
         public static void spawnBiomeAmbientParticle(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
             if(!state.isFullCube()) {
-                final Biome biome = world.getBiome(pos);
-                if(biome instanceof IAmbienceBiome) {
-                    final IParticleFactory[] factories = ((IAmbienceBiome)biome).getAmbientParticles();
-                    if(factories.length == 0) return;
+                final IParticleFactory[] factories = IAmbienceWorldProvider.getAmbienceOrFallback(world.provider, world.getBiome(pos), IAmbienceWorldProvider::getAmbientParticles, IAmbienceBiome::getAmbientParticles, null);
+                if(factories == null || factories.length == 0) return;
 
-                    else if(factories.length != 1) Collections.shuffle(Arrays.asList(factories), rand);
-                    for(final IParticleFactory factory : factories) {
-                        final Particle particle = factory.createParticle(-1, world, pos.getX() + rand.nextDouble(), pos.getY() + rand.nextDouble(), pos.getZ() + rand.nextDouble(), 0, 0, 0);
-                        if(particle != null) {
-                            Minecraft.getMinecraft().effectRenderer.addEffect(particle);
-                            return;
-                        }
+                else if(factories.length != 1) Collections.shuffle(Arrays.asList(factories), rand);
+                for(final IParticleFactory factory : factories) {
+                    final Particle particle = factory.createParticle(-1, world, pos.getX() + rand.nextDouble(), pos.getY() + rand.nextDouble(), pos.getZ() + rand.nextDouble(), 0, 0, 0);
+                    if(particle != null) {
+                        Minecraft.getMinecraft().effectRenderer.addEffect(particle);
+                        return;
                     }
                 }
             }

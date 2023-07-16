@@ -9,12 +9,11 @@ import git.jbredwards.nether_api.api.audio.IDarkSoundAmbience;
 import git.jbredwards.nether_api.api.audio.ISoundAmbience;
 import git.jbredwards.nether_api.api.audio.impl.DarkSoundAmbience;
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
+import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -29,6 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -40,8 +40,8 @@ import java.util.Map;
 @Mod.EventBusSubscriber(modid = NetherAPI.MODID, value = Side.CLIENT)
 final class BiomeAmbienceHandler
 {
-    @Nonnull
-    static final Map<Biome, FadingSound> activeBiomeAmbientSounds = new Object2ObjectArrayMap<>();
+    @Nonnull static final Map<Biome, FadingSound> activeBiomeAmbientSounds = new HashMap<>();
+    @Nonnull static final Minecraft mc = Minecraft.getMinecraft();
 
     @Nullable
     static Biome currentBiome;
@@ -50,66 +50,62 @@ final class BiomeAmbienceHandler
     @SubscribeEvent
     static void onPlayerTick(@Nonnull TickEvent.ClientTickEvent event) {
         if(event.phase == TickEvent.Phase.END) {
-            final EntityPlayerSP player = Minecraft.getMinecraft().player;
-            if(player != null && player.world != null) {
-                final Biome biome = player.world.getBiome(new BlockPos(ActiveRenderInfo.getCameraPosition()));
+            if(mc.player != null && mc.world != null) {
+                final Biome biome = mc.world.getBiome(new BlockPos(ActiveRenderInfo.projectViewFromEntity(mc.player, mc.getRenderPartialTicks())));
                 activeBiomeAmbientSounds.values().removeIf(FadingSound::isDonePlaying);
 
                 //continuous biome ambient sound
                 if(biome != currentBiome) {
                     currentBiome = biome;
                     activeBiomeAmbientSounds.values().forEach(FadingSound::fadeOut);
-                    if(biome instanceof IAmbienceBiome) {
-                        final SoundEvent ambientSound = ((IAmbienceBiome)biome).getAmbientSound();
-                        if(ambientSound != null) activeBiomeAmbientSounds.compute(biome, (biomeIn, sound) -> {
-                            if(sound == null) {
-                                sound = new FadingSound(ambientSound, SoundCategory.AMBIENT);
-                                Minecraft.getMinecraft().getSoundHandler().playSound(sound);
-                            }
 
-                            sound.fadeIn();
-                            return sound;
-                        });
-                    }
+                    final SoundEvent ambientSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world.provider, biome, IAmbienceWorldProvider::getAmbientSound, IAmbienceBiome::getAmbientSound, null);
+                    if(ambientSound != null) activeBiomeAmbientSounds.compute(biome, (biomeIn, sound) -> {
+                        if(sound == null) {
+                            sound = new FadingSound(ambientSound, SoundCategory.AMBIENT);
+                            mc.getSoundHandler().playSound(sound);
+                        }
+
+                        sound.fadeIn();
+                        return sound;
+                    });
                 }
 
                 //random biome ambient sound
-                if(biome instanceof IAmbienceBiome) {
-                    final ISoundAmbience ambientSound = ((IAmbienceBiome)biome).getRandomAmbientSound();
-                    if(ambientSound != null && player.world.rand.nextDouble() < ambientSound.getChancePerTick()) {
-                        final ISound sound = new PositionedSoundRecord(ambientSound.getSoundEvent().getSoundName(), SoundCategory.AMBIENT, 1, 1, false, 0, ISound.AttenuationType.NONE, 0, 0, 0);
-                        Minecraft.getMinecraft().getSoundHandler().playSound(sound);
-                    }
+                final ISoundAmbience ambientSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world.provider, biome, IAmbienceWorldProvider::getRandomAmbientSound, IAmbienceBiome::getRandomAmbientSound, null);
+                if(ambientSound != null && mc.player.getRNG().nextDouble() < ambientSound.getChancePerTick()) {
+                    final ISound sound = new PositionedSoundRecord(ambientSound.getSoundEvent().getSoundName(), SoundCategory.AMBIENT, 1, 1, false, 0, ISound.AttenuationType.NONE, 0, 0, 0);
+                    mc.getSoundHandler().playSound(sound);
                 }
 
                 //random dark biome ambient sound
-                final IDarkSoundAmbience caveSound = biome instanceof IAmbienceBiome ? ((IAmbienceBiome)biome).getDarkAmbienceSound() : DarkSoundAmbience.DEFAULT_CAVE;
+                final IDarkSoundAmbience caveSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world.provider, biome, IAmbienceWorldProvider::getDarkAmbienceSound, IAmbienceBiome::getDarkAmbienceSound, DarkSoundAmbience.DEFAULT_CAVE);
                 if(caveSound != null) {
                     final int searchDiameter = caveSound.getLightSearchRadius() << 1 + 1;
 
-                    final double searchX = player.posX + player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
-                    final double searchY = player.posY + player.getEyeHeight() + player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
-                    final double searchZ = player.posZ + player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
+                    final double searchX = mc.player.posX + mc.player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
+                    final double searchY = mc.player.posY + mc.player.getEyeHeight() + mc.player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
+                    final double searchZ = mc.player.posZ + mc.player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
                     final BlockPos searchPos = new BlockPos(searchX, searchY, searchZ);
 
-                    final int skyLight = player.world.getLightFor(EnumSkyBlock.SKY, searchPos);
-                    caveAmbienceChance -= skyLight > 0 ? skyLight * 0.001 / 15 : (player.world.getLightFor(EnumSkyBlock.BLOCK, searchPos) - 1) * caveSound.getChancePerTick();
+                    final int skyLight = mc.world.getLightFor(EnumSkyBlock.SKY, searchPos);
+                    caveAmbienceChance -= skyLight > 0 ? skyLight * 0.001 / 15 : (mc.world.getLightFor(EnumSkyBlock.BLOCK, searchPos) - 1) * caveSound.getChancePerTick();
                     if(caveAmbienceChance < 1) caveAmbienceChance = Math.max(caveAmbienceChance, 0);
 
                     //play the sound
                     else {
-                        final double offsetX = searchX - player.posX;
-                        final double offsetY = searchY - player.posY - player.getEyeHeight();
-                        final double offsetZ = searchZ - player.posZ;
+                        final double offsetX = searchX - mc.player.posX;
+                        final double offsetY = searchY - mc.player.posY - mc.player.getEyeHeight();
+                        final double offsetZ = searchZ - mc.player.posZ;
                         final double offset = Math.sqrt(offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ);
                         final double soundOffset = offset * (offset + caveSound.getSoundOffset());
 
-                        final float x = (float)(player.posX + offsetX / soundOffset);
-                        final float y = (float)(player.posY + player.getEyeHeight() + offsetY / soundOffset);
-                        final float z = (float)(player.posZ + offsetZ / soundOffset);
+                        final float x = (float)(mc.player.posX + offsetX / soundOffset);
+                        final float y = (float)(mc.player.posY + mc.player.getEyeHeight() + offsetY / soundOffset);
+                        final float z = (float)(mc.player.posZ + offsetZ / soundOffset);
                         final ISound sound = new PositionedSoundRecord(caveSound.getSoundEvent().getSoundName(), SoundCategory.AMBIENT, 1, 1, false, 0, ISound.AttenuationType.NONE, x, y, z);
 
-                        Minecraft.getMinecraft().getSoundHandler().playSound(sound);
+                        mc.getSoundHandler().playSound(sound);
                         caveAmbienceChance = 0;
                     }
                 }

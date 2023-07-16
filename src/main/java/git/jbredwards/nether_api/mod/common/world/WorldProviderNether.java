@@ -5,12 +5,16 @@
 
 package git.jbredwards.nether_api.mod.common.world;
 
+import git.jbredwards.nether_api.api.audio.IDarkSoundAmbience;
+import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.api.biome.INetherBiome;
+import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.client.audio.NetherMusicHandler;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.util.math.BlockPos;
@@ -29,7 +33,7 @@ import javax.annotation.Nullable;
  * @author jbred
  *
  */
-public class WorldProviderNether extends WorldProviderHell
+public class WorldProviderNether extends WorldProviderHell implements IAmbienceWorldProvider
 {
     @Override
     public void init() {
@@ -44,12 +48,20 @@ public class WorldProviderNether extends WorldProviderHell
         return new ChunkGeneratorNether(world, world.getWorldInfo().isMapFeaturesEnabled(), world.getSeed());
     }
 
+    @Nullable
+    @Override
+    public IDarkSoundAmbience getDarkAmbienceSound(@Nonnull Biome biome) {
+        return biome instanceof IAmbienceBiome ? ((IAmbienceBiome)biome).getDarkAmbienceSound() : null;
+    }
+
     @Nonnull
     @SideOnly(Side.CLIENT)
     @Override
     public Vec3d getFogColor(float celestialAngle, float partialTicks) {
-        final BlockPos originFloored = new BlockPos(ActiveRenderInfo.getCameraPosition());
-        final Vec3d originDiff = ActiveRenderInfo.getCameraPosition().subtract(originFloored.getX(), originFloored.getY(), originFloored.getZ());
+        final Vec3d entityPos = ActiveRenderInfo.projectViewFromEntity(Minecraft.getMinecraft().player, partialTicks);
+
+        final BlockPos originFloored = new BlockPos(entityPos);
+        final Vec3d originDiff = entityPos.subtract(originFloored.getX(), originFloored.getY(), originFloored.getZ());
 
         final int[] weights = {0, 1, 4, 6, 4, 1, 0};
         final int weightsSize = weights.length - 1;
@@ -73,7 +85,7 @@ public class WorldProviderNether extends WorldProviderHell
                     totalWeight += weight;
 
                     final Biome biome = world.getBiome(new BlockPos(posX, posY, posZ));
-                    color = color.add(biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : new Vec3d(0.2, 0.3, 0.2));
+                    color = color.add((biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : new Vec3d(0.2, 0.03, 0.03)).scale(weight));
                 }
             }
         }

@@ -13,7 +13,6 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -31,28 +30,25 @@ public interface IAmbienceBiome
      * One gets picked from random to be played. If the factory returns null, a different factory is randomly chosen.
      * @return the possible ambient particle factories
      */
-    @Nonnull
+    @Nullable
     @SideOnly(Side.CLIENT)
-    default IParticleFactory[] getAmbientParticles() { return new IParticleFactory[0]; }
+    default IParticleFactory[] getAmbientParticles() { return null; }
 
     /**
      * @return the ambient sound that continuously plays while in this biome.
      */
     @Nullable
-    @SideOnly(Side.CLIENT)
     default SoundEvent getAmbientSound() { return null; }
 
     /**
-     * @return the ambient sound that randomly plays while in this biome, null if none plays.
+     * @return the ambient sound that randomly plays while in this biome.
      */
     @Nullable
-    @SideOnly(Side.CLIENT)
     default ISoundAmbience getRandomAmbientSound() { return null; }
 
     /**
-     * @return the ambient sound that randomly plays in dark areas (cave sounds), null if none plays.
+     * @return the ambient sound that randomly plays in dark areas (cave sounds).
      */
     @Nullable
-    @SideOnly(Side.CLIENT)
     default IDarkSoundAmbience getDarkAmbienceSound() { return DarkSoundAmbience.DEFAULT_CAVE; }
 }

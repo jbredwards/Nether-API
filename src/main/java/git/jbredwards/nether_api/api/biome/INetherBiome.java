@@ -46,7 +46,7 @@ public interface INetherBiome
      */
     @Nonnull
     @SideOnly(Side.CLIENT)
-    default Vec3d getFogColor(float celestialAngle, float partialTicks) { return new Vec3d(0.2, 0.3, 0.2); }
+    default Vec3d getFogColor(float celestialAngle, float partialTicks) { return new Vec3d(0.2, 0.03, 0.03); }
 
     /**
      * @return the ambient music that plays while players are in this biome.
