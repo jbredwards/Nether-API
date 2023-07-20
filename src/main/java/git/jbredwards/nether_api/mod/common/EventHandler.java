@@ -33,7 +33,7 @@ final class EventHandler
 
         //built-in supported mods, other mods must use the event themselves
         if(NetherAPI.isBetterNetherLoaded) BetterNetherHandler.registerBiomes(event.registry);
-        if(NetherAPI.isBiomesOPlentyLoaded) BiomesOPlentyHandler.registerBiomes(event.registry, event.server);
+        if(NetherAPI.isBiomesOPlentyLoaded) BiomesOPlentyHandler.registerBiomes(event.registry, event.world);
         if(NetherAPI.isNetherExLoaded) NetherExHandler.registerBiomes(event.registry);
     }
 }

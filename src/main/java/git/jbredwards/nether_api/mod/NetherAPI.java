@@ -5,9 +5,7 @@
 
 package git.jbredwards.nether_api.mod;
 
-import git.jbredwards.nether_api.api.event.NetherAPIRegistryEvent;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
-import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderNether;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.DimensionManager;
@@ -16,8 +14,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 
 import javax.annotation.Nonnull;
 
@@ -55,18 +52,8 @@ public final class NetherAPI
 
     // Register Nether handler
     @Mod.EventHandler
-    static void serverStating(@Nonnull FMLServerStartingEvent event) {
-        MinecraftForge.EVENT_BUS.post(new NetherAPIRegistryEvent.Nether(NetherAPIRegistry.NETHER, event.getServer()));
+    static void serverAboutToStart(@Nonnull FMLServerAboutToStartEvent event) {
         DimensionManager.getProviderType(DimensionType.NETHER.getId()).clazz = WorldProviderNether.class;
-
-        MinecraftForge.EVENT_BUS.post(new NetherAPIRegistryEvent.End(NetherAPIRegistry.THE_END, event.getServer()));
         //TODO DimensionManager.getProviderType(DimensionType.THE_END.getId()).clazz = WorldProviderTheEnd.class;
-    }
-
-    // Unregister Nether handler
-    @Mod.EventHandler
-    static void serverStopping(@Nonnull FMLServerStoppingEvent event) {
-        NetherAPIRegistry.NETHER.clear();
-        NetherAPIRegistry.THE_END.clear();
     }
 }

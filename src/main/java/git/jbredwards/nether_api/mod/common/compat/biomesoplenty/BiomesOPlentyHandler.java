@@ -11,7 +11,6 @@ import biomesoplenty.api.enums.BOPClimates;
 import biomesoplenty.common.world.WorldTypeBOP;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -30,8 +29,8 @@ public final class BiomesOPlentyHandler
         return !NetherAPIConfig.dependentBOPHellBiomes || world.getWorldType() instanceof WorldTypeBOP;
     }
 
-    public static void registerBiomes(@Nonnull INetherAPIRegistry registry, @Nonnull MinecraftServer server) {
-        if(allowBOPNetherBiomes(server.getEntityWorld())) { //only use BOP biomes if the world type allows it
+    public static void registerBiomes(@Nonnull INetherAPIRegistry registry, @Nonnull World world) {
+        if(allowBOPNetherBiomes(world)) { //only use BOP biomes if the world type allows it
             BOPBiomes.corrupted_sands.toJavaUtil().ifPresent(biome ->
                     registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
             BOPBiomes.fungi_forest.toJavaUtil().ifPresent(biome ->

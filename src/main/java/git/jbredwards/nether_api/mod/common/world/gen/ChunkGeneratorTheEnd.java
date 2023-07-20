@@ -5,24 +5,29 @@
 
 package git.jbredwards.nether_api.mod.common.world.gen;
 
+import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
+import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.ChunkGeneratorEnd;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Random;
 
 /**
  * TODO, will use GenLayer to determine the placement of end islands and their biomes (one biome per end island)
  * @author jbred
  *
  */
-public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd
+public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAPIChunkGenerator
 {
     public ChunkGeneratorTheEnd(@Nonnull World worldIn, boolean generateStructures, long seed, @Nonnull BlockPos spawnCoord) {
         super(worldIn, generateStructures, seed, spawnCoord);
+        NetherAPIRegistry.THE_END.initializeStructures(this);
     }
 
     @Nonnull
@@ -30,4 +35,25 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd
     public List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull EnumCreatureType creatureType, @Nonnull BlockPos pos) {
         return super.getPossibleCreatures(creatureType, pos);
     }
+
+    // ========================
+    // INetherAPIChunkGenerator
+    // ========================
+
+    @Nonnull
+    @Override
+    public World getWorld() { return world; }
+
+    @Nonnull
+    @Override
+    public Random getRand() { return rand; }
+
+    @Override
+    public boolean areStructuresEnabled() { return mapFeaturesEnabled; }
+
+    @Override
+    public void populateWithVanilla(int chunkX, int chunkZ) { super.populate(chunkX, chunkZ); }
+
+    @Override
+    public void setBlocksInPrimer(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer) { setBlocksInChunk(chunkX, chunkZ, primer); }
 }

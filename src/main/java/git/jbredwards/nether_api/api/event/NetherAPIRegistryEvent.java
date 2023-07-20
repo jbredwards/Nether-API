@@ -6,7 +6,7 @@
 package git.jbredwards.nether_api.api.event;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
 import javax.annotation.Nonnull;
@@ -25,17 +25,19 @@ import javax.annotation.Nonnull;
  * @author jbred
  *
  */
-public class NetherAPIRegistryEvent extends Event
+public abstract class NetherAPIRegistryEvent extends Event
 {
     /**
      * This is specific to the dimension.
      */
     @Nonnull public final INetherAPIRegistry registry;
-    @Nonnull public final MinecraftServer server;
+    @Nonnull public final World world;
 
-    public NetherAPIRegistryEvent(@Nonnull INetherAPIRegistry registryIn, @Nonnull MinecraftServer serverIn) {
+    public NetherAPIRegistryEvent(@Nonnull INetherAPIRegistry registryIn, @Nonnull World worldIn) {
         registry = registryIn;
-        server = serverIn;
+        world = worldIn;
+
+        registryIn.clear(); // Ensure registry is empty before accepting new registries
     }
 
     /**
@@ -54,8 +56,8 @@ public class NetherAPIRegistryEvent extends Event
      */
     public static class End extends NetherAPIRegistryEvent
     {
-        public End(@Nonnull INetherAPIRegistry registryIn, @Nonnull MinecraftServer serverIn) {
-            super(registryIn, serverIn);
+        public End(@Nonnull INetherAPIRegistry registryIn, @Nonnull World worldIn) {
+            super(registryIn, worldIn);
         }
     }
 
@@ -75,8 +77,8 @@ public class NetherAPIRegistryEvent extends Event
      */
     public static class Nether extends NetherAPIRegistryEvent
     {
-        public Nether(@Nonnull INetherAPIRegistry registryIn, @Nonnull MinecraftServer serverIn) {
-            super(registryIn, serverIn);
+        public Nether(@Nonnull INetherAPIRegistry registryIn, @Nonnull World worldIn) {
+            super(registryIn, worldIn);
         }
     }
 }

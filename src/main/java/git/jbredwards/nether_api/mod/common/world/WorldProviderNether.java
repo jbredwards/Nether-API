@@ -8,10 +8,12 @@ package git.jbredwards.nether_api.mod.common.world;
 import git.jbredwards.nether_api.api.audio.IDarkSoundAmbience;
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.api.biome.INetherBiome;
+import git.jbredwards.nether_api.api.event.NetherAPIRegistryEvent;
 import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.client.audio.NetherMusicHandler;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
+import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
 import net.minecraft.client.Minecraft;
@@ -22,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -37,6 +40,7 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
 {
     @Override
     public void init() {
+        MinecraftForge.EVENT_BUS.post(new NetherAPIRegistryEvent.Nether(NetherAPIRegistry.NETHER, world));
         biomeProvider = new BiomeProviderNether(world.getWorldType(), world.getSeed());
         doesWaterVaporize = true;
         nether = true;

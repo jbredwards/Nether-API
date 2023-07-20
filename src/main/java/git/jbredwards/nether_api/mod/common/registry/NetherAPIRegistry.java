@@ -7,25 +7,34 @@ package git.jbredwards.nether_api.mod.common.registry;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistryListener;
+import git.jbredwards.nether_api.api.structure.INetherAPIStructureEntry;
+import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.BiomeManager;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  *
  * @author jbred
  *
  */
-public enum NetherAPIRegistry implements INetherAPIRegistry
+public class NetherAPIRegistry implements INetherAPIRegistry
 {
-    NETHER,
-    THE_END;
+    @Nonnull
+    public static final NetherAPIRegistry NETHER = new NetherAPIRegistry(), THE_END = new NetherAPIRegistry();
+    public NetherAPIRegistry() { REGISTRIES.add(this); }
 
-    @Nonnull final List<BiomeManager.BiomeEntry> biomes = new ArrayList<>();
-    @Nonnull final List<MapGenStructure> structureHandlers = new ArrayList<>();
+    @Nonnull final List<BiomeManager.BiomeEntry> biomeEntries = new LinkedList<>();
+    @Nonnull final List<INetherAPIStructureEntry> structureEntries = new LinkedList<>();
+
+    @Nonnull
+    @Override
+    public List<BiomeManager.BiomeEntry> getBiomeEntries() { return Collections.unmodifiableList(biomeEntries); }
 
     @Override
     public void registerBiome(@Nonnull Biome biome, int weight) {
@@ -34,7 +43,7 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
         if(weight < 1) return; //don't allow biomes with a weight less than 1
 
         removeBiome(biome); //no duplicate entries
-        biomes.add(new BiomeManager.BiomeEntry(biome, weight));
+        biomeEntries.add(new BiomeManager.BiomeEntry(biome, weight));
 
         //update biome if listener
         if(biome instanceof INetherAPIRegistryListener)
@@ -43,7 +52,7 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
 
     @Override
     public boolean removeBiome(@Nonnull Biome biome) {
-        return biomes.removeIf(entry -> {
+        return biomeEntries.removeIf(entry -> {
             if(entry.biome == biome) {
                 //update biome if listener
                 if(biome instanceof INetherAPIRegistryListener)
@@ -58,26 +67,31 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
 
     @Nonnull
     @Override
-    public List<BiomeManager.BiomeEntry> getBiomes() { return Collections.unmodifiableList(biomes); }
-
-    @Override
-    public void registerStructure(@Nonnull MapGenStructure structureHandler) {
-        removeStructure(structureHandler);
-        structureHandlers.add(structureHandler);
-
-        //update structure if listener
-        if(structureHandler instanceof INetherAPIRegistryListener)
-            ((INetherAPIRegistryListener)structureHandler).onAddedToRegistry(this, OptionalInt.empty());
+    public List<INetherAPIStructureEntry> getStructures() { return Collections.unmodifiableList(structureEntries); }
+    public void forEachStructure(@Nonnull Consumer<MapGenStructure> action) { // Utility function that applies the provided action to all initialized structures
+        structureEntries.forEach(entry -> { if(entry.getStructure().isPresent()) action.accept(entry.getStructure().get()); });
     }
 
     @Override
-    public boolean removeStructure(@Nonnull MapGenStructure structureHandler) {
-        return structureHandlers.removeIf(handler -> {
-            if(handler == structureHandler) {
-                //update structure if listener
-                if(handler instanceof INetherAPIRegistryListener)
-                    ((INetherAPIRegistryListener)handler).onRemovedFromRegistry(this, OptionalInt.empty());
+    public void registerStructure(@Nonnull INetherAPIStructureEntry structureEntry) {
+        removeStructure(structureEntry.getCommandName());
+        structureEntries.add(structureEntry);
 
+        //update structure if listener
+        if(structureEntry instanceof INetherAPIRegistryListener)
+            ((INetherAPIRegistryListener)structureEntry).onAddedToRegistry(this, OptionalInt.empty());
+    }
+
+    @Override
+    public void registerStructure(@Nonnull String commandName, @Nonnull Function<INetherAPIChunkGenerator, MapGenStructure> structureFactory) {
+        registerStructure(new NetherAPIStructureEntry(commandName, structureFactory));
+    }
+
+    @Override
+    public boolean removeStructure(@Nonnull String commandName) {
+        return structureEntries.removeIf(entry -> {
+            if(entry.getCommandName().equals(commandName)) {
+                if(entry instanceof INetherAPIRegistryListener) ((INetherAPIRegistryListener)entry).onRemovedFromRegistry(this, OptionalInt.empty());
                 return true;
             }
 
@@ -85,13 +99,9 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
         });
     }
 
-    @Nonnull
-    @Override
-    public List<MapGenStructure> getStructureHandlers() { return Collections.unmodifiableList(structureHandlers); }
-
     @Override
     public void clear() {
-        for(final Iterator<BiomeManager.BiomeEntry> it = biomes.iterator(); it.hasNext();) {
+        for(final Iterator<BiomeManager.BiomeEntry> it = biomeEntries.iterator(); it.hasNext();) {
             final BiomeManager.BiomeEntry entry = it.next();
             if(entry.biome instanceof INetherAPIRegistryListener)
                 ((INetherAPIRegistryListener)entry.biome).onRemovedFromRegistry(this, OptionalInt.of(entry.itemWeight));
@@ -99,12 +109,18 @@ public enum NetherAPIRegistry implements INetherAPIRegistry
             it.remove();
         }
 
-        for(final Iterator<MapGenStructure> it = structureHandlers.iterator(); it.hasNext();) {
-            final MapGenStructure structureHandler = it.next();
-            if(structureHandler instanceof INetherAPIRegistryListener)
-                ((INetherAPIRegistryListener)structureHandler).onRemovedFromRegistry(this, OptionalInt.empty());
+        for(final Iterator<INetherAPIStructureEntry> it = structureEntries.iterator(); it.hasNext();) {
+            it.next().getStructure().ifPresent(structureHandler -> {
+                if(structureHandler instanceof INetherAPIRegistryListener)
+                    ((INetherAPIRegistryListener)structureHandler).onRemovedFromRegistry(this, OptionalInt.empty());
+            });
 
             it.remove();
         }
+    }
+
+    @Override
+    public void initializeStructures(@Nonnull INetherAPIChunkGenerator chunkGenerator) throws UnsupportedOperationException {
+        structureEntries.forEach(entry -> entry.initialize(chunkGenerator));
     }
 }

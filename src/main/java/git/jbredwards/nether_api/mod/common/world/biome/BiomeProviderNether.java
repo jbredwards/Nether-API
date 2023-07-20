@@ -7,6 +7,7 @@ package git.jbredwards.nether_api.mod.common.world.biome;
 
 import git.jbredwards.nether_api.api.event.NetherAPIBiomeSizeEvent;
 import git.jbredwards.nether_api.api.event.NetherAPIInitBiomeGensEvent;
+import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.gen.layer.GenLayerNetherBiomes;
 import git.jbredwards.nether_api.mod.common.world.gen.layer.GenLayerNetherEdgeBiomes;
 import git.jbredwards.nether_api.mod.common.world.gen.layer.GenLayerNetherSubBiomes;
@@ -33,7 +34,7 @@ public class BiomeProviderNether extends BiomeProviderNetherAPI
         MinecraftForge.TERRAIN_GEN_BUS.post(event);
 
         //biome layer handlers
-        final GenLayer biomeLayerBase = new GenLayerFuzzyZoom(10, new GenLayerNetherBiomes(20));
+        final GenLayer biomeLayerBase = new GenLayerFuzzyZoom(10, new GenLayerNetherBiomes(20, NetherAPIRegistry.NETHER));
         final GenLayer biomeLayerWithSub = GenLayerZoom.magnify(10, new GenLayerNetherSubBiomes(20, biomeLayerBase), event.biomeSize);
         final GenLayer biomeLayerWithEdge = new GenLayerNetherEdgeBiomes(20, biomeLayerWithSub);
 

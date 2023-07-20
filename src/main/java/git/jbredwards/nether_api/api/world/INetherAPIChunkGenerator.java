@@ -6,6 +6,7 @@
 package git.jbredwards.nether_api.api.world;
 
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
 
 import javax.annotation.Nonnull;
@@ -41,4 +42,10 @@ public interface INetherAPIChunkGenerator extends IChunkGenerator
      * Utility function that runs the same code vanilla uses to populate its chunks.
      */
     void populateWithVanilla(int chunkX, int chunkZ);
+
+    /**
+     * Utility function that populates the provided ChunkPrimer with the basic terrain blocks.
+     * @since 1.2.1
+     */
+    void setBlocksInPrimer(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer);
 }

@@ -5,17 +5,14 @@
 
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
-import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
+import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
+import git.jbredwards.nether_api.api.structure.INetherAPIStructureEntry;
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -72,9 +69,7 @@ public final class TransformerCommandLocate implements IClassTransformer, Opcode
         @Nonnull
         public static String[] getStructures(@Nonnull String[] vanillaStructures) {
             final List<String> structures = new LinkedList<>(Arrays.asList(vanillaStructures));
-            NetherAPIRegistry.NETHER.getStructureHandlers().stream().map(MapGenStructure::getStructureName).forEach(structures::add);
-            NetherAPIRegistry.THE_END.getStructureHandlers().stream().map(MapGenStructure::getStructureName).forEach(structures::add);
-
+            INetherAPIRegistry.REGISTRIES.forEach(registry -> registry.getStructures().stream().map(INetherAPIStructureEntry::getCommandName).forEach(structures::add));
             return structures.toArray(new String[0]);
         }
     }
