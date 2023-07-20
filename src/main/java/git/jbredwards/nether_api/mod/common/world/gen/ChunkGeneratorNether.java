@@ -6,7 +6,6 @@
 package git.jbredwards.nether_api.mod.common.world.gen;
 
 import git.jbredwards.nether_api.api.biome.INetherBiome;
-import git.jbredwards.nether_api.api.structure.INetherAPIStructureEntry;
 import git.jbredwards.nether_api.api.structure.ISpawningStructure;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
@@ -30,6 +29,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -43,10 +43,12 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     @Nonnull protected final NoiseGeneratorPerlin terrainNoiseGen;
     @Nonnull protected Biome[] biomesForGeneration = new Biome[0];
 
+    @Nonnull
+    protected final List<MapGenStructure> moddedStructures = new LinkedList<>();
     public ChunkGeneratorNether(@Nonnull World worldIn, boolean generateStructures, long seed) {
         super(worldIn, generateStructures, seed);
         terrainNoiseGen = new NoiseGeneratorPerlin(rand, 4);
-        NetherAPIRegistry.NETHER.initializeStructures(this);
+        NetherAPIRegistry.NETHER.getStructures().forEach(entry -> moddedStructures.add(entry.getStructureFactory().apply(this)));
     }
 
     @Override
@@ -100,7 +102,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
         genNetherCaves.generate(world, x, z, primer);
         if(areStructuresEnabled()) {
             if(genNetherBridge != null) genNetherBridge.generate(world, x, z, primer);
-            NetherAPIRegistry.NETHER.forEachStructure(structure -> structure.generate(world, x, z, primer));
+            moddedStructures.forEach(structure -> structure.generate(world, x, z, primer));
         }
 
         final Chunk chunk = new Chunk(world, primer, x, z);
@@ -124,7 +126,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
         final Biome biome = world.getBiome(pos.add(16, 0, 16));
         final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
 
-        NetherAPIRegistry.NETHER.forEachStructure(structure -> structure.generateStructure(world, rand, chunkPos));
+        moddedStructures.forEach(structure -> structure.generateStructure(world, rand, chunkPos));
         if(!(biome instanceof INetherBiome)) populateWithVanilla(chunkX, chunkZ);
         else { //allow mods to populate chunks differently
             BlockFalling.fallInstantly = true;
@@ -149,13 +151,10 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
                 return genNetherBridge.getSpawnList();
 
             //modded
-            for(final INetherAPIStructureEntry entry : NetherAPIRegistry.NETHER.getStructures()) {
-                if(entry.getStructure().isPresent()) {
-                    final MapGenStructure structure = entry.getStructure().get();
-                    if(structure instanceof ISpawningStructure) {
-                        final List<Biome.SpawnListEntry> possibleCreatures = ((ISpawningStructure)entry).getPossibleCreatures(creatureType, world, pos);
-                        if(!possibleCreatures.isEmpty()) return possibleCreatures;
-                    }
+            for(final MapGenStructure structure : moddedStructures) {
+                if(structure instanceof ISpawningStructure) {
+                    final List<Biome.SpawnListEntry> possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
+                    if(!possibleCreatures.isEmpty()) return possibleCreatures;
                 }
             }
         }
@@ -172,9 +171,8 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
                 return genNetherBridge.getNearestStructurePos(worldIn, position, findUnexplored);
 
             //modded
-            for(final INetherAPIStructureEntry entry : NetherAPIRegistry.NETHER.getStructures())
-                if(entry.getCommandName().equals(structureName)) return entry.getStructure().isPresent()
-                        ? entry.getStructure().get().getNearestStructurePos(worldIn, position, findUnexplored) : null;
+            for(final MapGenStructure structure : moddedStructures)
+                if(structure.getStructureName().equals(structureName)) return structure.getNearestStructurePos(worldIn, position, findUnexplored);
         }
 
         return null;
@@ -184,8 +182,8 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     public boolean isInsideStructure(@Nonnull World worldIn, @Nonnull String structureName, @Nonnull BlockPos pos) {
         if(areStructuresEnabled()) {
             if("Fortress".equals(structureName) && genNetherBridge != null) return genNetherBridge.isInsideStructure(pos);
-            for(final INetherAPIStructureEntry entry : NetherAPIRegistry.NETHER.getStructures())
-                if(entry.getCommandName().equals(structureName)) return entry.getStructure().isPresent() && entry.getStructure().get().isInsideStructure(pos);
+            for(final MapGenStructure structure : moddedStructures)
+                if(structure.getStructureName().equals(structureName)) return structure.isInsideStructure(pos);
         }
 
         return false;
@@ -195,7 +193,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     public void recreateStructures(@Nonnull Chunk chunkIn, int x, int z) {
         if(areStructuresEnabled()) {
             genNetherBridge.generate(world, x, z, null);
-            NetherAPIRegistry.NETHER.forEachStructure(structure -> structure.generate(world, x, z, null));
+            moddedStructures.forEach(structure -> structure.generate(world, x, z, null));
         }
     }
 

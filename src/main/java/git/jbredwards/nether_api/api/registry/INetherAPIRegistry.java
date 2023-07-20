@@ -86,12 +86,4 @@ public interface INetherAPIRegistry
      * @since 1.2.1
      */
     boolean removeStructure(@Nonnull String commandName);
-
-    /**
-     * Initializes all registered structure handlers. This method should only be called from the chunk generator's constructor.
-     *
-     * @throws UnsupportedOperationException if a structure is already initialized.
-     * @since 1.2.1
-     */
-    void initializeStructures(@Nonnull INetherAPIChunkGenerator chunkGenerator) throws UnsupportedOperationException;
 }

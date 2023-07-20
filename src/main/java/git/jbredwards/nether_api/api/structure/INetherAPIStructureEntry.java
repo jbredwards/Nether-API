@@ -9,7 +9,7 @@ import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import net.minecraft.world.gen.structure.MapGenStructure;
 
 import javax.annotation.Nonnull;
-import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Used to register structures that can make use of {@link INetherAPIChunkGenerator} instances.
@@ -27,14 +27,8 @@ public interface INetherAPIStructureEntry
     String getCommandName();
 
     /**
-     * @return the structure instance if it's been initialized.
+     * @return the structure factory associated with this entry.
      */
     @Nonnull
-    Optional<MapGenStructure> getStructure();
-
-    /**
-     * Initializes the structure instance using the provided chunkGenerator.
-     * @throws UnsupportedOperationException if this entry's structure is already initialized.
-     */
-    void initialize(@Nonnull INetherAPIChunkGenerator chunkGenerator) throws UnsupportedOperationException;
+    Function<INetherAPIChunkGenerator, MapGenStructure> getStructureFactory();
 }

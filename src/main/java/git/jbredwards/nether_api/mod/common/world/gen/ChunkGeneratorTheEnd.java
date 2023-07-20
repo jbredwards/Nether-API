@@ -13,8 +13,10 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.ChunkGeneratorEnd;
+import net.minecraft.world.gen.structure.MapGenStructure;
 
 import javax.annotation.Nonnull;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -25,9 +27,11 @@ import java.util.Random;
  */
 public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAPIChunkGenerator
 {
+    @Nonnull
+    protected final List<MapGenStructure> moddedStructures = new LinkedList<>();
     public ChunkGeneratorTheEnd(@Nonnull World worldIn, boolean generateStructures, long seed, @Nonnull BlockPos spawnCoord) {
         super(worldIn, generateStructures, seed, spawnCoord);
-        NetherAPIRegistry.THE_END.initializeStructures(this);
+        NetherAPIRegistry.THE_END.getStructures().forEach(entry -> moddedStructures.add(entry.getStructureFactory().apply(this)));
     }
 
     @Nonnull
