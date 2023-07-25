@@ -62,13 +62,19 @@ final class BiomeAmbienceHandler
                     final SoundEvent ambientSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world.provider, biome, IAmbienceWorldProvider::getAmbientSound, IAmbienceBiome::getAmbientSound, null);
                     if(ambientSound != null) activeBiomeAmbientSounds.compute(biome, (biomeIn, sound) -> {
                         if(sound == null) {
-                            sound = new FadingSound(ambientSound, SoundCategory.AMBIENT);
+                            sound = new FadingSound(mc.player, ambientSound, SoundCategory.AMBIENT);
                             mc.getSoundHandler().playSound(sound);
                         }
 
                         sound.fadeIn();
                         return sound;
                     });
+                }
+
+                //ensure continuous biome ambient sound is continuous
+                else if(activeBiomeAmbientSounds.containsKey(biome) && !mc.getSoundHandler().isSoundPlaying(activeBiomeAmbientSounds.get(biome))) {
+                    currentBiome = null;
+                    activeBiomeAmbientSounds.clear();
                 }
 
                 //random biome ambient sound

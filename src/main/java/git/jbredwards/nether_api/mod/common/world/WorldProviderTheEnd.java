@@ -26,7 +26,7 @@ public class WorldProviderTheEnd extends WorldProviderEnd
 {
     @Override
     public void init() {
-        MinecraftForge.EVENT_BUS.post(new NetherAPIRegistryEvent.End(NetherAPIRegistry.THE_END, world));
+        if(NetherAPIRegistry.THE_END.isEmpty()) MinecraftForge.EVENT_BUS.post(new NetherAPIRegistryEvent.End(NetherAPIRegistry.THE_END, world));
         biomeProvider = new BiomeProviderTheEnd(world.getWorldType(), world.getSeed());
         if(world instanceof WorldServer) dragonFightManager = new DragonFightManager((WorldServer)world, world.getWorldInfo().getDimensionData(getDimension()).getCompoundTag("DragonFight"));
     }

@@ -86,4 +86,10 @@ public interface INetherAPIRegistry
      * @since 1.2.1
      */
     boolean removeStructure(@Nonnull String commandName);
+
+    /**
+     * @return true if this registry currently has no biomes or structures.
+     * @since 1.2.1
+     */
+    default boolean isEmpty() { return getBiomeEntries().isEmpty() && getStructures().isEmpty(); }
 }

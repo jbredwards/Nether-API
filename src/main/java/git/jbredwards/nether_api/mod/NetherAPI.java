@@ -5,6 +5,7 @@
 
 package git.jbredwards.nether_api.mod;
 
+import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderNether;
 import net.minecraft.world.DimensionType;
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 
 import javax.annotation.Nonnull;
 
@@ -28,7 +30,7 @@ public final class NetherAPI
 {
     // Mod Constants
     @Nonnull
-    public static final String MODID = "nether_api", NAME = "Nether API", VERSION = "1.2.0", DEPENDENCIES =
+    public static final String MODID = "nether_api", NAME = "Nether API", VERSION = "1.2.1", DEPENDENCIES =
             // Minimum supported mod versions, since earlier versions may cause ASM problems
             "after:betternether@[0.1.8.6,);after:biomesoplenty@[7.0.1.2444,);after:netherex@[2.2.5,);";
 
@@ -55,5 +57,11 @@ public final class NetherAPI
     static void serverAboutToStart(@Nonnull FMLServerAboutToStartEvent event) {
         DimensionManager.getProviderType(DimensionType.NETHER.getId()).clazz = WorldProviderNether.class;
         //TODO DimensionManager.getProviderType(DimensionType.THE_END.getId()).clazz = WorldProviderTheEnd.class;
+    }
+
+    // Ensure all registries are cleared before another world is loaded
+    @Mod.EventHandler
+    static void serverStopping(@Nonnull FMLServerStoppingEvent event) {
+        INetherAPIRegistry.REGISTRIES.forEach(INetherAPIRegistry::clear);
     }
 }

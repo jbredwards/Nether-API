@@ -5,6 +5,7 @@
 
 package git.jbredwards.nether_api.api.event;
 
+import com.google.common.base.Preconditions;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -34,10 +35,9 @@ public abstract class NetherAPIRegistryEvent extends Event
     @Nonnull public final World world;
 
     public NetherAPIRegistryEvent(@Nonnull INetherAPIRegistry registryIn, @Nonnull World worldIn) {
+        Preconditions.checkState(registryIn.isEmpty()); // Ensure registry is empty before accepting new entries
         registry = registryIn;
         world = worldIn;
-
-        registryIn.clear(); // Ensure registry is empty before accepting new registries
     }
 
     /**

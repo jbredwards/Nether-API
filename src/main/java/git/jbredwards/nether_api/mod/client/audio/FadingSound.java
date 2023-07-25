@@ -6,6 +6,7 @@
 package git.jbredwards.nether_api.mod.client.audio;
 
 import net.minecraft.client.audio.MovingSound;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
@@ -22,21 +23,27 @@ import javax.annotation.Nonnull;
 @SideOnly(Side.CLIENT)
 public class FadingSound extends MovingSound
 {
+    @Nonnull
+    protected final EntityPlayerSP player;
     protected int fadeSpeed;
     protected int fadeInTicks;
 
-    public FadingSound(@Nonnull SoundEvent soundIn, @Nonnull SoundCategory category) {
+    public FadingSound(@Nonnull EntityPlayerSP playerIn, @Nonnull SoundEvent soundIn, @Nonnull SoundCategory category) {
         super(soundIn, category);
+        player = playerIn;
         repeat = true;
     }
 
     @Override
     public void update() {
-        if(fadeInTicks < 0) {
+        if(fadeInTicks < 0 || player.isDead) {
             donePlaying = true;
             repeat = false;
         }
 
+        xPosF = (float)player.posX;
+        yPosF = (float)player.posY;
+        zPosF = (float)player.posZ;
         fadeInTicks += fadeSpeed;
         volume = MathHelper.clamp(fadeInTicks / 40f, 0, 1);
     }

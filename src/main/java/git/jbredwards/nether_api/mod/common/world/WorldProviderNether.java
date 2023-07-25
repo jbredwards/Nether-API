@@ -38,9 +38,11 @@ import javax.annotation.Nullable;
  */
 public class WorldProviderNether extends WorldProviderHell implements IAmbienceWorldProvider
 {
+    public static boolean FORCE_NETHER_FOG = false;
+
     @Override
     public void init() {
-        MinecraftForge.EVENT_BUS.post(new NetherAPIRegistryEvent.Nether(NetherAPIRegistry.NETHER, world));
+        if(NetherAPIRegistry.NETHER.isEmpty()) MinecraftForge.EVENT_BUS.post(new NetherAPIRegistryEvent.Nether(NetherAPIRegistry.NETHER, world));
         biomeProvider = new BiomeProviderNether(world.getWorldType(), world.getSeed());
         doesWaterVaporize = true;
         nether = true;
@@ -110,6 +112,6 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @SideOnly(Side.CLIENT)
     @Override
     public boolean doesXZShowFog(int x, int z) {
-        return !NetherAPI.isNetherExLoaded || NetherExHandler.doesXZShowFog(); //preserve NetherEx's fog settings if that mod is present
+        return FORCE_NETHER_FOG || !NetherAPI.isNetherExLoaded || NetherExHandler.doesXZShowFog(); //preserve NetherEx's fog settings if that mod is present
     }
 }
