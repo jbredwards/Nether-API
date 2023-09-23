@@ -1,5 +1,19 @@
-// Config
-config.nether_api.compat.bop.dependentHellBiomes=BOP Nether Biome World-Type Dependency
-config.nether_api.compat.bop.dependentHellBiomes.tooltip=Nether biomes from the Biomes O' Plenty's mod can only spawn if the world-type is set to "Biomes O' Plenty".
+# Config
+config.nether_api.compat.bop.dependentHellBiomes=World-Type Dependency
+config.nether_api.compat.bop.dependentHellBiomes.tooltip=Nether biomes from the Biomes O' Plenty's mod can only generate if the world-type is set to "Biomes O' Plenty".
+config.nether_api.compat.jitl.bloodForestWeight=Blood Forest Generation Weight
+config.nether_api.compat.jitl.bloodForestWeight.tooltip=The generation weight of Journey Into The Light's Blood Forest biome. The higher this value is, the higher chance the biome has of spawning compared to others.
+config.nether_api.compat.jitl.earthenSeepWeight=Earthen Seep Generation Weight
+config.nether_api.compat.jitl.earthenSeepWeight.tooltip=The generation weight of Journey Into The Light's Earthen Seep biome. The higher this value is, the higher chance the biome has of spawning compared to others.
+config.nether_api.compat.jitl.heatSandsWeight=Heat Sands Generation Weight
+config.nether_api.compat.jitl.heatSandsWeight.tooltip=The generation weight of Journey Into The Light's Heat Sands biome. The higher this value is, the higher chance the biome has of spawning compared to others.
+config.nether_api.endWeight=Vanilla's End Biome Generation Weight
+config.nether_api.endWeight.tooltip=The generation weight of Vanilla's End biome. The higher this value is, the higher chance the biome has of spawning compared to others.
 config.nether_api.hellWeight=Vanilla's Hell Biome Generation Weight
 config.nether_api.hellWeight.tooltip=The generation weight of Vanilla's Hell biome. The higher this value is, the higher chance the biome has of spawning compared to others.
+nether_api/biomes_o_plenty=(Compatibility) Biomes O' Plenty
+nether_api/biomes_o_plenty.tooltip=Compatibility settings for while the Biomes O' Plenty mod is installed.
+nether_api/journey_into_the_light=(Compatibility) Journey Into The Light
+nether_api/journey_into_the_light.tooltip=Compatibility settings for while the Journey Into The Light mod is installed.
+nether_api/vanilla=Vanilla
+nether_api/vanilla.tooltip=Vanilla settings.

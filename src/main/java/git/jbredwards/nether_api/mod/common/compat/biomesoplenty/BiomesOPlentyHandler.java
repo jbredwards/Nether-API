@@ -26,11 +26,11 @@ public final class BiomesOPlentyHandler
      * Consistent behavior with BOP, but with the config option to override it.
      */
     public static boolean allowBOPNetherBiomes(@Nonnull World world) {
-        return !NetherAPIConfig.dependentBOPHellBiomes || world.getWorldType() instanceof WorldTypeBOP;
+        return !NetherAPIConfig.BOP.dependentBOPHellBiomes || world.getWorldType() instanceof WorldTypeBOP;
     }
 
     public static void registerBiomes(@Nonnull INetherAPIRegistry registry, @Nonnull World world) {
-        if(allowBOPNetherBiomes(world)) { //only use BOP biomes if the world type allows it
+        if(allowBOPNetherBiomes(world)) { // only use BOP biomes if the world type allows it
             BOPBiomes.corrupted_sands.toJavaUtil().ifPresent(biome ->
                     registry.registerBiome(biome, ((IExtendedBiome)biome).getWeightMap().getOrDefault(BOPClimates.HELL, 0)));
             BOPBiomes.fungi_forest.toJavaUtil().ifPresent(biome ->

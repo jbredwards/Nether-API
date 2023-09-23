@@ -2,7 +2,7 @@
 {
   "modid": "nether_api",
   "name": "Nether API",
-  "description": "Serves as a library for anyone wanting to add nether biomes, also unifies other mods' nether biomes!",
+  "description": "Serves as a library for anyone wanting to add Nether or End biomes, also unifies other mods' Nether and End biomes!",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",

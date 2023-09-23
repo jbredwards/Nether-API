@@ -23,7 +23,7 @@ import java.util.List;
 public interface ISpawningStructure
 {
     /**
-     * @return all possible spawn entries for the provided creature type.
+     * @return all possible spawn entries for the provided creature type. This should also check whether the provided position is within the structure.
      */
     @Nonnull
     List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull EnumCreatureType type, @Nonnull World world, @Nonnull BlockPos pos);

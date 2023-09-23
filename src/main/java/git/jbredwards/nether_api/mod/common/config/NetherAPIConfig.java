@@ -14,17 +14,41 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nonnull;
 
-@Config(modid = NetherAPI.MODID)
+@Config(modid = NetherAPI.MODID, name = "nether_api/vanilla")
 @Mod.EventBusSubscriber(modid = NetherAPI.MODID)
 public final class NetherAPIConfig
 {
     @Config.RequiresWorldRestart
-    @Config.LangKey("config.nether_api.compat.bop.dependentHellBiomes")
-    public static boolean dependentBOPHellBiomes = true;
+    @Config.LangKey("config.nether_api.endWeight")
+    public static int endWeight = 100;
 
     @Config.RequiresWorldRestart
     @Config.LangKey("config.nether_api.hellWeight")
     public static int hellWeight = 30;
+
+    @Config(modid = NetherAPI.MODID, name = "nether_api/biomes_o_plenty")
+    public static final class BOP
+    {
+        @Config.RequiresWorldRestart
+        @Config.LangKey("config.nether_api.compat.bop.dependentHellBiomes")
+        public static boolean dependentBOPHellBiomes = true;
+    }
+
+    @Config(modid = NetherAPI.MODID, name = "nether_api/journey_into_the_light")
+    public static final class JITL
+    {
+        @Config.RequiresWorldRestart
+        @Config.LangKey("config.nether_api.compat.jitl.bloodForestWeight")
+        public static int bloodForestWeight = 30;
+
+        @Config.RequiresWorldRestart
+        @Config.LangKey("config.nether_api.compat.jitl.earthenSeepWeight")
+        public static int earthenSeepWeight = 30;
+
+        @Config.RequiresWorldRestart
+        @Config.LangKey("config.nether_api.compat.jitl.heatSandsWeight")
+        public static int heatSandsWeight = 30;
+    }
 
     @SubscribeEvent
     static void sync(@Nonnull ConfigChangedEvent.OnConfigChangedEvent event) {

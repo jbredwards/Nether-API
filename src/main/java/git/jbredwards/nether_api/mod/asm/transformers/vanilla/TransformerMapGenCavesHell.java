@@ -120,7 +120,7 @@ public final class TransformerMapGenCavesHell implements IClassTransformer, Opco
 
         public static boolean canCarveThrough(@Nonnull IBlockState state, @Nonnull ChunkPrimer primer, int x, int y, int z, @Nonnull Biome biome) {
             if(state.getBlock() instanceof INetherCarvable) return ((INetherCarvable)state.getBlock()).canNetherCarveThrough(state, primer, x, y, z);
-            return state.getBlock() == Blocks.NETHERRACK || state.getBlock() == Blocks.SOUL_SAND //built-in
+            return state.getBlock() == Blocks.NETHERRACK || state.getBlock() == Blocks.SOUL_SAND || state.getBlock() == Blocks.END_STONE //built-in
                     || biome instanceof INetherCarvable && ((INetherCarvable)biome).canNetherCarveThrough(state, primer, x, y, z);
         }
     }

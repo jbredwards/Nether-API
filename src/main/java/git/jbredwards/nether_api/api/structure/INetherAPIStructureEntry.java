@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * Used to register structures that can make use of {@link INetherAPIChunkGenerator} instances.
  *
- * @since 1.2.1
+ * @since 1.3.0
  * @author jbred
  *
  */

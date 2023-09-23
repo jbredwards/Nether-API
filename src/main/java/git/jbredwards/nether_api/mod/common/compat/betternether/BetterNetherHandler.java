@@ -104,7 +104,7 @@ public final class BetterNetherHandler
     }
 
     //exists because this mod adds BetterNether biomes as real biomes
-    public static void removeOrFixEntitySpawnBiomes() {
+    public static void init() {
         //fix fireflies
         Biomes.HELL.getSpawnableList(EnumCreatureType.AMBIENT).removeIf(entry -> entry.entityClass == EntityFirefly.class);
         EntityRegistry.addSpawn(EntityFirefly.class, 100, 5, 10, EnumCreatureType.AMBIENT,

@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
  */
 public final class BiomeBetterNether extends BiomeHell implements INetherBiomeProvider, INetherAPIRegistryListener
 {
-    @Nonnull private static final Field SUBBIOMES_FIELD = ObfuscationReflectionHelper.findField(NetherBiome.class, "subbiomes");
+    @Nonnull
+    static final Field SUBBIOMES_FIELD = ObfuscationReflectionHelper.findField(NetherBiome.class, "subbiomes");
     int cachedWeight = -1;
 
     @Nonnull

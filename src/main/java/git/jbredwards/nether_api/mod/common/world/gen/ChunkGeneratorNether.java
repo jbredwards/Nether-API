@@ -13,6 +13,7 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import net.minecraft.block.BlockFalling;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -23,6 +24,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.ChunkGeneratorHell;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -48,6 +50,9 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     public ChunkGeneratorNether(@Nonnull World worldIn, boolean generateStructures, long seed) {
         super(worldIn, generateStructures, seed);
         terrainNoiseGen = new NoiseGeneratorPerlin(rand, 4);
+        magmaGen = new WorldGenMinable(Blocks.MAGMA.getDefaultState(), 33,
+                state -> state == NETHERRACK || state.isFullCube() && state.getMaterial() != Material.ROCK);
+
         NetherAPIRegistry.NETHER.getStructures().forEach(entry -> moddedStructures.add(entry.getStructureFactory().apply(this)));
     }
 
@@ -98,8 +103,8 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
         final ChunkPrimer primer = new ChunkPrimer();
         setBlocksInPrimer(x, z, primer);
         buildSurfaces(x, z, primer);
-
         genNetherCaves.generate(world, x, z, primer);
+
         if(areStructuresEnabled()) {
             if(genNetherBridge != null) genNetherBridge.generate(world, x, z, primer);
             moddedStructures.forEach(structure -> structure.generate(world, x, z, primer));
@@ -151,7 +156,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
                 return genNetherBridge.getSpawnList();
 
             //modded
-            for(final MapGenStructure structure : moddedStructures) {
+            else for(final MapGenStructure structure : moddedStructures) {
                 if(structure instanceof ISpawningStructure) {
                     final List<Biome.SpawnListEntry> possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
                     if(!possibleCreatures.isEmpty()) return possibleCreatures;
@@ -171,7 +176,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
                 return genNetherBridge.getNearestStructurePos(worldIn, position, findUnexplored);
 
             //modded
-            for(final MapGenStructure structure : moddedStructures)
+            else for(final MapGenStructure structure : moddedStructures)
                 if(structure.getStructureName().equals(structureName)) return structure.getNearestStructurePos(worldIn, position, findUnexplored);
         }
 
@@ -181,8 +186,11 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     @Override
     public boolean isInsideStructure(@Nonnull World worldIn, @Nonnull String structureName, @Nonnull BlockPos pos) {
         if(areStructuresEnabled()) {
+            //vanilla
             if("Fortress".equals(structureName) && genNetherBridge != null) return genNetherBridge.isInsideStructure(pos);
-            for(final MapGenStructure structure : moddedStructures)
+
+            //modded
+            else for(final MapGenStructure structure : moddedStructures)
                 if(structure.getStructureName().equals(structureName)) return structure.isInsideStructure(pos);
         }
 

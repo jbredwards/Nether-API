@@ -31,6 +31,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBetterNetherGenerator", //Allow BetterNether to use real biomes instead of pseudo-biomes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBiomesOPlentyBiomes", //Change Biomes O' Plenty's nether biome super classes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerBiomesOPlentyDecorator", //Allow BOP nether features to always generate in the nether
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerJITLCascadingFix", //Fix cascading world gen problems with Journey Into The Light
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerJITLGenerator", //Allow Journey Into The Light to use real biomes instead of pseudo-biomes
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerJITLTowerFix", //Fix Journey Into The Light's WorldGenNetherTower using bad registry names for spawners
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerLibraryExCascadingFix", //Fix cascading world gen problems with LibraryEx
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerNetherEXBiomes", //Change NetherEx's nether biome super classes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerNetherExOverride", //Disable NetherEx's nether override

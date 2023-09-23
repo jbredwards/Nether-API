@@ -17,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.feature.*;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent;
@@ -61,8 +62,7 @@ public abstract class AbstractNetherBOPBiome extends BOPHellBiome implements INe
             for (int k = 0; k < 8; ++k)
                 new WorldGenHellLava(Blocks.FLOWING_LAVA, false).generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(120) + 4, rand.nextInt(16) + 8));
 
-        // don't do this to prevent double-ups
-        //MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(world, rand, pos));
+        MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(world, rand, pos));
 
         // note: this was moved earlier to be more similar to overworld biome decoration, however
         // it's possible that this may cause issues with other mods
@@ -114,8 +114,6 @@ public abstract class AbstractNetherBOPBiome extends BOPHellBiome implements INe
                 new WorldGenHellLava(Blocks.FLOWING_LAVA, true).generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(108) + 10, rand.nextInt(16) + 8));
             }
 
-        // this should already be called during biome decoration (Vanilla doesn't usually call this for the Nether
-        // though, since the decoration method is empty)
-        //MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(world, rand, pos));
+        MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(world, rand, pos));
     }
 }

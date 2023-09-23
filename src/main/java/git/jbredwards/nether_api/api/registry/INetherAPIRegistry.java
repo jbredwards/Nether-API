@@ -27,14 +27,14 @@ public interface INetherAPIRegistry
 {
     /**
      * Contains all {@link INetherAPIRegistry} instances. This is used by the /locate command to auto-complete structure names.
-     * @since 1.2.1
+     * @since 1.3.0
      */
     @Nonnull
     List<INetherAPIRegistry> REGISTRIES = new LinkedList<>();
 
     /**
      * @return an immutable list containing all the Biomes in the generation list.
-     * @since 1.2.1
+     * @since 1.3.0
      */
     List<BiomeManager.BiomeEntry> getBiomeEntries();
 
@@ -56,7 +56,7 @@ public interface INetherAPIRegistry
 
     /**
      * @return an immutable list containing all the structure handlers in the generation list.
-     * @since 1.2.1
+     * @since 1.3.0
      */
     List<INetherAPIStructureEntry> getStructures();
 
@@ -64,7 +64,7 @@ public interface INetherAPIRegistry
      * Adds the structure handler to the generation list. Structures do not have to be registered in order to generate,
      * but do if you want them to be able to spawn mobs within its area (like nether fortresses do), and if you want /locate to work with it.
      *
-     * @since 1.2.1
+     * @since 1.3.0
      */
     void registerStructure(@Nonnull INetherAPIStructureEntry structureEntry);
 
@@ -75,7 +75,7 @@ public interface INetherAPIRegistry
      * @param commandName the name of the structure used by the /locate command (should match the result of calling the structure's {@link MapGenStructure#getStructureName()} method).
      * @param structureFactory responsible for initializing the structure during the construction of the registry's respective {@link INetherAPIChunkGenerator}.
      *
-     * @since 1.2.1
+     * @since 1.3.0
      */
     void registerStructure(@Nonnull String commandName, @Nonnull Function<INetherAPIChunkGenerator, MapGenStructure> structureFactory);
 
@@ -83,13 +83,13 @@ public interface INetherAPIRegistry
      * Removes the structure handler from the generation list if present.
      * @return true if the structure handler was removed from the generation list.
      *
-     * @since 1.2.1
+     * @since 1.3.0
      */
     boolean removeStructure(@Nonnull String commandName);
 
     /**
      * @return true if this registry currently has no biomes or structures.
-     * @since 1.2.1
+     * @since 1.3.0
      */
     default boolean isEmpty() { return getBiomeEntries().isEmpty() && getStructures().isEmpty(); }
 }

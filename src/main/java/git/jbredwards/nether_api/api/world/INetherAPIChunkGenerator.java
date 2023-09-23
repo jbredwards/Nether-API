@@ -45,7 +45,7 @@ public interface INetherAPIChunkGenerator extends IChunkGenerator
 
     /**
      * Utility function that populates the provided ChunkPrimer with the basic terrain blocks.
-     * @since 1.2.1
+     * @since 1.3.0
      */
     void setBlocksInPrimer(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer);
 }
