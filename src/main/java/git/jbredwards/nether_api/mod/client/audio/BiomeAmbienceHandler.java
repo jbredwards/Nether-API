@@ -49,7 +49,7 @@ final class BiomeAmbienceHandler
 
     @SubscribeEvent
     static void onPlayerTick(@Nonnull TickEvent.ClientTickEvent event) {
-        if(event.phase == TickEvent.Phase.END) {
+        if(event.phase == TickEvent.Phase.END && !mc.isGamePaused()) {
             if(mc.player != null && mc.world != null) {
                 final BlockPos pos = new BlockPos(ActiveRenderInfo.projectViewFromEntity(mc.player, mc.getRenderPartialTicks()));
                 final Biome biome = mc.world.getBiome(pos);

@@ -15,7 +15,6 @@ import com.legacy.nethercraft.entities.tribal.EntityTribalTrainee;
 import com.legacy.nethercraft.entities.tribal.EntityTribalWarrior;
 import com.legacy.nethercraft.world.NetherGenMinable;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
-import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Biomes;
@@ -30,7 +29,6 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -49,8 +47,7 @@ public final class NethercraftHandler
             UPDATE_FREQUENCY_FIELD = ObfuscationReflectionHelper.findField(EntityRegistry.EntityRegistration.class, "updateFrequency"),
             SENDS_VELOCITY_UPDATES_FIELD = ObfuscationReflectionHelper.findField(EntityRegistry.EntityRegistration.class, "sendsVelocityUpdates");
 
-    @GameRegistry.ObjectHolder(NetherAPI.MODID + ":nethercraft_glowing_grove")
-    public static BiomeNethercraft GLOWING_GROVE = null;
+    public static BiomeNethercraft GLOWING_GROVE;
     public static int // non-hardcoded for modpack devs, these can be changed through the use of GroovyScript
             foulitePerChunk = 20, fouliteOreSize = 14, fouliteMinHeight = 10, fouliteMaxHeight = 118,
             neridiumPerChunk = 8, neridiumOreSize = 14, neridiumMinHeight = 10, neridiumMaxHeight = 118,
@@ -95,7 +92,7 @@ public final class NethercraftHandler
 
     @SubscribeEvent
     static void registerBiomes(@Nonnull RegistryEvent.Register<Biome> event) {
-        event.getRegistry().register(new BiomeNethercraft());
+        event.getRegistry().register(GLOWING_GROVE = new BiomeNethercraft());
     }
 
     @SubscribeEvent

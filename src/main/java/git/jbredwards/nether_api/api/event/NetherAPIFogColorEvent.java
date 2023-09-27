@@ -61,6 +61,8 @@ public abstract class NetherAPIFogColorEvent extends Event
      * @author jbred
      *
      */
+    @Cancelable
+    @SideOnly(Side.CLIENT)
     public static class End extends NetherAPIFogColorEvent
     {
         public End(@Nonnull Biome biomeIn, @Nonnull World worldIn, float celestialAngleIn, float partialTicksIn) {
@@ -83,6 +85,8 @@ public abstract class NetherAPIFogColorEvent extends Event
      * @author jbred
      *
      */
+    @Cancelable
+    @SideOnly(Side.CLIENT)
     public static class Nether extends NetherAPIFogColorEvent
     {
         public Nether(@Nonnull Biome biomeIn, @Nonnull World worldIn, float celestialAngleIn, float partialTicksIn) {
