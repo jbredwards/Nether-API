@@ -92,7 +92,7 @@ public final class TransformerWorldClient implements IClassTransformer, Opcodes
         @SideOnly(Side.CLIENT)
         public static void spawnBiomeAmbientParticle(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
             if(!state.isFullCube()) {
-                final IParticleFactory[] factories = IAmbienceWorldProvider.getAmbienceOrFallback(world.provider, world.getBiome(pos), IAmbienceWorldProvider::getAmbientParticles, IAmbienceBiome::getAmbientParticles, null);
+                final IParticleFactory[] factories = IAmbienceWorldProvider.getAmbienceOrFallback(world, pos, world.getBiome(pos), IParticleFactory[].class, IAmbienceWorldProvider::getAmbientParticles, IAmbienceBiome::getAmbientParticles, null);
                 if(factories == null || factories.length == 0) return;
 
                 else if(factories.length != 1) Collections.shuffle(Arrays.asList(factories), rand);

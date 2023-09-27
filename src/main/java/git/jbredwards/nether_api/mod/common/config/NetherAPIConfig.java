@@ -50,6 +50,20 @@ public final class NetherAPIConfig
         public static int heatSandsWeight = 30;
     }
 
+    @Config(modid = NetherAPI.MODID, name = "nether_api/nethercraft")
+    public static final class Nethercraft
+    {
+        @Config.RequiresWorldRestart
+        @Config.LangKey("config.nether_api.compat.nethercraft.glowingGroveWeight")
+        public static int glowingGroveWeight = 30;
+    }
+
+    @Config(modid = NetherAPI.MODID, name = "nether_api/stygain_end")
+    public static final class StygainEnd
+    {
+
+    }
+
     @SubscribeEvent
     static void sync(@Nonnull ConfigChangedEvent.OnConfigChangedEvent event) {
         if(event.getModID().equals(NetherAPI.MODID)) ConfigManager.sync(NetherAPI.MODID, Config.Type.INSTANCE);

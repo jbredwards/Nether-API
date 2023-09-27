@@ -8,6 +8,7 @@ package git.jbredwards.nether_api.mod.common.world;
 import git.jbredwards.nether_api.api.audio.IDarkSoundAmbience;
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.api.biome.INetherBiome;
+import git.jbredwards.nether_api.api.event.NetherAPIFogColorEvent;
 import git.jbredwards.nether_api.api.event.NetherAPIRegistryEvent;
 import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
@@ -16,10 +17,7 @@ import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.biome.Biome;
@@ -36,7 +34,7 @@ import javax.annotation.Nullable;
  * @author jbred
  *
  */
-public class WorldProviderNether extends WorldProviderHell implements IAmbienceWorldProvider
+public class WorldProviderNether extends WorldProviderHell implements IAmbienceWorldProvider, IFogWorldProvider
 {
     public static boolean FORCE_NETHER_FOG = false;
 
@@ -64,39 +62,14 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @SideOnly(Side.CLIENT)
     @Override
     public Vec3d getFogColor(float celestialAngle, float partialTicks) {
-        final Vec3d entityPos = ActiveRenderInfo.projectViewFromEntity(Minecraft.getMinecraft().player, partialTicks);
+        return getFogColor(world, celestialAngle, partialTicks, 0.2, 0.03, 0.03, NetherAPIFogColorEvent.Nether::new);
+    }
 
-        final BlockPos originFloored = new BlockPos(entityPos);
-        final Vec3d originDiff = entityPos.subtract(originFloored.getX(), originFloored.getY(), originFloored.getZ());
-
-        final int[] weights = {0, 1, 4, 6, 4, 1, 0};
-        final int weightsSize = weights.length - 1;
-
-        double totalWeight = 0;
-        Vec3d color = Vec3d.ZERO;
-
-        for(int offsetX = 0; offsetX < weightsSize; offsetX++) {
-            final double weightX = originDiff.x * (weights[offsetX] - weights[offsetX + 1]) + weights[offsetX];
-            final int posX = originFloored.getX() + offsetX - (weightsSize >> 2);
-
-            for(int offsetY = 0; offsetY < weightsSize; offsetY++) {
-                final double weightY = originDiff.y * (weights[offsetY] - weights[offsetY + 1]) + weights[offsetY];
-                final int posY = originFloored.getY() + offsetY - (weightsSize >> 2);
-
-                for(int offsetZ = 0; offsetZ < weightsSize; offsetZ++) {
-                    final double weightZ = originDiff.z * (weights[offsetZ] - weights[offsetZ + 1]) + weights[offsetZ];
-                    final int posZ = originFloored.getZ() + offsetZ - (weightsSize >> 2);
-
-                    final double weight = weightX * weightY * weightZ;
-                    totalWeight += weight;
-
-                    final Biome biome = world.getBiome(new BlockPos(posX, posY, posZ));
-                    color = color.add((biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : new Vec3d(0.2, 0.03, 0.03)).scale(weight));
-                }
-            }
-        }
-
-        return color.scale(1 / totalWeight);
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public Vec3d getDefaultFogColor(@Nonnull Biome biome, float celestialAngle, float partialTicks, double defaultR, double defaultG, double defaultB) {
+        return biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : new Vec3d(defaultR, defaultG, defaultB);
     }
 
     @Nullable

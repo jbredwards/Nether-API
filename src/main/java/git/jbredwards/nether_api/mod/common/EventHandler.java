@@ -10,6 +10,7 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import git.jbredwards.nether_api.mod.common.compat.biomesoplenty.BiomesOPlentyHandler;
 import git.jbredwards.nether_api.mod.common.compat.journey_into_the_light.JITLHandler;
+import git.jbredwards.nether_api.mod.common.compat.nethercraft.NethercraftHandler;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.compat.stygain_end.StygainEndHandler;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
@@ -46,6 +47,7 @@ final class EventHandler
         if(NetherAPI.isBetterNetherLoaded) BetterNetherHandler.registerBiomes(event.registry);
         if(NetherAPI.isBiomesOPlentyLoaded) BiomesOPlentyHandler.registerBiomes(event.registry, event.world);
         if(NetherAPI.isJourneyIntoTheLightLoaded) JITLHandler.registerBiomes(event.registry);
+        if(NetherAPI.isNethercraftLoaded) NethercraftHandler.registerBiomes(event.registry);
         if(NetherAPI.isNetherExLoaded) NetherExHandler.registerBiomes(event.registry);
     }
 }

@@ -121,6 +121,7 @@ dependencies {
     compileOnly rfg.deobf('com.github.jbredwards:NetherEx-JitPack-Fix:1.12.x-SNAPSHOT')
     compileOnly rfg.deobf('curse.maven:biomes-o-plenty-220318:2842510')
     compileOnly rfg.deobf('curse.maven:journey-into-the-light-354673:3449157')
+    compileOnly rfg.deobf('curse.maven:nethercraft-classic-342087:2827467')
     compileOnly rfg.deobf('maven.modrinth:stygian-endunoffical:1.0.5')
 
     if (project.use_mixins.toBoolean()) {

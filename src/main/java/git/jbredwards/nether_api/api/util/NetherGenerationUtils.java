@@ -29,8 +29,16 @@ public final class NetherGenerationUtils
      * At the given x and z positions, replaces "stateToFill" with the provided top and filler blocks. Also generates the random gravel and soul sand for the biome.
      */
     public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn, @Nonnull IBlockState liquidBlockIn) {
-        final boolean soulSand = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesSoulSandGenerate()) && soulSandNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
-        final boolean gravel = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesGravelGenerate()) && gravelNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
+        buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, stateToFill, topBlockIn, fillerBlockIn, liquidBlockIn, Blocks.GRAVEL.getDefaultState(), Blocks.SOUL_SAND.getDefaultState());
+    }
+
+    /**
+     * At the given x and z positions, replaces "stateToFill" with the provided top and filler blocks. Also generates the random gravel and soul sand for the biome.
+     * @since 1.3.0
+     */
+    public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn, @Nonnull IBlockState liquidBlockIn, @Nonnull IBlockState gravelIn, @Nonnull IBlockState sandIn) {
+        final boolean soulSand = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesSoulSandGenerate() || sandIn.getBlock() != Blocks.SOUL_SAND) && soulSandNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
+        final boolean gravel = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesGravelGenerate() || gravelIn.getBlock() != Blocks.GRAVEL) && gravelNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
         final int depth = (int)(depthBuffer[x << 4 | z] / 3 + 3 + rand.nextDouble() * 0.25);
         int depthRemaining = -1;
 
@@ -49,10 +57,10 @@ public final class NetherGenerationUtils
                             topBlock = topBlockIn;
                             fillerBlock = fillerBlockIn;
 
-                            if(gravel) topBlock = Blocks.GRAVEL.getDefaultState();
+                            if(gravel) topBlock = gravelIn;
                             if(soulSand) {
-                                topBlock = Blocks.SOUL_SAND.getDefaultState();
-                                fillerBlock = Blocks.SOUL_SAND.getDefaultState();
+                                topBlock = sandIn;
+                                fillerBlock = sandIn;
                             }
                         }
 

@@ -9,10 +9,13 @@ import git.jbredwards.nether_api.api.audio.IDarkSoundAmbience;
 import git.jbredwards.nether_api.api.audio.ISoundAmbience;
 import git.jbredwards.nether_api.api.audio.impl.DarkSoundAmbience;
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
+import git.jbredwards.nether_api.api.event.BiomeAmbienceEvent;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -32,10 +35,16 @@ public interface IAmbienceWorldProvider
 {
     /**
      * Utility function that tries getting ambience from the provider, then the biome, then the fallback.
+     * @since 1.3.0
      */
     @Nullable
-    static <T> T getAmbienceOrFallback(@Nonnull WorldProvider provider, @Nonnull Biome biome, @Nonnull BiFunction<IAmbienceWorldProvider, Biome, T> pFun, @Nonnull Function<IAmbienceBiome, T> bFun, @Nullable T fallback) {
-        return provider instanceof IAmbienceWorldProvider ? pFun.apply((IAmbienceWorldProvider)provider, biome) : biome instanceof IAmbienceBiome ? bFun.apply((IAmbienceBiome)biome) : fallback;
+    static <T> T getAmbienceOrFallback(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull Biome biome, @Nonnull Class<T> ambienceType, @Nonnull BiFunction<IAmbienceWorldProvider, Biome, T> pFun, @Nonnull Function<IAmbienceBiome, T> bFun, @Nullable T fallback) {
+        final BiomeAmbienceEvent<T> event = new BiomeAmbienceEvent<>(ambienceType, biome, world, pos);
+        if(MinecraftForge.EVENT_BUS.post(event)) return event.ambience;
+
+        return world.provider instanceof IAmbienceWorldProvider
+                ? pFun.apply((IAmbienceWorldProvider)world.provider, biome)
+                : biome instanceof IAmbienceBiome ? bFun.apply((IAmbienceBiome)biome) : fallback;
     }
 
     /**

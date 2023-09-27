@@ -10,6 +10,7 @@ import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.journey.dimension.nether.JNWorldGenerator;
 import net.journey.dimension.nether.biomes.*;
 import net.journey.dimension.nether.biomes.structure.IStructureWorld;
+import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DimensionType;
@@ -87,6 +88,8 @@ public final class JITLHandler
     @SubscribeEvent
     static void globalNetherPopulations(@Nonnull PopulateChunkEvent.Post event) throws InvocationTargetException, IllegalAccessException {
         if(event.getWorld().provider.getDimensionType() == DimensionType.NETHER && event.getWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) {
+            BlockFalling.fallInstantly = true;
+
             // -----------------
             // GLOBAL STRUCTURES
             // -----------------
@@ -172,6 +175,8 @@ public final class JITLHandler
                     }
                 }
             }
+
+            BlockFalling.fallInstantly = false;
         }
     }
 }

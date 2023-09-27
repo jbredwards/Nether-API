@@ -59,8 +59,6 @@ public final class TransformerJITLCascadingFix implements IClassTransformer, Opc
                                 while(!(target.getOpcode() == ALOAD && ((VarInsnNode)target).var == 2));
                                 method.instructions.remove(target);
                             }
-
-                            break methods;
                         }
                         /*
                          * generateNether:

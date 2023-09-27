@@ -35,11 +35,13 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerJITLGenerator", //Allow Journey Into The Light to use real biomes instead of pseudo-biomes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerJITLTowerFix", //Fix Journey Into The Light's WorldGenNetherTower using bad registry names for spawners
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerLibraryExCascadingFix", //Fix cascading world gen problems with LibraryEx
+                "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerNethercraftEvents", //Ensure all Nethercraft world generation is kept to within one biome
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerNetherEXBiomes", //Change NetherEx's nether biome super classes
                 "git.jbredwards.nether_api.mod.asm.transformers.modded.TransformerNetherExOverride", //Disable NetherEx's nether override
                 //Vanilla
                 "git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerBiomeHell", //All BiomeHell instances use netherrack as their top and filler blocks
                 "git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerCommandLocate", //Add registered structures to the /locate tab completion list
+                "git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerEntityRenderer", //Fix MC-31681 (Fog and clouds darken when indoors or under trees)
                 "git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerMapGenCavesHell", //Ensures that nether caves can carve through any biome
                 "git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerWorldClient" //Handle biome ambient sounds and particles from this mod's end
         };
