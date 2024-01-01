@@ -12,7 +12,7 @@ plugins {
 
 version = project.mod_version
 group = project.maven_group
-archivesBaseName = project.archives_base_name
+archivesBaseName = 'Nether-API'
 
 // Set the toolchain version to decouple the Java we run Gradle with from the Java used to compile and run the mod
 java {
@@ -90,6 +90,10 @@ repositories {
         url 'https://repo.spongepowered.org/maven'
     }
     maven {
+        name 'DVS1 Repo'
+        url 'https://dvs1.progwml6.com/files/maven'
+    }
+    maven {
         name 'CurseMaven'
         url 'https://cursemaven.com'
         content {
@@ -119,6 +123,7 @@ dependencies {
     compileOnly rfg.deobf('com.github.jbredwards:BetterNether-Continuation:patch-1-SNAPSHOT')
     compileOnly rfg.deobf('com.github.jbredwards:LibraryEx-JitPack-Fix:1.12.x-SNAPSHOT')
     compileOnly rfg.deobf('com.github.jbredwards:NetherEx-JitPack-Fix:1.12.x-SNAPSHOT')
+    compileOnly rfg.deobf('com.progwml6.natura:natura:1.12.2-4.3.2.69')
     compileOnly rfg.deobf('curse.maven:biomes-o-plenty-220318:2842510')
     compileOnly rfg.deobf('curse.maven:journey-into-the-light-354673:3449157')
     compileOnly rfg.deobf('curse.maven:nethercraft-classic-342087:2827467')

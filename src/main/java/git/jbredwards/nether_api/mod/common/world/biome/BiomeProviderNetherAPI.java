@@ -1,23 +1,29 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
 package git.jbredwards.nether_api.mod.common.world.biome;
 
+import com.google.common.collect.ImmutableList;
+import git.jbredwards.nether_api.api.biome.INoSpawnBiome;
+import git.jbredwards.nether_api.api.event.NetherAPIRegistryEvent;
+import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.layer.GenLayer;
 import net.minecraft.world.gen.layer.IntCache;
+import net.minecraftforge.common.MinecraftForge;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.function.BiFunction;
 
 /**
  *
@@ -26,17 +32,28 @@ import java.util.Random;
  */
 public abstract class BiomeProviderNetherAPI extends BiomeProvider
 {
-    public BiomeProviderNetherAPI(@Nonnull WorldType worldType, long seed) {
-        final GenLayer[] biomeGenerators = getModdedBiomeGenerators(worldType, seed, getBiomeGenerators(worldType, seed));
+    @SuppressWarnings("UnstableApiUsage")
+    protected BiomeProviderNetherAPI(@Nonnull World world, @Nonnull INetherAPIRegistry registry, @Nonnull BiFunction<INetherAPIRegistry, World, NetherAPIRegistryEvent> eventSupplier) {
+        if(registry.isEmpty()) MinecraftForge.EVENT_BUS.post(eventSupplier.apply(registry, world));
+        if(registry.getBiomeEntries().isEmpty()) {
+            final String id = world.provider.getDimensionType().getName();
+            throw new IllegalStateException("Dimension with id: \"" + id + "\" has no biomes, try adjusting your config settings!");
+        }
+
+        final GenLayer[] biomeGenerators =
+                getModdedBiomeGenerators(world.getWorldType(), world.getSeed(),
+                getBiomeGenerators(world.getWorldType(), world.getSeed(), registry));
 
         genBiomes = biomeGenerators[0];
         biomeIndexLayer = biomeGenerators[1];
-
-        biomesToSpawnIn = Collections.emptyList();
+        biomesToSpawnIn = registry.getBiomeEntries().stream()
+                .map(entry -> entry.biome)
+                .filter(biome -> !(biome instanceof INoSpawnBiome))
+                .collect(ImmutableList.toImmutableList());
     }
 
     @Nonnull
-    public abstract GenLayer[] getBiomeGenerators(@Nonnull WorldType worldType, long seed);
+    public abstract GenLayer[] getBiomeGenerators(@Nonnull WorldType worldType, long seed, @Nonnull INetherAPIRegistry registry);
 
     @Nonnull
     @Override
@@ -85,12 +102,12 @@ public abstract class BiomeProviderNetherAPI extends BiomeProvider
 
     @Override
     public boolean areBiomesViable(int x, int z, int radius, @Nonnull List<Biome> allowed) {
-        return !allowed.isEmpty() && super.areBiomesViable(x, z, radius, allowed);
+        return !allowed.isEmpty() && super.areBiomesViable(x, z, radius << 2, allowed);
     }
 
     @Nullable
     @Override
     public BlockPos findBiomePosition(int x, int z, int range, @Nonnull List<Biome> biomes, @Nonnull Random random) {
-        return biomes.isEmpty() ? null : super.findBiomePosition(x, z, range, biomes, random);
+        return biomes.isEmpty() ? null : super.findBiomePosition(x, z, range << 2, biomes, random);
     }
 }

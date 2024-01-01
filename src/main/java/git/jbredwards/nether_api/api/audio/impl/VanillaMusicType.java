@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -21,19 +21,23 @@ import java.util.Objects;
  * @author jbred
  *
  */
-@SideOnly(Side.CLIENT)
 public class VanillaMusicType implements IMusicType
 {
     @Nonnull
+    @SideOnly(Side.CLIENT)
     public final MusicType musicType;
+
+    @SideOnly(Side.CLIENT)
     public VanillaMusicType(@Nullable MusicType musicTypeIn) {
         musicType = Objects.requireNonNull(musicTypeIn, "MusicType cannot be null!");
     }
 
     @Nonnull
+    @SideOnly(Side.CLIENT)
     @Override
     public MusicType getMusicType() { return musicType; }
 
+    @SideOnly(Side.CLIENT)
     @Override
     public boolean replacesCurrentMusic(@Nonnull MusicType currentlyPlaying) { return false; }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -46,8 +46,8 @@ public final class NetherGenerationUtils
         IBlockState topBlock = topBlockIn;
         IBlockState fillerBlock = fillerBlockIn;
 
-        IBlockState prevCheckState = primer.getBlockState(x, 128, z);
-        for(int y = 127; y >= 0; --y) {
+        IBlockState prevCheckState = Blocks.AIR.getDefaultState();
+        for(int y = world.getActualHeight() - 1; y >= 0; --y) {
             final IBlockState checkState = primer.getBlockState(x, y, z);
             if(checkState.getMaterial() != Material.AIR) {
                 if(checkState == stateToFill) {

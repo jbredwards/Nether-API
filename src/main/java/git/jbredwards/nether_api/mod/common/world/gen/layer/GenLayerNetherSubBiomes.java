@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
 package git.jbredwards.nether_api.mod.common.world.gen.layer;
 
-import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
+import git.jbredwards.nether_api.api.biome.INetherAPIBiomeProvider;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.layer.GenLayer;
@@ -46,8 +46,8 @@ public class GenLayerNetherSubBiomes extends GenLayer
                 && biomeId == biomeIds[x + 1 - 1 + (z + 1) * (areaHeight + 2)]
                 && biomeId == biomeIds[x + 1 + (z + 1 + 1) * (areaHeight + 2)]) {
                     final Biome biome = Biome.getBiomeForId(biomeId);
-                    if(biome instanceof INetherBiomeProvider) {
-                        final List<BiomeManager.BiomeEntry> subBiomes = ((INetherBiomeProvider)biome).getSubBiomes();
+                    if(biome instanceof INetherAPIBiomeProvider) {
+                        final List<BiomeManager.BiomeEntry> subBiomes = ((INetherAPIBiomeProvider)biome).getSubBiomes();
                         if(!subBiomes.isEmpty()) {
                             final int totalWeight = WeightedRandom.getTotalWeight(subBiomes);
                             final Biome subBiome = WeightedRandom.getRandomItem(subBiomes, nextInt(totalWeight)).biome;

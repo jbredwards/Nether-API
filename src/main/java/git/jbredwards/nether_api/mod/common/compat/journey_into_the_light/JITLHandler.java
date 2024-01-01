@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -10,9 +10,13 @@ import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.journey.dimension.nether.JNWorldGenerator;
 import net.journey.dimension.nether.biomes.*;
 import net.journey.dimension.nether.biomes.structure.IStructureWorld;
+import net.journey.entity.mob.nether.*;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
@@ -22,6 +26,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -49,11 +54,49 @@ public final class JITLHandler
     }
 
     public static void init() {
+        // add biome references to NetherBiome counterpart
         if(BiomeRegister.BIOME_EMPTY_NETHER != null) getBiomeFromLookup(BiomeRegister.BIOME_EMPTY_NETHER).netherBiome = BiomeRegister.BIOME_EMPTY_NETHER;
         if(BiomeRegister.BIOME_FOREST != null) getBiomeFromLookup(BiomeRegister.BIOME_FOREST).netherBiome = BiomeRegister.BIOME_FOREST;
         if(BiomeRegister.BIOME_EARTHEN != null) getBiomeFromLookup(BiomeRegister.BIOME_EARTHEN).netherBiome = BiomeRegister.BIOME_EARTHEN;
         if(BiomeRegister.BIOME_HEAT_SANDS != null) getBiomeFromLookup(BiomeRegister.BIOME_HEAT_SANDS).netherBiome = BiomeRegister.BIOME_HEAT_SANDS;
         if(BiomeRegister.BIOME_FOREST_EDGE != null) getBiomeFromLookup(BiomeRegister.BIOME_FOREST_EDGE).netherBiome = BiomeRegister.BIOME_FOREST_EDGE;
+
+        // remove old entity spawns
+        EntityRegistry.removeSpawn(EntityLavasnake.class, EnumCreatureType.MONSTER, Biomes.HELL);
+        EntityRegistry.removeSpawn(EntityWitherspine.class, EnumCreatureType.MONSTER, Biomes.HELL);
+        EntityRegistry.removeSpawn(EntityReaper.class, EnumCreatureType.MONSTER, Biomes.HELL);
+        EntityRegistry.removeSpawn(EntityHellCow.class, EnumCreatureType.MONSTER, Biomes.HELL);
+        EntityRegistry.removeSpawn(EntityMiniGhast.class, EnumCreatureType.MONSTER, Biomes.HELL);
+        EntityRegistry.removeSpawn(EntityInfernoBlaze.class, EnumCreatureType.MONSTER, Biomes.HELL);
+        EntityRegistry.removeSpawn(EntityHellTurtle.class, EnumCreatureType.MONSTER, Biomes.HELL);
+
+        // new forest spawns
+        if(BiomeRegister.BIOME_FOREST != null) {
+            final BiomeJITL biome = getBiomeFromLookup(BiomeRegister.BIOME_FOREST);
+            EntityRegistry.addSpawn(EntityHellCow.class, 15, 1, 1, EnumCreatureType.MONSTER, biome);
+            EntityRegistry.addSpawn(EntityMiniGhast.class, 3, 1, 1, EnumCreatureType.MONSTER, biome);
+            EntityRegistry.addSpawn(EntityInfernoBlaze.class, 2, 1, 2, EnumCreatureType.MONSTER, biome);
+        }
+
+        // new earthen spawns
+        if(BiomeRegister.BIOME_EARTHEN != null) {
+            final BiomeJITL biome = getBiomeFromLookup(BiomeRegister.BIOME_EARTHEN);
+            EntityRegistry.addSpawn(EntityWitherspine.class, 8, 1, 1, EnumCreatureType.MONSTER, biome);
+            EntityRegistry.addSpawn(EntityReaper.class, 8, 1, 1, EnumCreatureType.MONSTER, biome);
+        }
+
+        // new heat sands spawns
+        if(BiomeRegister.BIOME_HEAT_SANDS != null) {
+            final BiomeJITL biome = getBiomeFromLookup(BiomeRegister.BIOME_HEAT_SANDS);
+            EntityRegistry.addSpawn(EntityLavasnake.class, 15, 1, 1, EnumCreatureType.MONSTER, biome);
+            EntityRegistry.addSpawn(EntityHellTurtle.class, 15, 1, 2, EnumCreatureType.MONSTER, biome);
+        }
+
+        // new forest edge spawns
+        if(BiomeRegister.BIOME_FOREST_EDGE != null) {
+            final BiomeJITL biome = getBiomeFromLookup(BiomeRegister.BIOME_FOREST_EDGE);
+            EntityRegistry.addSpawn(EntityHellCow.class, 15, 1, 1, EnumCreatureType.MONSTER, biome);
+        }
     }
 
     @Nonnull
@@ -101,7 +144,7 @@ public final class JITLHandler
                 final int x = (event.getChunkX() << 4) + event.getRand().nextInt(16) + 8;
                 final int z = (event.getChunkZ() << 4) + event.getRand().nextInt(16) + 8;
 
-                final BlockPos.MutableBlockPos start = new BlockPos.MutableBlockPos(x, 32 + event.getRand().nextInt(88), z);
+                final BlockPos.MutableBlockPos start = new BlockPos.MutableBlockPos(x, MathHelper.getInt(event.getRand(), 32, event.getWorld().getActualHeight() - 40), z);
                 final Chunk chunk = event.getWorld().getChunk(start);
 
                 while(start.getY() > 32 && !chunk.getBlockState(start).getBlock().isAir(chunk.getBlockState(start), event.getWorld(), start)) start.setY(start.getY() - 1);
@@ -143,29 +186,29 @@ public final class JITLHandler
             try { plantDensity = PLANT_DENSITY_FIELD.getFloat(null); }
             catch(final IllegalAccessException e) { throw new RuntimeException(e); } // should never pass
 
-            final Chunk[] chunks = new Chunk[4];
-            final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(event.getChunkX() << 4 | 8, 0, event.getChunkZ() << 4 | 8);
+            final Chunk chunk = event.getWorld().getChunk(event.getChunkX(), event.getChunkZ());
+            final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(chunk.x << 4, 0, chunk.z << 4);
 
             for(int x = 0; x < 16; x++, pos.x++) {
                 for(int z = 0; z < 16; z++, pos.z++) {
-                    final int index = (z & 1) << 1 | (x & 1);
-                    final Chunk chunk = chunks[index] != null ? chunks[index] : (chunks[index] = event.getWorld().getChunk(pos));
                     final Biome biome = chunk.getBiome(pos, event.getWorld().getBiomeProvider());
-
                     if(biome instanceof BiomeJITL) {
                         final NetherBiome netherBiome = ((BiomeJITL)biome).netherBiome;
                         if(netherBiome != null) {
-                            for(int y = 5; y < 126; y++) {
+                            for(int y = 5; y < event.getWorld().getActualHeight() - 5; y++) {
                                 pos.setY(y);
-
                                 if(chunk.getBlockState(pos).isFullCube()) {
-                                    if(chunk.getBlockState(pos.up()).getMaterial() == Material.AIR) {
+                                    final Material above = chunk.getBlockState(pos.up()).getMaterial();
+                                    if(!above.isLiquid() && !above.isSolid()) {
                                         netherBiome.genSurfColumn(chunk, pos, event.getRand());
                                         if(event.getRand().nextFloat() < plantDensity) netherBiome.genFloorObjects(chunk, pos, event.getRand());
                                     }
 
-                                    else if(chunk.getBlockState(pos.down()).getMaterial() == Material.AIR) {
-                                        if(event.getRand().nextFloat() < plantDensity) netherBiome.genCeilObjects(chunk, pos, event.getRand());
+                                    else {
+                                        final Material below = chunk.getBlockState(pos.down()).getMaterial();
+                                        if(!below.isLiquid() && !below.isSolid()) {
+                                            if(event.getRand().nextFloat() < plantDensity) netherBiome.genCeilObjects(chunk, pos, event.getRand());
+                                        }
                                     }
 
                                     // NetherBiome::genWallObjects is unused in JITL, no need to implement logic for it here.

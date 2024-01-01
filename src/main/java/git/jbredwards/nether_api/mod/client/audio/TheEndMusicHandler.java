@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -38,16 +38,14 @@ public final class TheEndMusicHandler
     @Nullable
     public static MusicTicker.MusicType getMusicType() {
         if(currentType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) currentType = null;
-        final boolean bossMusic = mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic();
-
         final Biome biome = mc.world.getBiome(new BlockPos(ActiveRenderInfo.projectViewFromEntity(mc.player, mc.getRenderPartialTicks())));
         if(biome instanceof IEndBiome) {
-            final IMusicType musicType = bossMusic ? ((IEndBiome)biome).getBossMusicType() : ((IEndBiome)biome).getMusicType();
+            final IMusicType musicType = mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic() ? ((IEndBiome)biome).getBossMusicType() : ((IEndBiome)biome).getMusicType();
             if(currentType == null) currentType = musicType.getMusicType();
             else if(musicType.replacesCurrentMusic(currentType)) currentType = musicType.getMusicType();
         }
 
-        else if(currentType == null) currentType = bossMusic ? MusicTicker.MusicType.END_BOSS : MusicTicker.MusicType.END;
+        else if(currentType == null) currentType = mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic() ? MusicTicker.MusicType.END_BOSS : MusicTicker.MusicType.END;
         return currentType;
     }
 

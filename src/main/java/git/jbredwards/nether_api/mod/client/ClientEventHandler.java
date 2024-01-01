@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -30,9 +30,9 @@ final class ClientEventHandler
     @SideOnly(Side.CLIENT)
     @SubscribeEvent(priority = EventPriority.LOWEST)
     static void applyLavaColors(@Nonnull ColorHandlerEvent.Block event) {
-        final BiomeColorHelper.ColorResolver resolver = (biome, posIn) -> biome instanceof ILavaTintBiome ? ((ILavaTintBiome)biome).getBiomeLavaColor() : -1;
+        final BiomeColorHelper.ColorResolver resolver = (biome, pos) -> biome instanceof ILavaTintBiome ? ((ILavaTintBiome)biome).getBiomeLavaColor(pos) : -1;
         final IBlockColor colorHandler = (state, world, pos, tintIndex) -> world != null && pos != null ? BiomeColorHelper.getColorAtPos(world, pos, resolver) : -1;
 
-        event.getBlockColors().registerBlockColorHandler(colorHandler, Blocks.LAVA, Blocks.FLOWING_LAVA);
+        event.getBlockColors().registerBlockColorHandler(colorHandler, Blocks.FLOWING_LAVA, Blocks.LAVA);
     }
 }

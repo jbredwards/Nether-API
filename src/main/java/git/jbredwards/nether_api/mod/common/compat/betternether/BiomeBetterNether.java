@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
 package git.jbredwards.nether_api.mod.common.compat.betternether;
 
-import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
+import git.jbredwards.nether_api.api.biome.INetherAPIBiomeProvider;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistryListener;
 import git.jbredwards.nether_api.mod.NetherAPI;
@@ -18,7 +18,6 @@ import paulevs.betternether.biomes.NetherBiome;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
  * @author jbred
  *
  */
-public final class BiomeBetterNether extends BiomeHell implements INetherBiomeProvider, INetherAPIRegistryListener
+public final class BiomeBetterNether extends BiomeHell implements INetherAPIBiomeProvider, INetherAPIRegistryListener
 {
     @Nonnull
     static final Field SUBBIOMES_FIELD = ObfuscationReflectionHelper.findField(NetherBiome.class, "subbiomes");
@@ -59,7 +58,7 @@ public final class BiomeBetterNether extends BiomeHell implements INetherBiomePr
                 .map(netherBiomeIn -> netherBiomeIn == netherBiome
                         ? new BiomeManager.BiomeEntry(this, 1000) //BetterNether sub-biomes have "chance in 1000" of spawning
                         : BetterNetherHandler.getBiomeFromLookup(netherBiomeIn).createBiomeEntry())
-                .collect(Collectors.toCollection(LinkedList::new));
+                .collect(Collectors.toList());
     }
 
     @Nonnull

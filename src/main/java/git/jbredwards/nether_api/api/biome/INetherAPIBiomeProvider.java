@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -12,13 +12,13 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Having your nether biome implement this will allow it to have sub-biomes and edge biomes.
+ * Having your nether or end biome implement this will allow it to have sub-biomes and edge biomes.
  *
- * @since 1.0.0
+ * @since 1.3.0
  * @author jbred
  *
  */
-public interface INetherBiomeProvider
+public interface INetherAPIBiomeProvider
 {
     /**
      * @return all possible biomes that can spawn inside this one.

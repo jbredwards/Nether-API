@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
 package git.jbredwards.nether_api.mod.common.compat.journey_into_the_light;
 
-import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
+import git.jbredwards.nether_api.api.biome.INetherAPIBiomeProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import net.journey.dimension.nether.biomes.NetherBiome;
 import net.minecraft.world.biome.Biome;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @author jbred
  *
  */
-public final class BiomeJITL extends BiomeHell implements INetherBiomeProvider
+public final class BiomeJITL extends BiomeHell implements INetherAPIBiomeProvider
 {
     @Nonnull static final Field SUBBIOMES_FIELD = ObfuscationReflectionHelper.findField(NetherBiome.class, "subbiomes");
     @Nonnull public final Class<? extends NetherBiome> netherBiomeClass;
@@ -35,7 +35,6 @@ public final class BiomeJITL extends BiomeHell implements INetherBiomeProvider
     BiomeJITL(@Nonnull Class<? extends NetherBiome> netherBiomeClassIn, @Nonnull String nameIn) {
         super(new BiomeProperties(nameIn).setTemperature(2).setRainfall(0).setRainDisabled());
         setRegistryName(NetherAPI.MODID, "journey_into_the_light_" + netherBiomeClassIn.getSimpleName());
-
         netherBiomeClass = netherBiomeClassIn;
     }
 

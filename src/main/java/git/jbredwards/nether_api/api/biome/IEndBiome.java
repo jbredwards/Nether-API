@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -12,6 +12,7 @@ import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -27,28 +28,51 @@ import java.util.Random;
  */
 public interface IEndBiome
 {
+    /**
+     * At the given x and z positions, build the biome surface by replacing the template blocks.
+     */
+    void buildSurface(@Nonnull final INetherAPIChunkGenerator chunkGenerator, final int chunkX, final int chunkZ, @Nonnull final ChunkPrimer primer, final int x, final int z, final double terrainNoise);
 
     /**
      * Called instead of vanilla's {@link net.minecraft.world.biome.Biome#decorate(World, Random, BlockPos) Biome::decorate} method.
      */
-    default void populate(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ) {
+    default void populate(@Nonnull final INetherAPIChunkGenerator chunkGenerator, final int chunkX, final int chunkZ) {
         chunkGenerator.populateWithVanilla(chunkX, chunkZ);
+    }
+
+    /**
+     * @return true if this biome can generate small floating islands.
+     */
+    default boolean generateIslands(@Nonnull final INetherAPIChunkGenerator chunkGenerator, final int chunkX, final int chunkZ, final float islandHeight) {
+        return true;
     }
 
     /**
      * @return true if this biome can generate chorus plants.
      */
-    default boolean generateChorusPlants(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ) {
+    default boolean generateChorusPlants(@Nonnull final INetherAPIChunkGenerator chunkGenerator, final int chunkX, final int chunkZ, final float islandHeight) {
         return true;
     }
 
     /**
-     * It's also recommended to override {@link net.minecraft.world.biome.Biome#getSkyColorByTemp Biome.getSkyColorByTemp()} for the best result.
+     * @return true if this biome can generate end cities.
+     */
+    default boolean generateEndCity(@Nonnull final INetherAPIChunkGenerator chunkGenerator, final int chunkX, final int chunkZ, final int islandHeight) {
+        return islandHeight >= 60;
+    }
+
+    /**
+     * @return true if this biome creates extra fog.
+     */
+    @SideOnly(Side.CLIENT)
+    default boolean hasExtraXZFog(@Nonnull final World world, final int x, final int z) { return false; }
+
+    /**
      * @return this biome's background fog color.
      */
     @Nonnull
     @SideOnly(Side.CLIENT)
-    default Vec3d getFogColor(float celestialAngle, float partialTicks) { return new Vec3d(0.777451, 0.6519608, 0.777451); }
+    default Vec3d getFogColor(final float celestialAngle, final float partialTicks) { return new Vec3d(0.09411766, 0.07529412, 0.09411766); }
 
     /**
      * @return the ambient music that plays while players are in this biome.

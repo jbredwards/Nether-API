@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
 package git.jbredwards.nether_api.mod.asm.transformers.modded;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -35,15 +36,19 @@ public final class TransformerJITLTowerFix implements IClassTransformer, Opcodes
                 /*
                  * generate:
                  * Old code:
+                 * mobNames.add("LavaSlime");
+                 * mobNames.add("PigZombie");
                  * mobNames.add("lavasnake");
                  * mobNames.add("reaper");
                  *
                  * New code:
                  * // Add proper namespace
+                 * mobNames.add("minecraft:magma_cube");
+                 * mobNames.add("minecraft:zombie_pigman");
                  * mobNames.add("journey:lavasnake");
                  * mobNames.add("journey:reaper");
                  */
-                if(method.name.equals("generate")) {
+                if(method.name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "generate" : "func_180709_b")) {
                     for(final AbstractInsnNode insn : method.instructions.toArray()) {
                         if(insn.getOpcode() == LDC) {
                             if(((LdcInsnNode)insn).cst.equals("LavaSlime")) ((LdcInsnNode)insn).cst = "minecraft:magma_cube";

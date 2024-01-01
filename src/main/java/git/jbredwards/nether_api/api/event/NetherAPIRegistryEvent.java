@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -41,7 +41,7 @@ public abstract class NetherAPIRegistryEvent extends Event
     }
 
     /**
-     * Fired when Nether API end registry is ready to accept generation registries (WIP).<br>
+     * Fired when Nether API end registry is ready to accept generation registries.<br>
      * <br>
      * This event is not {@link net.minecraftforge.fml.common.eventhandler.Cancelable Cancelable}.
      * <br>

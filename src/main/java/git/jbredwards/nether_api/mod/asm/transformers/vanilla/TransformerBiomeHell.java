@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -16,7 +16,7 @@ import org.objectweb.asm.tree.*;
 import javax.annotation.Nonnull;
 
 /**
- * All BiomeHell instances use netherrack as their top and filler blocks
+ * All BiomeHell instances now use netherrack as their top and filler blocks by default
  * @author jbred
  *
  */

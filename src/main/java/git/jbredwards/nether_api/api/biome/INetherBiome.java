@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -29,7 +29,7 @@ import java.util.Random;
 public interface INetherBiome
 {
     /**
-     * At the given x and z positions, this replaces "stateToFill" with the provided top and filler blocks.
+     * At the given x and z positions, build the biome surface by replacing the template blocks.
      */
     void buildSurface(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise);
 
@@ -41,7 +41,6 @@ public interface INetherBiome
     }
 
     /**
-     * It's also recommended to override {@link net.minecraft.world.biome.Biome#getSkyColorByTemp Biome.getSkyColorByTemp()} for the best result.
      * @return this biome's background fog color.
      */
     @Nonnull

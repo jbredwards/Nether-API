@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -33,7 +33,7 @@ public abstract class NetherAPIBiomeSizeEvent extends WorldTypeEvent
     }
 
     /**
-     * Fired when determining the size of the biomes to generate for the End (WIP).<br>
+     * Fired when determining the size of the biomes to generate for the End.<br>
      * <br>
      * This event is not {@link net.minecraftforge.fml.common.eventhandler.Cancelable Cancelable}.
      * <br>

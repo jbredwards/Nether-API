@@ -2,10 +2,10 @@
 {
   "modid": "nether_api",
   "name": "Nether API",
-  "description": "Serves as a library for anyone wanting to add Nether or End biomes, also unifies other mods' Nether and End biomes!",
+  "description": "Serves as a library for anyone wanting to add End or Nether biomes, also unifies other mods' End and Nether biomes!",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://modrinth.com/mod/nether-api",
   "updateUrl": "",
   "authorList": ["jbredwards"],
   "credits": "jbredwards",

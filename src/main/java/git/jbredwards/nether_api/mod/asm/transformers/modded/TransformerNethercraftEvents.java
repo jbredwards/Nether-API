@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -65,18 +65,38 @@ public final class TransformerNethercraftEvents implements IClassTransformer, Op
                 final ClassNode classNode = new ClassNode();
                 new ClassReader(basicClass).accept(classNode, 0);
                 for(final MethodNode method : classNode.methods) {
-                    /*
-                     * generate:
-                     * Old code:
-                     * world.setBlockState(mutablePos, BlocksNether.glowood_leaves.getDefaultState());
-                     *
-                     * New code:
-                     * // Use better block flags
-                     * world.setBlockState(mutablePos, BlocksNether.glowood_leaves.getDefaultState(), 18);
-                     */
                     if(method.name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "generate" : "func_180709_b")) {
                         for(final AbstractInsnNode insn : method.instructions.toArray()) {
-                            if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "setBlockState" : "func_175656_a")) {
+                            /*
+                             * generate:
+                             * Old code:
+                             * if (i1 < 0 || i1 >= 128)
+                             * {
+                             *     ...
+                             * }
+                             *
+                             * New code:
+                             * // Use actual nether height instead of a hardcoded value
+                             * if (i1 < 0 || i1 >= world.getActualHeight())
+                             * {
+                             *     ...
+                             * }
+                             */
+                            if(insn.getOpcode() == SIPUSH && ((IntInsnNode)insn).operand == 128) {
+                                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 1));
+                                method.instructions.insertBefore(insn, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", FMLLaunchHandler.isDeobfuscatedEnvironment() ? "getActualHeight" : "func_72940_L", "()I", false));
+                                method.instructions.remove(insn);
+                            }
+                            /*
+                             * generate:
+                             * Old code:
+                             * world.setBlockState(mutablePos, BlocksNether.glowood_leaves.getDefaultState());
+                             *
+                             * New code:
+                             * // Use better block flags
+                             * world.setBlockState(mutablePos, BlocksNether.glowood_leaves.getDefaultState(), 18);
+                             */
+                            else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "setBlockState" : "func_175656_a")) {
                                 method.instructions.insertBefore(insn, new IntInsnNode(BIPUSH, 18));
                                 if(!FMLLaunchHandler.isDeobfuscatedEnvironment()) ((MethodInsnNode)insn).name = "func_180501_a";
                                 ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
@@ -174,7 +194,7 @@ public final class TransformerNethercraftEvents implements IClassTransformer, Op
                             if(insn.getOpcode() == RETURN) {
                                 method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
                                 method.instructions.insertBefore(insn, new InsnNode(ICONST_1));
-                                method.instructions.insertBefore(insn, new FieldInsnNode(PUTFIELD, "net/minecraft/entity/Entity", FMLLaunchHandler.isDeobfuscatedEnvironment() ? "isImmuneToFire" : "func_70045_F", "Z"));
+                                method.instructions.insertBefore(insn, new FieldInsnNode(PUTFIELD, "net/minecraft/entity/Entity", FMLLaunchHandler.isDeobfuscatedEnvironment() ? "isImmuneToFire" : "field_70178_ae", "Z"));
                                 break methods;
                             }
                         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -11,9 +11,11 @@ import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -27,7 +29,12 @@ import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.ForgeModContainer;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
+import net.minecraftforge.event.terraingen.OreGenEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.terraingen.TerrainGen;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,10 +63,60 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
         NetherAPIRegistry.NETHER.getStructures().forEach(entry -> moddedStructures.add(entry.getStructureFactory().apply(this)));
     }
 
+    @SuppressWarnings({"DuplicateExpressions", "PointlessArithmeticExpression"})
     @Override
     public void prepareHeights(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer) {
-        //TODO: add custom nether heights handler
-        super.prepareHeights(chunkX, chunkZ, primer);
+        final int lavaHeight = (world.getSeaLevel() >> 1) + 1;
+        final int noiseHeight = (world.getActualHeight() >> 3) + 1;
+        final int noiseWidthX = 5;
+        final int noiseWidthZ = 5;
+
+        buffer = getHeights(buffer, chunkX << 2, 0, chunkZ << 2, noiseWidthX, noiseHeight, noiseWidthZ);
+        for(int j1 = 0; j1 < 4; ++j1) {
+            for(int k1 = 0; k1 < 4; ++k1) {
+                for(int heightIndex = noiseHeight - 2; heightIndex >= 0; heightIndex--) {
+                    double d1 = buffer[((j1 + 0) * 5 + k1 + 0) * noiseHeight + heightIndex];
+                    double d2 = buffer[((j1 + 0) * 5 + k1 + 1) * noiseHeight + heightIndex];
+                    double d3 = buffer[((j1 + 1) * 5 + k1 + 0) * noiseHeight + heightIndex];
+                    double d4 = buffer[((j1 + 1) * 5 + k1 + 1) * noiseHeight + heightIndex];
+                    double d5 = (buffer[((j1 + 0) * 5 + k1 + 0) * noiseHeight + heightIndex + 1] - d1) * 0.125;
+                    double d6 = (buffer[((j1 + 0) * 5 + k1 + 1) * noiseHeight + heightIndex + 1] - d2) * 0.125;
+                    double d7 = (buffer[((j1 + 1) * 5 + k1 + 0) * noiseHeight + heightIndex + 1] - d3) * 0.125;
+                    double d8 = (buffer[((j1 + 1) * 5 + k1 + 1) * noiseHeight + heightIndex + 1] - d4) * 0.125;
+
+                    for(int yOffset = 0; yOffset < 8; yOffset++) {
+                        double d10 = d1;
+                        double d11 = d2;
+                        final double d12 = (d3 - d1) * 0.25;
+                        final double d13 = (d4 - d2) * 0.25;
+
+                        for(int xOffset = 0; xOffset < 4; xOffset++) {
+                            double density = d10;
+                            final double d16 = (d11 - d10) * 0.25;
+
+                            for(int zOffset = 0; zOffset < 4; zOffset++) {
+                                final int y = (heightIndex << 3) + yOffset;
+                                IBlockState state = null;
+
+                                if(y < lavaHeight) state = LAVA;
+                                if(density > 0) state = NETHERRACK;
+
+                                primer.setBlockState((j1 << 2) + xOffset, y, (k1 << 2) + zOffset, state); // this method is actually nullable
+                                density += d16;
+                            }
+
+                            d10 += d12;
+                            d11 += d13;
+                        }
+
+                        d1 += d5;
+                        d2 += d6;
+                        d3 += d7;
+                        d4 += d8;
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -78,7 +135,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
                 //generate the bedrock
                 for(int posY = 4; posY >= 0; posY--) {
                     if(posY <= rand.nextInt(5)) primer.setBlockState(posX, posY, posZ, BEDROCK);
-                    if(posY >= 4 - rand.nextInt(5)) primer.setBlockState(posX, posY + 123, posZ, BEDROCK);
+                    if(posY >= 4 - rand.nextInt(5)) primer.setBlockState(posX, posY + world.getActualHeight() - 5, posZ, BEDROCK);
                 }
 
                 //replace netherrack top and filler blocks, and generate random soul sand & gravel
@@ -103,8 +160,8 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
         final ChunkPrimer primer = new ChunkPrimer();
         setBlocksInPrimer(x, z, primer);
         buildSurfaces(x, z, primer);
-        genNetherCaves.generate(world, x, z, primer);
 
+        if(NetherAPIConfig.hellCaves) genNetherCaves.generate(world, x, z, primer);
         if(areStructuresEnabled()) {
             if(genNetherBridge != null) genNetherBridge.generate(world, x, z, primer);
             moddedStructures.forEach(structure -> structure.generate(world, x, z, primer));
@@ -127,9 +184,9 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
         final boolean prevFixVanillaCascading = ForgeModContainer.fixVanillaCascading;
         ForgeModContainer.fixVanillaCascading = true;
 
-        final BlockPos pos = new BlockPos(chunkX << 4, 0, chunkZ << 4);
-        final Biome biome = world.getBiome(pos.add(16, 0, 16));
-        final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
+        @Nonnull final BlockPos pos = new BlockPos(chunkX << 4, 0, chunkZ << 4);
+        @Nonnull final Biome biome = world.getBiome(pos.add(16, 0, 16));
+        @Nonnull final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
 
         moddedStructures.forEach(structure -> structure.generateStructure(world, rand, chunkPos));
         if(!(biome instanceof INetherBiome)) populateWithVanilla(chunkX, chunkZ);
@@ -144,6 +201,64 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
 
         //restore old vanilla cascading fix settings
         ForgeModContainer.fixVanillaCascading = prevFixVanillaCascading;
+    }
+
+    @Override
+    public void populateWithVanilla(int chunkX, int chunkZ) {
+        @Nonnull final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
+
+        final int originX = chunkX << 4;
+        final int originZ = chunkZ << 4;
+        final int maxHeight = world.getActualHeight();
+        final int heightGenFactor = 0; // = maxHeight >> 8; // generate everything twice as often if the world height is twice what it normally would be
+
+        BlockFalling.fallInstantly = true;
+        ForgeEventFactory.onChunkPopulate(true, this, world, rand, chunkX, chunkZ, false);
+        if(genNetherBridge != null) genNetherBridge.generateStructure(world, rand, chunkPos);
+
+        @Nonnull final BlockPos pos = new BlockPos(originX, 0, originZ);
+        @Nonnull final Biome biome = world.getBiome(pos.add(16, 0, 16));
+
+        // lava "waterfalls"
+        if(TerrainGen.populate(this, world, rand, chunkX, chunkZ, false, PopulateChunkEvent.Populate.EventType.NETHER_LAVA))
+            for(int i = 0; i < 8 << heightGenFactor; ++i) hellSpringGen.generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(maxHeight - 8) + 4, rand.nextInt(16) + 8));
+
+        // fire
+        if(TerrainGen.populate(this, world, rand, chunkX, chunkZ, false, PopulateChunkEvent.Populate.EventType.FIRE))
+            for(int i = 0; i < (rand.nextInt(rand.nextInt(10) + 1) + 1) << heightGenFactor; ++i) fireFeature.generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(maxHeight - 8) + 4, rand.nextInt(16) + 8));
+
+        // glowstone
+        if(TerrainGen.populate(this, world, rand, chunkX, chunkZ, false, PopulateChunkEvent.Populate.EventType.GLOWSTONE)) {
+            for(int i = 0; i < (rand.nextInt(rand.nextInt(10) + 1) + 1) << heightGenFactor; ++i) lightGemGen.generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(maxHeight - 8) + 4, rand.nextInt(16) + 8));
+            for(int i = 0; i < 10 << heightGenFactor; ++i) hellPortalGen.generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(maxHeight), rand.nextInt(16) + 8));
+        }
+
+        ForgeEventFactory.onChunkPopulate(false, this, world, rand, chunkX, chunkZ, false);
+        MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(world, rand, chunkPos));
+
+        // mushrooms
+        if(TerrainGen.decorate(world, rand, chunkPos, DecorateBiomeEvent.Decorate.EventType.SHROOM)) {
+            for(int i = 0; i < 1 << heightGenFactor; i++) {
+                if(rand.nextBoolean()) brownMushroomFeature.generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(maxHeight), rand.nextInt(16) + 8));
+                if(rand.nextBoolean()) redMushroomFeature.generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(maxHeight), rand.nextInt(16) + 8));
+            }
+        }
+
+        // quartz gen
+        if(TerrainGen.generateOre(world, rand, quartzGen, pos, OreGenEvent.GenerateMinable.EventType.QUARTZ))
+            for(int i = 0; i < 16 << heightGenFactor; ++i) quartzGen.generate(world, rand, pos.add(rand.nextInt(16), rand.nextInt(maxHeight - 20) + 10, rand.nextInt(16)));
+
+        // magma
+        if(TerrainGen.populate(this, world, rand, chunkX, chunkZ, false, PopulateChunkEvent.Populate.EventType.NETHER_MAGMA))
+            for(int i = 0; i < 4; ++i) magmaGen.generate(world, rand, pos.add(rand.nextInt(16), (world.getSeaLevel() >> 1) - 4 + rand.nextInt(10), rand.nextInt(16)));
+
+        // lava traps
+        if(TerrainGen.populate(this, world, rand, chunkX, chunkZ, false, PopulateChunkEvent.Populate.EventType.NETHER_LAVA2))
+            for(int i = 0; i < 16 << heightGenFactor; ++i) lavaTrapGen.generate(world, rand, pos.add(rand.nextInt(16) + 8, rand.nextInt(maxHeight - 20) + 10, rand.nextInt(16) + 8));
+        
+        biome.decorate(world, rand, new BlockPos(originX, 0, originZ));
+        MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Post(world, rand, chunkPos));
+        BlockFalling.fallInstantly = false;
     }
 
     @Nonnull
@@ -219,9 +334,6 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
 
     @Override
     public boolean areStructuresEnabled() { return generateStructures; }
-
-    @Override
-    public void populateWithVanilla(int chunkX, int chunkZ) { super.populate(chunkX, chunkZ); }
 
     @Override
     public void setBlocksInPrimer(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer) { prepareHeights(chunkX, chunkZ, primer); }

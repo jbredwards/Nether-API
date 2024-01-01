@@ -1,12 +1,12 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
 package git.jbredwards.nether_api.mod.common.compat.netherex;
 
 import git.jbredwards.nether_api.api.biome.INetherBiome;
-import git.jbredwards.nether_api.api.biome.INetherBiomeProvider;
+import git.jbredwards.nether_api.api.biome.INetherAPIBiomeProvider;
 import git.jbredwards.nether_api.api.block.INetherCarvable;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import logictechcorp.libraryex.IModData;
@@ -30,7 +30,6 @@ import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
 import javax.annotation.Nonnull;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -41,7 +40,7 @@ import java.util.stream.Collectors;
  *
  */
 @SuppressWarnings("unused") //used via asm
-public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INetherBiome, INetherBiomeProvider, INetherCarvable
+public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INetherBiome, INetherAPIBiomeProvider, INetherCarvable
 {
     public AbstractNetherExBiome(@Nonnull IModData data, @Nonnull BiomeProperties properties, @Nonnull String name) {
         super(data, properties, name);
@@ -59,7 +58,7 @@ public abstract class AbstractNetherExBiome extends BiomeNetherEx implements INe
         return NetherEx.BIOME_DATA_MANAGER.getBiomeData(this).getSubBiomes().stream()
                 .filter(BiomeData::isEnabled)
                 .map(data -> new BiomeManager.BiomeEntry(data.getBiome(), data.getGenerationWeight()))
-                .collect(Collectors.toCollection(LinkedList::new));
+                .collect(Collectors.toList());
     }
 
     @Override

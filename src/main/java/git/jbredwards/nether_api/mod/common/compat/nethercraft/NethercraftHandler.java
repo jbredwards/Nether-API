@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -99,11 +99,11 @@ public final class NethercraftHandler
     static void generateOres(@Nonnull DecorateBiomeEvent.Pre event) {
         if(event.getWorld().provider.getDimensionType() == DimensionType.NETHER) {
             GLOWING_GROVE.decorator.chunkPos = event.getPos();
-            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), foulitePerChunk, new NetherGenMinable(BlocksNether.foulite_ore.getDefaultState(), fouliteOreSize), fouliteMinHeight, fouliteMaxHeight);
-            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), neridiumPerChunk, new NetherGenMinable(BlocksNether.neridium_ore.getDefaultState(), neridiumOreSize), neridiumMinHeight, neridiumMaxHeight);
-            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), liniumPerChunk, new NetherGenMinable(BlocksNether.linium_ore.getDefaultState(), liniumOreSize), liniumMinHeight, liniumMaxHeight);
-            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), pyridiumPerChunk, new NetherGenMinable(BlocksNether.pyridium_ore.getDefaultState(), pyridiumOreSize), pyridiumMinHeight, pyridiumMaxHeight);
-            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), wPerChunk, new NetherGenMinable(BlocksNether.w_ore.getDefaultState(), wOreSize), wMinHeight, wMaxHeight);
+            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), foulitePerChunk, new NetherGenMinable(BlocksNether.foulite_ore.getDefaultState(), fouliteOreSize), fouliteMinHeight, fouliteMaxHeight << (event.getWorld().getActualHeight() >> 8));
+            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), neridiumPerChunk, new NetherGenMinable(BlocksNether.neridium_ore.getDefaultState(), neridiumOreSize), neridiumMinHeight, neridiumMaxHeight << (event.getWorld().getActualHeight() >> 8));
+            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), liniumPerChunk, new NetherGenMinable(BlocksNether.linium_ore.getDefaultState(), liniumOreSize), liniumMinHeight, liniumMaxHeight << (event.getWorld().getActualHeight() >> 8));
+            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), pyridiumPerChunk, new NetherGenMinable(BlocksNether.pyridium_ore.getDefaultState(), pyridiumOreSize), pyridiumMinHeight, pyridiumMaxHeight << (event.getWorld().getActualHeight() >> 8));
+            GLOWING_GROVE.decorator.genStandardOre1(event.getWorld(), event.getRand(), wPerChunk, new NetherGenMinable(BlocksNether.w_ore.getDefaultState(), wOreSize), wMinHeight, wMaxHeight << (event.getWorld().getActualHeight() >> 8));
         }
     }
 

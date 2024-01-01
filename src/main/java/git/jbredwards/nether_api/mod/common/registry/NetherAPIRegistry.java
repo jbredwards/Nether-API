@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -28,8 +28,8 @@ public class NetherAPIRegistry implements INetherAPIRegistry
     public static final NetherAPIRegistry NETHER = new NetherAPIRegistry(), THE_END = new NetherAPIRegistry();
     public NetherAPIRegistry() { REGISTRIES.add(this); }
 
-    @Nonnull protected final List<BiomeManager.BiomeEntry> biomeEntries = new LinkedList<>();
-    @Nonnull protected final List<INetherAPIStructureEntry> structureEntries = new LinkedList<>();
+    @Nonnull protected final List<BiomeManager.BiomeEntry> biomeEntries = new ArrayList<>();
+    @Nonnull protected final List<INetherAPIStructureEntry> structureEntries = new ArrayList<>();
 
     @Nonnull
     @Override

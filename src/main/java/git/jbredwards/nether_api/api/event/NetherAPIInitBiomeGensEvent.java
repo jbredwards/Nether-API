@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -38,7 +38,7 @@ public abstract class NetherAPIInitBiomeGensEvent extends WorldTypeEvent
     }
 
     /**
-     * Fired when determining the GenLayers used for biome generation in the End (WIP).<br>
+     * Fired when determining the GenLayers used for biome generation in the End.<br>
      * <br>
      * This event is not {@link net.minecraftforge.fml.common.eventhandler.Cancelable Cancelable}.
      * <br>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -38,7 +38,7 @@ public abstract class NetherAPIFogColorEvent extends Event
     public final float celestialAngle;
     public final float partialTicks;
 
-    public double fogR, fogG, fogB; // Unit RGB values (must be between 0 and 1)
+    public double fogR, fogG, fogB; // RGB values (must be between 0 and 1)
     protected NetherAPIFogColorEvent(@Nonnull Biome biomeIn, @Nonnull World worldIn, float celestialAngleIn, float partialTicksIn) {
         biome = biomeIn;
         world = worldIn;

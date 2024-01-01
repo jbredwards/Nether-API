@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. jbredwards
+ * Copyright (c) 2023-2024. jbredwards
  * All rights reserved.
  */
 
@@ -36,7 +36,7 @@ public class FadingSound extends MovingSound
 
     @Override
     public void update() {
-        if(fadeInTicks < 0 || player.isDead) {
+        if(fadeInTicks < 0 || player.isDead || !player.isAddedToWorld()) {
             donePlaying = true;
             repeat = false;
         }
