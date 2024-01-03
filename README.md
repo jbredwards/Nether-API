@@ -8,7 +8,7 @@
 
 ```groovy
 dependencies {
-    deobfCompile 'com.github.jbredwards:nether-api:0920099e17'
+    deobfCompile 'com.github.jbredwards:nether-API:f2f48d7b8b'
 }
 
 repositories {
