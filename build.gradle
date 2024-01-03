@@ -228,3 +228,21 @@ idea {
 tasks.named("processIdeaSettings").configure {
     dependsOn("injectTags")
 }
+
+// below for jitpack.io, copied from GTNH:
+
+artifacts {
+    archives tasks.named("sourcesJar")
+}
+
+publishing {
+    publications {
+        create("maven", MavenPublication) {
+            from components.java
+
+            groupId = project.group
+            artifactId = project.archivesBaseName
+            version = project.version
+        }
+    }
+}
