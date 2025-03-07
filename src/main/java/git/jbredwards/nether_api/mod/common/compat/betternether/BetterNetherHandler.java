@@ -75,6 +75,8 @@ public final class BetterNetherHandler
     @SubscribeEvent
     static void registerBiomes(@Nonnull final RegistryEvent.Register<Biome> event) {
         @Nonnull final ObjIntConsumer<NetherBiome> registerAction = (netherBiome, netherBiomeId) -> {
+            if(!biomeIsEnabled(netherBiomeId)) return;
+
             @Nonnull final BiomeBetterNether biome = new BiomeBetterNether(netherBiome, netherBiomeId);
             event.getRegistry().register(biome);
 
@@ -83,11 +85,11 @@ public final class BetterNetherHandler
         };
 
         // register biomes for gen
-        GEN_BIOMES.add(BiomeRegister.BIOME_GRAVEL_DESERT);
-        GEN_BIOMES.add(BiomeRegister.BIOME_NETHER_JUNGLE);
-        GEN_BIOMES.add(BiomeRegister.BIOME_WART_FOREST);
-        GEN_BIOMES.add(BiomeRegister.BIOME_GRASSLANDS);
-        GEN_BIOMES.add(BiomeRegister.BIOME_MUSHROOM_FOREST);
+        if(biomeIsEnabled(1)) GEN_BIOMES.add(BiomeRegister.BIOME_GRAVEL_DESERT);
+        if(biomeIsEnabled(2)) GEN_BIOMES.add(BiomeRegister.BIOME_NETHER_JUNGLE);
+        if(biomeIsEnabled(3)) GEN_BIOMES.add(BiomeRegister.BIOME_WART_FOREST);
+        if(biomeIsEnabled(4)) GEN_BIOMES.add(BiomeRegister.BIOME_GRASSLANDS);
+        if(biomeIsEnabled(5)) GEN_BIOMES.add(BiomeRegister.BIOME_MUSHROOM_FOREST);
 
         // register biomes
         registerAction.accept(BiomeRegister.BIOME_EMPTY_NETHER, 0);
@@ -100,6 +102,8 @@ public final class BetterNetherHandler
         registerAction.accept(BiomeRegister.BIOME_WART_FOREST_EDGE, 7);
         registerAction.accept(BiomeRegister.BIOME_BONE_REEF, 8);
         registerAction.accept(BiomeRegister.BIOME_POOR_GRASSLANDS, 9);
+
+        betterNetherBiomeEnabledConfig = null;
     }
 
     // exists because this mod adds BetterNether biomes as real biomes
@@ -113,5 +117,24 @@ public final class BetterNetherHandler
         // remove ghasts from biomes that have cacti, as to prevent lots of really annoying damage sounds from playing
         getBiomeFromLookup(BiomeRegister.BIOME_GRAVEL_DESERT).getSpawnableList(EnumCreatureType.MONSTER)
                 .removeIf(entry -> EntityGhast.class.isAssignableFrom(entry.entityClass));
+    }
+
+    //The following is only necessary in older versions of BetterNether
+    //Cache for faster access
+    private static boolean[] betterNetherBiomeEnabledConfig = null;
+    private static boolean biomeIsEnabled(int id) {
+        if (betterNetherBiomeEnabledConfig == null) {
+            try {
+                Field field = ConfigLoader.class.getDeclaredField("registerBiomes");
+                field.setAccessible(true);
+                betterNetherBiomeEnabledConfig = (boolean[]) field.get(null);
+            } catch (Exception ignored) {
+                //In other versions of BetterNether the targeted field will just not exist
+                betterNetherBiomeEnabledConfig = new boolean[]{true};
+            }
+        }
+
+        if (id < 0 || id >= betterNetherBiomeEnabledConfig.length) return true;
+        else return betterNetherBiomeEnabledConfig[id];
     }
 }
