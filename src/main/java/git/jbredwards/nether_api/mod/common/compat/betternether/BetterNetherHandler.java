@@ -36,7 +36,6 @@ public final class BetterNetherHandler
 {
     @Nonnull static final Set<NetherBiome> GEN_BIOMES = new HashSet<>();
     @Nonnull static final Map<NetherBiome, BiomeBetterNether> BIOME_LOOKUP = new HashMap<>();
-    @Nullable static Field legacyEnabledBiomes;
 
     public static void registerBiomes(@Nonnull final INetherAPIRegistry registry) {
         GEN_BIOMES.forEach(netherBiome -> {
@@ -59,14 +58,8 @@ public final class BetterNetherHandler
             // using a forked version of the mod
             if(biome.netherBiome instanceof WeightedRandom.Item) biome.cachedWeight = ConfigLoader.mustInitBiome(biome.netherBiome) ? biome.netherBiome.itemWeight : 0;
 
-            // using the original mod
-            else {
-                if(legacyEnabledBiomes == null) legacyEnabledBiomes = ObfuscationReflectionHelper.findField(ConfigLoader.class, "registerBiomes");
-                try { biome.cachedWeight = ((boolean[])legacyEnabledBiomes.get(null))[biome.netherBiomeId] ? 1 : 0; }
-
-                // should never pass
-                catch(final IllegalAccessException e) { throw new RuntimeException(e); }
-            }
+            // using the original mod, config disable already handled via biome != null in registerBiomes
+            else biome.cachedWeight = 1;
         }
 
         return biome.cachedWeight;
@@ -75,6 +68,8 @@ public final class BetterNetherHandler
     @SubscribeEvent
     static void registerBiomes(@Nonnull final RegistryEvent.Register<Biome> event) {
         @Nonnull final ObjIntConsumer<NetherBiome> registerAction = (netherBiome, netherBiomeId) -> {
+            if(netherBiome == null) return;
+
             @Nonnull final BiomeBetterNether biome = new BiomeBetterNether(netherBiome, netherBiomeId);
             event.getRegistry().register(biome);
 
@@ -83,11 +78,11 @@ public final class BetterNetherHandler
         };
 
         // register biomes for gen
-        GEN_BIOMES.add(BiomeRegister.BIOME_GRAVEL_DESERT);
-        GEN_BIOMES.add(BiomeRegister.BIOME_NETHER_JUNGLE);
-        GEN_BIOMES.add(BiomeRegister.BIOME_WART_FOREST);
-        GEN_BIOMES.add(BiomeRegister.BIOME_GRASSLANDS);
-        GEN_BIOMES.add(BiomeRegister.BIOME_MUSHROOM_FOREST);
+        if(BiomeRegister.BIOME_GRAVEL_DESERT != null) GEN_BIOMES.add(BiomeRegister.BIOME_GRAVEL_DESERT);
+        if(BiomeRegister.BIOME_NETHER_JUNGLE != null) GEN_BIOMES.add(BiomeRegister.BIOME_NETHER_JUNGLE);
+        if(BiomeRegister.BIOME_WART_FOREST != null) GEN_BIOMES.add(BiomeRegister.BIOME_WART_FOREST);
+        if(BiomeRegister.BIOME_GRASSLANDS != null) GEN_BIOMES.add(BiomeRegister.BIOME_GRASSLANDS);
+        if(BiomeRegister.BIOME_MUSHROOM_FOREST != null) GEN_BIOMES.add(BiomeRegister.BIOME_MUSHROOM_FOREST);
 
         // register biomes
         registerAction.accept(BiomeRegister.BIOME_EMPTY_NETHER, 0);
@@ -106,12 +101,12 @@ public final class BetterNetherHandler
     public static void init() {
         // fix fireflies
         Biomes.HELL.getSpawnableList(EnumCreatureType.AMBIENT).removeIf(entry -> entry.entityClass == EntityFirefly.class);
-        EntityRegistry.addSpawn(EntityFirefly.class, 100, 5, 10, EnumCreatureType.AMBIENT,
-                getBiomeFromLookup(BiomeRegister.BIOME_GRASSLANDS), getBiomeFromLookup(BiomeRegister.BIOME_NETHER_JUNGLE)
-        );
+        if(BiomeRegister.BIOME_GRASSLANDS != null) EntityRegistry.addSpawn(EntityFirefly.class, 100, 5, 10, EnumCreatureType.AMBIENT, getBiomeFromLookup(BiomeRegister.BIOME_GRASSLANDS));
+        if(BiomeRegister.BIOME_NETHER_JUNGLE != null) EntityRegistry.addSpawn(EntityFirefly.class, 100, 5, 10, EnumCreatureType.AMBIENT, getBiomeFromLookup(BiomeRegister.BIOME_NETHER_JUNGLE));
 
         // remove ghasts from biomes that have cacti, as to prevent lots of really annoying damage sounds from playing
-        getBiomeFromLookup(BiomeRegister.BIOME_GRAVEL_DESERT).getSpawnableList(EnumCreatureType.MONSTER)
-                .removeIf(entry -> EntityGhast.class.isAssignableFrom(entry.entityClass));
+        if(BiomeRegister.BIOME_GRAVEL_DESERT != null)
+            getBiomeFromLookup(BiomeRegister.BIOME_GRAVEL_DESERT).getSpawnableList(EnumCreatureType.MONSTER)
+                    .removeIf(entry -> EntityGhast.class.isAssignableFrom(entry.entityClass));
     }
 }
