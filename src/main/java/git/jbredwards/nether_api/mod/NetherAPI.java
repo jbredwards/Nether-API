@@ -5,6 +5,7 @@
 
 package git.jbredwards.nether_api.mod;
 
+import git.jbredwards.nether_api.Tags;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import git.jbredwards.nether_api.mod.common.compat.journey_into_the_light.JITLHandler;
@@ -36,9 +37,15 @@ public final class NetherAPI
 {
     // Mod Constants
     @Nonnull
-    public static final String MODID = "nether_api", NAME = "Nether API", VERSION = "1.3.0", DEPENDENCIES =
+    public static final String MODID = Tags.MOD_ID, NAME = Tags.MOD_NAME, VERSION = Tags.VERSION, DEPENDENCIES =
             // Minimum supported mod versions, since earlier versions may cause ASM problems
-            "after:betternether@[0.1.8.6,);after:biomesoplenty@[7.0.1.2444,);after:journey@1.0.6.11;after:natura@1.12.2-4.3.2.69;after:nethercraft@1.0.2;after:netherex@2.2.5;after:stygian@[1.0.4,);";
+            "after:betternether@[0.1.8.6,);" +
+            "after:biomesoplenty@[7.0.1.2444,);" +
+            "after:journey@1.0.6.11;" +
+            "after:natura@1.12.2-4.3.2.69;" +
+            "after:nethercraft@1.0.2;" +
+            "after:netherex@2.2.5;" +
+            "after:stygian@[1.0.4,);";
 
     // Mod Compatibility
     public static final boolean isBetterNetherLoaded = Loader.isModLoaded("betternether");
