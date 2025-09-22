@@ -8,13 +8,10 @@ package git.jbredwards.nether_api.mod.asm;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Streams;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.TransformerBiomesOPlentyFixes;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherConfigLoader;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherFirefly;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherGenerator;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.TransformerBiomesOPlentyBiomes;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.TransformerBiomesOPlentyDecorator;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.Transformer_NetherHeight_BiomesOPlenty;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.*;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLGenerator;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLTowerFix;
@@ -82,6 +79,10 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "biomesoplenty.common.world.generator.GeneratorBramble",
                         "biomesoplenty.common.world.generator.GeneratorHive",
                         "zmaster587.advancedRocketry.event.PlanetEventHandler");
+                // Prevent certain BOP fluids from vaporizing.
+                register(new TransformerBiomesOPlentyFluids(),
+                        "biomesoplenty.common.fluids.BloodFluid",
+                        "biomesoplenty.common.fluids.HoneyFluid");
             }
             // Journey Into The Light:
             {
