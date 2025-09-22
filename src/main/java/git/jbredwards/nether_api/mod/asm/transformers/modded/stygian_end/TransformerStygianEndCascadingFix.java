@@ -3,14 +3,11 @@
  * All rights reserved.
  */
 
-package git.jbredwards.nether_api.mod.asm.transformers.modded;
+package git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end;
 
+import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
-import net.minecraft.launchwrapper.IClassTransformer;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
+import io.netty.util.internal.IntegerHolder;
 import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
@@ -20,17 +17,15 @@ import javax.annotation.Nonnull;
  * @author jbred
  *
  */
-public final class TransformerStygianEndCascadingFix implements IClassTransformer, Opcodes
+public final class TransformerStygianEndCascadingFix implements ITransformer
 {
     @Nonnull
     @Override
     public byte[] transform(@Nonnull final String name, @Nonnull final String transformedName, @Nonnull final byte[] basicClass) {
         // WorldGenEnderCanopy
         switch(transformedName) {
-            case "fluke.stygian.world.feature.WorldGenEnderCanopy":
-                if(!NetherAPIConfig.StygianEnd.wideEnderCanopyGen) {
-                    @Nonnull final ClassNode classNode = new ClassNode();
-                    new ClassReader(basicClass).accept(classNode, 0);
+            case "fluke.stygian.world.feature.WorldGenEnderCanopy": {
+                return NetherAPIConfig.StygianEnd.wideEnderCanopyGen ? basicClass : transform(basicClass, classNode -> {
                     for(@Nonnull final MethodNode method : classNode.methods) {
                         switch(method.name) {
                             /*
@@ -50,8 +45,8 @@ public final class TransformerStygianEndCascadingFix implements IClassTransforme
                              */
                             case "isValidGenLocation":
                                 // vars for stygian end continuation only
-                                final int trunkRadiusVar = method.localVariables.stream().filter(var -> var.name.equals("trunkRadius")).mapToInt(var -> var.index).findFirst().orElse(-1);
-                                final int canopyRadiusVar = method.localVariables.stream().filter(var -> var.name.equals("canopyRadius")).mapToInt(var -> var.index).findFirst().orElse(-1);
+                                final int trunkRadiusVar = getLocalVar(method, "trunkRadius");
+                                final int canopyRadiusVar = getLocalVar(method, "canopyRadius");
                                 for(@Nonnull final AbstractInsnNode insn : method.instructions.toArray()) {
                                     if(insn.getOpcode() == BIPUSH) {
                                         if(((IntInsnNode)insn).operand == -23) ((IntInsnNode)insn).operand = -15;
@@ -124,11 +119,8 @@ public final class TransformerStygianEndCascadingFix implements IClassTransforme
                              * branchLength = 2 + rand.nextInt(2);
                              */
                             case "buildBranches":
-                                final int branchLengthVar = method.localVariables.stream() // dynamically find the variable index, since stygian end continuation changes it
-                                        .filter(var -> var.name.equals("branchLength"))
-                                        .mapToInt(var -> var.index)
-                                        .findFirst()
-                                        .orElseThrow(() -> new UnsupportedOperationException("Unsupported version of Stygian End found, please try a different version!"));
+                                final int branchLengthVar = getLocalVar(method, "branchLength"); // dynamically find the variable index, since stygian end continuation changes it
+                                if(branchLengthVar == -1) throw new UnsupportedOperationException("Unsupported version of Stygian End found, please try a different version!");
                                 for(@Nonnull final AbstractInsnNode insn : method.instructions.toArray()) {
                                     if(insn.getOpcode() == ISTORE && ((VarInsnNode)insn).var == branchLengthVar) {
                                         @Nonnull AbstractInsnNode nextBackInsn = insn.getPrevious(), backInsn;
@@ -186,10 +178,10 @@ public final class TransformerStygianEndCascadingFix implements IClassTransforme
                             case "placeLogAt":
                             case "placeLeafAt":
                                 for(@Nonnull final AbstractInsnNode insn : method.instructions.toArray()) {
-                                    if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "setBlockState" : "func_175656_a")) {
-                                        method.instructions.insertBefore(insn, new IntInsnNode(BIPUSH, 18));
+                                    if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "setBlockState" : "func_175656_a")) {
+                                        method.instructions.insertBefore(insn, genBlockFlags());
 
-                                        if(!FMLLaunchHandler.isDeobfuscatedEnvironment()) ((MethodInsnNode)insn).name = "func_180501_a";
+                                        if(DEOBFUSCATED) ((MethodInsnNode)insn).name = "func_180501_a";
                                         ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
                                         break;
                                     }
@@ -197,107 +189,82 @@ public final class TransformerStygianEndCascadingFix implements IClassTransforme
                                 break;
                         }
                     }
+                });
+            }
 
-                    //writes the changes
-                    @Nonnull final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-                    classNode.accept(writer);
-                    return writer.toByteArray();
-                }
-                break;
             // WorldGenEndVolcano
             case "fluke.stygian.world.feature.WorldGenEndVolcano": {
-                @Nonnull final ClassNode classNode = new ClassNode();
-                new ClassReader(basicClass).accept(classNode, 0);
-
-                methods:
-                for (@Nonnull final MethodNode method : classNode.methods) {
-                    /*
-                     * generate:
-                     * Old code:
-                     * int radius = 9 + rand.nextInt(6);
-                     * ...
-                     * world.setBlockState(baseBlock, volcBlock);
-                     * ...
-                     * world.setBlockState(pos.add(x, y, z), volcBlock);
-                     *
-                     * New code:
-                     * // Shrink max radius by one block, as to not generate into unloaded chunks
-                     * int radius = 9 + rand.nextInt(5);
-                     * ...
-                     * // Don't use bad block flags for volcano generation
-                     * world.setBlockState(baseBlock, volcBlock, 18);
-                     * ...
-                     * world.setBlockState(pos.add(x, y, z), volcBlock, 18);
-                     */
-                    if (method.name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "generate" : "func_180709_b")) {
-                        int changes = 0;
-                        for(@Nonnull final AbstractInsnNode insn : method.instructions.toArray()) {
-                            // int radius = 9 + rand.nextInt(6) -> int radius = 9 + rand.nextInt(5)
-                            if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 6) {
-                                method.instructions.insert(insn, new InsnNode(ICONST_5));
-                                method.instructions.remove(insn);
-                            }
-                            // world.setBlockState(baseBlock, volcBlock) -> world.setBlockState(baseBlock, volcBlock, 18)
-                            else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "setBlockState" : "func_175656_a")) {
-                                method.instructions.insertBefore(insn, new IntInsnNode(BIPUSH, 18));
-
-                                if(!FMLLaunchHandler.isDeobfuscatedEnvironment()) ((MethodInsnNode)insn).name = "func_180501_a";
-                                ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
-                                if(++changes == 2) break methods;
-                            }
-                        }
+                /*
+                 * generate:
+                 * Old code:
+                 * int radius = 9 + rand.nextInt(6);
+                 * ...
+                 * world.setBlockState(baseBlock, volcBlock);
+                 * ...
+                 * world.setBlockState(pos.add(x, y, z), volcBlock);
+                 *
+                 * New code:
+                 * // Shrink max radius by one block, as to not generate into unloaded chunks
+                 * int radius = 9 + rand.nextInt(5);
+                 * ...
+                 * // Don't use bad block flags for volcano generation
+                 * world.setBlockState(baseBlock, volcBlock, 18);
+                 * ...
+                 * world.setBlockState(pos.add(x, y, z), volcBlock, 18);
+                 */
+                @Nonnull final IntegerHolder changes = new IntegerHolder();
+                return transformMethod(basicClass, method -> method.name.equals(DEOBFUSCATED ? "generate" : "func_180709_b"), (method, insn) -> {
+                    // int radius = 9 + rand.nextInt(6) -> int radius = 9 + rand.nextInt(5)
+                    if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 6) {
+                        method.instructions.insert(insn, new InsnNode(ICONST_5));
+                        method.instructions.remove(insn);
                     }
-                }
+                    // world.setBlockState(baseBlock, volcBlock) -> world.setBlockState(baseBlock, volcBlock, 18)
+                    else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "setBlockState" : "func_175656_a")) {
+                        method.instructions.insertBefore(insn, genBlockFlags());
 
-                //writes the changes
-                @Nonnull final ClassWriter writer = new ClassWriter(0);
-                classNode.accept(writer);
-                return writer.toByteArray();
+                        if(!DEOBFUSCATED) ((MethodInsnNode)insn).name = "func_180501_a";
+                        ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
+                        if(++changes.value == 2) return BreakType.METHODS;
+                    }
+
+                    return BreakType.CONTINUE;
+                });
             }
+
             // BiomeEndVolcano
             case "fluke.stygian.world.biomes.BiomeEndVolcano": {
-                @Nonnull final ClassNode classNode = new ClassNode();
-                new ClassReader(basicClass).accept(classNode, 0);
-
-                methods:
-                for(@Nonnull final MethodNode method : classNode.methods) {
-                    /*
-                     * generate:
-                     * Old code:
-                     * this.getEndSurfaceHeight(world, ..., (IBlockState)null);
-                     * ...
-                     * world.setBlockState(p, ModBlocks.endAcid.getDefaultState());
-                     *
-                     * New code:
-                     * // Don't generate volcano features outside the volcano biome
-                     * this.getEndSurfaceHeight(world, ..., END_OBSIDIAN);
-                     * ...
-                     * // Don't use bad block flags for acid generation
-                     * world.setBlockState(p, ModBlocks.endAcid.getDefaultState(), 18);
-                     */
-                    if(method.name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "decorate" : "func_180624_a")) {
-                        for(@Nonnull final AbstractInsnNode insn : method.instructions.toArray()) {
-                            // this.getEndSurfaceHeight(world, ..., (IBlockState)null) -> this.getEndSurfaceHeight(world, ..., END_OBSIDIAN)
-                            if(insn.getOpcode() == ACONST_NULL) {
-                                method.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, "fluke/stygian/world/biomes/BiomeEndVolcano", "END_OBSIDIAN", "Lnet/minecraft/block/state/IBlockState;"));
-                                method.instructions.remove(insn);
-                            }
-                            // world.setBlockState(p, ModBlocks.endAcid.getDefaultState()) -> world.setBlockState(p, ModBlocks.endAcid.getDefaultState(), 18)
-                            else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "setBlockState" : "func_175656_a")) {
-                                method.instructions.insertBefore(insn, new IntInsnNode(BIPUSH, 18));
-
-                                if(!FMLLaunchHandler.isDeobfuscatedEnvironment()) ((MethodInsnNode)insn).name = "func_180501_a";
-                                ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
-                                break methods;
-                            }
-                        }
+                /*
+                 * generate:
+                 * Old code:
+                 * this.getEndSurfaceHeight(world, ..., (IBlockState)null);
+                 * ...
+                 * world.setBlockState(p, ModBlocks.endAcid.getDefaultState());
+                 *
+                 * New code:
+                 * // Don't generate volcano features outside the volcano biome
+                 * this.getEndSurfaceHeight(world, ..., END_OBSIDIAN);
+                 * ...
+                 * // Don't use bad block flags for acid generation
+                 * world.setBlockState(p, ModBlocks.endAcid.getDefaultState(), 18);
+                 */
+                return transformMethod(basicClass, method -> method.name.equals(DEOBFUSCATED ? "decorate" : "func_180624_a"), (method, insn) -> {
+                    // this.getEndSurfaceHeight(world, ..., (IBlockState)null) -> this.getEndSurfaceHeight(world, ..., END_OBSIDIAN)
+                    if(insn.getOpcode() == ACONST_NULL) {
+                        method.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, "fluke/stygian/world/biomes/BiomeEndVolcano", "END_OBSIDIAN", "Lnet/minecraft/block/state/IBlockState;"));
+                        method.instructions.remove(insn);
                     }
-                }
+                    // world.setBlockState(p, ModBlocks.endAcid.getDefaultState()) -> world.setBlockState(p, ModBlocks.endAcid.getDefaultState(), 18)
+                    else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "setBlockState" : "func_175656_a")) {
+                        method.instructions.insertBefore(insn, genBlockFlags());
 
-                //writes the changes
-                @Nonnull final ClassWriter writer = new ClassWriter(0);
-                classNode.accept(writer);
-                return writer.toByteArray();
+                        if(!DEOBFUSCATED) ((MethodInsnNode)insn).name = "func_180501_a";
+                        ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
+                        return BreakType.METHODS;
+                    }
+
+                    return BreakType.CONTINUE;
+                });
             }
         }
 

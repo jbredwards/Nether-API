@@ -3,17 +3,13 @@
  * All rights reserved.
  */
 
-package git.jbredwards.nether_api.mod.asm.transformers.modded;
+package git.jbredwards.nether_api.mod.asm.transformers.modded.betternether;
 
+import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BiomeBetterNether;
-import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import paulevs.betternether.biomes.BiomeRegister;
 import paulevs.betternether.biomes.NetherBiome;
@@ -26,12 +22,12 @@ import java.util.Random;
  * @author jbred
  *
  */
-public final class TransformerBetterNetherGenerator implements IClassTransformer, Opcodes
+public final class TransformerBetterNetherGenerator implements ITransformer
 {
     //exists in case BetterNether-Continuation adds built-in support
     public static boolean isEnabled = true;
 
-    static void legacyTransformer(@Nonnull final ClassNode classNode) {
+    void legacyTransformer(@Nonnull final ClassNode classNode) {
         for(final MethodNode method : classNode.methods) {
             if(method.name.equals("generate")) {
                 // needed down the line
@@ -75,7 +71,7 @@ public final class TransformerBetterNetherGenerator implements IClassTransformer
                         list.add(new VarInsnNode(ALOAD, 0));
                         list.add(new VarInsnNode(ILOAD, wzIndex - 2));
                         list.add(new VarInsnNode(ILOAD, wzIndex));
-                        list.add(new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/asm/transformers/modded/TransformerBetterNetherGenerator$Hooks", "getNetherBiome", "(Lnet/minecraft/world/World;II)Lpaulevs/betternether/biomes/NetherBiome;", false));
+                        list.add(genHookMethod("getNetherBiome", "(Lnet/minecraft/world/World;II)Lpaulevs/betternether/biomes/NetherBiome;"));
                         list.add(new VarInsnNode(ASTORE, biomeIndex));
                         method.instructions.insert(insn, list);
                     }
@@ -96,7 +92,7 @@ public final class TransformerBetterNetherGenerator implements IClassTransformer
                      */
                     else if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 126) {
                         method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
-                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", FMLLaunchHandler.isDeobfuscatedEnvironment() ? "getActualHeight" : "func_72940_L", "()I", false));
+                        method.instructions.insertBefore(insn, genHeightMethod());
                         method.instructions.insertBefore(insn, new InsnNode(ICONST_2));
                         method.instructions.insertBefore(insn, new InsnNode(ISUB));
                         method.instructions.remove(insn);
@@ -123,9 +119,9 @@ public final class TransformerBetterNetherGenerator implements IClassTransformer
                 }
             }
         }
-    };
+    }
 
-    static void continuationTransformer(@Nonnull final ClassNode classNode) {
+    void continuationTransformer(@Nonnull final ClassNode classNode) {
         for(final MethodNode method : classNode.methods) {
             if(method.name.equals("generate")) {
                 //generate
@@ -162,7 +158,7 @@ public final class TransformerBetterNetherGenerator implements IClassTransformer
                      */
                     else if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 126) {
                         method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
-                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", FMLLaunchHandler.isDeobfuscatedEnvironment() ? "getActualHeight" : "func_72940_L", "()I", false));
+                        method.instructions.insertBefore(insn, genHeightMethod());
                         method.instructions.insertBefore(insn, new InsnNode(ICONST_2));
                         method.instructions.insertBefore(insn, new InsnNode(ISUB));
                         method.instructions.remove(insn);
@@ -178,7 +174,7 @@ public final class TransformerBetterNetherGenerator implements IClassTransformer
                      */
                     else if(insn.getOpcode() == INVOKESTATIC && ((MethodInsnNode)insn).name.equals("getBiomeFromCache")) {
                         method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 10));
-                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/asm/transformers/modded/TransformerBetterNetherGenerator$Hooks", "getNetherBiome", "(II[[Lpaulevs/betternether/biomes/NetherBiome;Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;)Lpaulevs/betternether/biomes/NetherBiome;", false));
+                        method.instructions.insertBefore(insn, genHookMethod("getNetherBiome", "(II[[Lpaulevs/betternether/biomes/NetherBiome;Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;)Lpaulevs/betternether/biomes/NetherBiome;"));
                         method.instructions.remove(insn);
                         return;
                     }
@@ -191,45 +187,32 @@ public final class TransformerBetterNetherGenerator implements IClassTransformer
     @Override
     public byte[] transform(@Nonnull final String name, @Nonnull final String transformedName, @Nonnull final byte[] basicClass) {
         if(isEnabled && transformedName.equals("paulevs.betternether.world.BNWorldGenerator")) {
-            @Nonnull final ClassNode classNode = new ClassNode();
-            new ClassReader(basicClass).accept(classNode, ClassReader.SKIP_FRAMES);
-
-            //search for method existing in only legacy versions
-            boolean useLegacyTransformer = false;
-            for(@Nonnull final MethodNode method : classNode.methods) {
-                if(method.name.equals("smoothChunk")) {
-                    useLegacyTransformer = true;
-                    break;
+            return transform(basicClass, true, classNode -> {
+                //search for method existing in only legacy versions
+                boolean useLegacyTransformer = false;
+                for(@Nonnull final MethodNode method : classNode.methods) {
+                    if(method.name.equals("smoothChunk")) {
+                        useLegacyTransformer = true;
+                        break;
+                    }
                 }
-            }
 
-            if(useLegacyTransformer) legacyTransformer(classNode);
-            else continuationTransformer(classNode);
-
-            // writes the changes
-            @Nonnull final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-            classNode.accept(writer);
-            return writer.toByteArray();
+                if(useLegacyTransformer) legacyTransformer(classNode);
+                else continuationTransformer(classNode);
+            });
         }
 
         // Fix TONS of bad block flags
-        else if("paulevs.betternether.biomes".startsWith(transformedName)) {
-            final ClassNode classNode = new ClassNode();
-            new ClassReader(basicClass).accept(classNode, 0);
-            for(@Nonnull final MethodNode method : classNode.methods) {
-                for(@Nonnull final AbstractInsnNode insn : method.instructions.toArray()) {
-                    if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "setBlockState" : "func_175656_a")) {
-                        method.instructions.insertBefore(insn, new IntInsnNode(BIPUSH, 18));
-                        if(!FMLLaunchHandler.isDeobfuscatedEnvironment()) ((MethodInsnNode)insn).name = "func_180501_a";
-                        ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
-                    }
+        else if(transformedName.startsWith("paulevs.betternether.biomes")) {
+            return transformMethod(basicClass, method -> true, (method, insn) -> {
+                if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "setBlockState" : "func_175656_a")) {
+                    method.instructions.insertBefore(insn, genBlockFlags());
+                    if(!DEOBFUSCATED) ((MethodInsnNode)insn).name = "func_180501_a";
+                    ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
                 }
-            }
 
-            // writes the changes
-            @Nonnull final ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-            classNode.accept(writer);
-            return writer.toByteArray();
+                return BreakType.CONTINUE;
+            });
         }
 
         return basicClass;

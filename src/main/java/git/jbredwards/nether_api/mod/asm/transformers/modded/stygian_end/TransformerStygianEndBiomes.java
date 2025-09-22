@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package git.jbredwards.nether_api.mod.asm.transformers.modded;
+package git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.*;

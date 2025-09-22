@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package git.jbredwards.nether_api.mod.asm.transformers.modded;
+package git.jbredwards.nether_api.mod.asm.transformers.modded.netherex;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.*;
@@ -11,23 +11,23 @@ import org.objectweb.asm.*;
 import javax.annotation.Nonnull;
 
 /**
- * Change Biomes O' Plenty's nether biome super classes
+ * Change NetherEx's nether biome super classes
  * @author jbred
  *
  */
-public final class TransformerBiomesOPlentyBiomes implements IClassTransformer
+public final class TransformerNetherEXBiomes implements IClassTransformer
 {
     @Nonnull
     @Override
     public byte[] transform(@Nonnull String name, @Nonnull String transformedName, @Nonnull byte[] basicClass) {
-        if(transformedName.startsWith("biomesoplenty")) {
+        if(transformedName.startsWith("logictechcorp")) {
             final ClassReader reader = new ClassReader(basicClass);
-            if("biomesoplenty/common/biome/nether/BOPHellBiome".equals(reader.getSuperName())) {
+            if("logictechcorp/netherex/world/biome/BiomeNetherEx".equals(reader.getSuperName())) {
                 final ClassWriter writer = new ClassWriter(0);
                 reader.accept(new ClassVisitor(Opcodes.ASM5, writer) {
                     @Override
                     public void visit(int version, int access, @Nonnull String name, @Nonnull String signature, @Nonnull String superName, @Nonnull String[] interfaces) {
-                        super.visit(version, access, name, signature, "git/jbredwards/nether_api/mod/common/compat/biomesoplenty/AbstractNetherBOPBiome", interfaces);
+                        super.visit(version, access, name, signature, "git/jbredwards/nether_api/mod/common/compat/netherex/AbstractNetherExBiome", interfaces);
                     }
 
                     @Nonnull
@@ -37,7 +37,7 @@ public final class TransformerBiomesOPlentyBiomes implements IClassTransformer
                         return "<init>".equals(name) ? new MethodVisitor(Opcodes.ASM5, old) {
                             @Override
                             public void visitMethodInsn(int opcode, @Nonnull String owner, @Nonnull String name, @Nonnull String desc, boolean itf) {
-                                super.visitMethodInsn(opcode, "biomesoplenty/common/biome/nether/BOPHellBiome".equals(owner) ? "git/jbredwards/nether_api/mod/common/compat/biomesoplenty/AbstractNetherBOPBiome" : owner, name, desc, itf);
+                                super.visitMethodInsn(opcode, "logictechcorp/netherex/world/biome/BiomeNetherEx".equals(owner) ? "git/jbredwards/nether_api/mod/common/compat/netherex/AbstractNetherExBiome" : owner, name, desc, itf);
                             }
                         } : old;
                     }

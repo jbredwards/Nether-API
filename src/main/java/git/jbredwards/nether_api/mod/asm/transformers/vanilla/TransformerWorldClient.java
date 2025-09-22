@@ -7,19 +7,15 @@ package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
+import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
@@ -32,58 +28,44 @@ import java.util.Random;
  * @author jbred
  *
  */
-public final class TransformerWorldClient implements IClassTransformer, Opcodes
+public final class TransformerWorldClient implements ITransformer
 {
     @Nonnull
     @Override
     public byte[] transform(@Nonnull String name, @Nonnull String transformedName, @Nonnull byte[] basicClass) {
-        if("net.minecraft.client.multiplayer.WorldClient".equals(transformedName)) {
-            final ClassNode classNode = new ClassNode();
-            new ClassReader(basicClass).accept(classNode, 0);
-
+        return transform(basicClass, classNode -> {
             //remove playMoodSoundAndCheckLight method
-            classNode.methods.removeIf(method -> method.name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "playMoodSoundAndCheckLight" : "func_147467_a"));
-
+            classNode.methods.removeIf(method -> method.name.equals(DEOBFUSCATED ? "playMoodSoundAndCheckLight" : "func_147467_a"));
             //transform showBarrierParticles method
-            methods:
-            for(final MethodNode method : classNode.methods) {
-                if(method.name.equals(FMLLaunchHandler.isDeobfuscatedEnvironment() ? "showBarrierParticles" : "func_184153_a")) {
-                    for(final AbstractInsnNode insn : method.instructions.toArray()) {
-                        /*
-                         * showBarrierParticles: (changes are around line 396)
-                         * Old code:
-                         * public void showBarrierParticles(int x, int y, int z, int offset, Random random, boolean holdingBarrier, BlockPos.MutableBlockPos pos)
-                         * {
-                         *     ...
-                         * }
-                         *
-                         * New code:
-                         * //add biome ambient particles
-                         * public void showBarrierParticles(int x, int y, int z, int offset, Random random, boolean holdingBarrier, BlockPos.MutableBlockPos pos)
-                         * {
-                         *     ...
-                         *     Hooks.spawnBiomeAmbientParticle(this, random, pos, iblockstate);
-                         * }
-                         */
-                        if(insn.getOpcode() == RETURN) {
-                            method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
-                            method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 5));
-                            method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 7));
-                            method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 11));
-                            method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/asm/transformers/vanilla/TransformerWorldClient$Hooks", "spawnBiomeAmbientParticle", "(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)V", false));
-                            break methods;
-                        }
-                    }
+            transformMethod(classNode, method -> method.name.equals(DEOBFUSCATED ? "showBarrierParticles" : "func_184153_a"), (method, insn) -> {
+                /*
+                 * showBarrierParticles: (changes are around line 396)
+                 * Old code:
+                 * public void showBarrierParticles(int x, int y, int z, int offset, Random random, boolean holdingBarrier, BlockPos.MutableBlockPos pos)
+                 * {
+                 *     ...
+                 * }
+                 *
+                 * New code:
+                 * //add biome ambient particles
+                 * public void showBarrierParticles(int x, int y, int z, int offset, Random random, boolean holdingBarrier, BlockPos.MutableBlockPos pos)
+                 * {
+                 *     ...
+                 *     Hooks.spawnBiomeAmbientParticle(this, random, pos, iblockstate);
+                 * }
+                 */
+                if(insn.getOpcode() == RETURN) {
+                    method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
+                    method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 5));
+                    method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 7));
+                    method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 11));
+                    method.instructions.insertBefore(insn, genHookMethod("spawnBiomeAmbientParticle", "(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)V"));
+                    return BreakType.METHODS;
                 }
-            }
 
-            //writes the changes
-            final ClassWriter writer = new ClassWriter(0);
-            classNode.accept(writer);
-            return writer.toByteArray();
-        }
-
-        return basicClass;
+                return BreakType.CONTINUE;
+            });
+        });
     }
 
     @SuppressWarnings("unused")
