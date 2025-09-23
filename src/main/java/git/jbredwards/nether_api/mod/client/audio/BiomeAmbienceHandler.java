@@ -14,10 +14,11 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
-import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.Mod;
@@ -51,7 +52,9 @@ final class BiomeAmbienceHandler
     static void onPlayerTick(@Nonnull TickEvent.ClientTickEvent event) {
         if(event.phase == TickEvent.Phase.END && !mc.isGamePaused()) {
             if(mc.player != null && mc.world != null) {
-                final BlockPos pos = new BlockPos(ActiveRenderInfo.projectViewFromEntity(mc.player, mc.getRenderPartialTicks()));
+                final Vec3d posEyes = mc.player.getPositionEyes(mc.getRenderPartialTicks());
+
+                final BlockPos pos = new BlockPos(posEyes);
                 final Biome biome = mc.world.getBiome(pos);
                 activeBiomeAmbientSounds.values().removeIf(FadingSound::isDonePlaying);
 
@@ -80,7 +83,7 @@ final class BiomeAmbienceHandler
 
                 //random biome ambient sound
                 final ISoundAmbience ambientSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world, pos, biome, ISoundAmbience.class, IAmbienceWorldProvider::getRandomAmbientSound, IAmbienceBiome::getRandomAmbientSound, null);
-                if(ambientSound != null && mc.player.getRNG().nextDouble() < ambientSound.getChancePerTick()) {
+                if(ambientSound != null && Math.random() < ambientSound.getChancePerTick()) {
                     final ISound sound = new PositionedSoundRecord(ambientSound.getSoundEvent().getSoundName(), SoundCategory.AMBIENT, 1, 1, false, 0, ISound.AttenuationType.NONE, 0, 0, 0);
                     mc.getSoundHandler().playSound(sound);
                 }
@@ -88,28 +91,27 @@ final class BiomeAmbienceHandler
                 //random dark biome ambient sound
                 final IDarkSoundAmbience caveSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world, pos, biome, IDarkSoundAmbience.class, IAmbienceWorldProvider::getDarkAmbienceSound, IAmbienceBiome::getDarkAmbienceSound, DarkSoundAmbience.DEFAULT_CAVE);
                 if(caveSound != null) {
-                    final int searchDiameter = caveSound.getLightSearchRadius() << 1 + 1;
+                    final double searchX = posEyes.x + MathHelper.getInt(mc.player.getRNG(), -caveSound.getLightSearchRadius(), caveSound.getLightSearchRadius());
+                    final double searchY = posEyes.y + MathHelper.getInt(mc.player.getRNG(), -caveSound.getLightSearchRadius(), caveSound.getLightSearchRadius());
+                    final double searchZ = posEyes.z + MathHelper.getInt(mc.player.getRNG(), -caveSound.getLightSearchRadius(), caveSound.getLightSearchRadius());
 
-                    final double searchX = mc.player.posX + mc.player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
-                    final double searchY = mc.player.posY + mc.player.getEyeHeight() + mc.player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
-                    final double searchZ = mc.player.posZ + mc.player.getRNG().nextInt(searchDiameter) - caveSound.getLightSearchRadius();
                     final BlockPos searchPos = new BlockPos(searchX, searchY, searchZ);
-
                     final int skyLight = mc.world.getLightFor(EnumSkyBlock.SKY, searchPos);
+
                     caveAmbienceChance -= skyLight > 0 ? skyLight * 0.001 / 15 : (mc.world.getLightFor(EnumSkyBlock.BLOCK, searchPos) - 1) * caveSound.getChancePerTick();
                     if(caveAmbienceChance < 1) caveAmbienceChance = Math.max(caveAmbienceChance, 0);
 
                     //play the sound
                     else {
-                        final double offsetX = searchX - mc.player.posX;
-                        final double offsetY = searchY - mc.player.posY - mc.player.getEyeHeight();
-                        final double offsetZ = searchZ - mc.player.posZ;
+                        final double offsetX = searchX - posEyes.x;
+                        final double offsetY = searchY - posEyes.y;
+                        final double offsetZ = searchZ - posEyes.z;
                         final double offset = Math.sqrt(offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ);
                         final double soundOffset = offset * (offset + caveSound.getSoundOffset());
 
-                        final float x = (float)(mc.player.posX + offsetX / soundOffset);
-                        final float y = (float)(mc.player.posY + mc.player.getEyeHeight() + offsetY / soundOffset);
-                        final float z = (float)(mc.player.posZ + offsetZ / soundOffset);
+                        final float x = (float)(posEyes.x + offsetX / soundOffset);
+                        final float y = (float)(posEyes.y + offsetY / soundOffset);
+                        final float z = (float)(posEyes.z + offsetZ / soundOffset);
                         final ISound sound = new PositionedSoundRecord(caveSound.getSoundEvent().getSoundName(), SoundCategory.AMBIENT, 1, 1, false, 0, ISound.AttenuationType.NONE, x, y, z);
 
                         mc.getSoundHandler().playSound(sound);

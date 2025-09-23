@@ -26,10 +26,18 @@ public class VanillaMusicType implements IMusicType
     @Nonnull
     @SideOnly(Side.CLIENT)
     public final MusicType musicType;
+    private final boolean replacesCurrent;
 
     @SideOnly(Side.CLIENT)
     public VanillaMusicType(@Nullable MusicType musicTypeIn) {
+        this(musicTypeIn, false);
+    }
+
+    // Since 1.4.0
+    @SideOnly(Side.CLIENT)
+    public VanillaMusicType(@Nullable MusicType musicTypeIn, boolean replacesCurrentIn) {
         musicType = Objects.requireNonNull(musicTypeIn, "MusicType cannot be null!");
+        replacesCurrent = replacesCurrentIn;
     }
 
     @Nonnull
@@ -39,5 +47,5 @@ public class VanillaMusicType implements IMusicType
 
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean replacesCurrentMusic(@Nonnull MusicType currentlyPlaying) { return false; }
+    public boolean replacesCurrentMusic(@Nonnull MusicType currentlyPlaying) { return replacesCurrent; }
 }

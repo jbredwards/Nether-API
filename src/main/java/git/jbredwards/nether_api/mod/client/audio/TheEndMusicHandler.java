@@ -10,7 +10,6 @@ import git.jbredwards.nether_api.api.biome.IEndBiome;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
-import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
@@ -38,7 +37,7 @@ public final class TheEndMusicHandler
     @Nullable
     public static MusicTicker.MusicType getMusicType() {
         if(currentType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) currentType = null;
-        final Biome biome = mc.world.getBiome(new BlockPos(ActiveRenderInfo.projectViewFromEntity(mc.player, mc.getRenderPartialTicks())));
+        final Biome biome = mc.world.getBiome(new BlockPos(mc.player.getPositionEyes(mc.getRenderPartialTicks())));
         if(biome instanceof IEndBiome) {
             final IMusicType musicType = mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic() ? ((IEndBiome)biome).getBossMusicType() : ((IEndBiome)biome).getMusicType();
             if(currentType == null) currentType = musicType.getMusicType();
