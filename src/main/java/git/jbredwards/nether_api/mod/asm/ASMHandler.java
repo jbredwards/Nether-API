@@ -138,6 +138,7 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Disable NetherEx's nether override.
                 register(new TransformerNetherExOverride(),
                         "logictechcorp.netherex.handler.BiomeTraitGenerationHandler",
+                        "logictechcorp.netherex.handler.WorldHandler",
                         "logictechcorp.netherex.world.biome.data.BiomeDataManagerNetherEx",
                         "logictechcorp.netherex.NetherEx");
             }

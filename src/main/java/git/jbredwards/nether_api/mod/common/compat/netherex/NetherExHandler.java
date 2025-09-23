@@ -10,10 +10,11 @@ import logictechcorp.libraryex.event.LibExEventFactory;
 import logictechcorp.libraryex.world.biome.data.BiomeData;
 import logictechcorp.netherex.NetherEx;
 import logictechcorp.netherex.NetherExConfig;
-import logictechcorp.netherex.init.NetherExBiomes;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.event.world.WorldEvent;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -32,24 +33,20 @@ public final class NetherExHandler
 
     public static boolean doesSoulSandGenerate() { return NetherExConfig.dimension.nether.generateSoulSand; }
 
-    public static void onChunkGenerate(@Nonnull Chunk chunk) { LibExEventFactory.onChunkGenerate(chunk); }
+    public static void onChunkGenerate(@Nonnull final Chunk chunk) { LibExEventFactory.onChunkGenerate(chunk); }
 
-    public static void registerBiomes(@Nonnull INetherAPIRegistry registry) {
-        registerBiome(registry, NetherExBiomes.ARCTIC_ABYSS);
-        registerBiome(registry, NetherExBiomes.FUNGI_FOREST);
-        registerBiome(registry, NetherExBiomes.RUTHLESS_SANDS);
-        registerBiome(registry, NetherExBiomes.TORRID_WASTELAND);
-    }
-
-    static void registerBiome(@Nonnull INetherAPIRegistry registry, @Nonnull Biome biome) {
-        final BiomeData biomeData = NetherEx.BIOME_DATA_MANAGER.getBiomeData(biome);
-        if(biomeData.isEnabled()) registry.registerBiome(biome, biomeData.getGenerationWeight());
+    public static void registerBiomes(@Nonnull final INetherAPIRegistry registry, @Nonnull final World world) {
+        // Read NetherEx data, which is no longer handled on world loading.
+        NetherEx.BIOME_DATA_MANAGER.onWorldUnload(new WorldEvent.Unload(world));
+        NetherEx.BIOME_DATA_MANAGER.onWorldLoad(new WorldEvent.Load(world));
+        // Copy NetherEx biome entries to Nether API registry.
+        NetherEx.BIOME_DATA_MANAGER.getCurrentBiomeEntries().values().forEach(registry::registerBiome);
     }
 
     @Nonnull
-    public static List<Biome.SpawnListEntry> getSpawnableList(@Nonnull Biome biome, @Nonnull EnumCreatureType creatureType) {
-        final List<Biome.SpawnListEntry> spawns = new ArrayList<>(biome.getSpawnableList(creatureType));
-        final BiomeData biomeData = NetherEx.BIOME_DATA_MANAGER.getBiomeData(biome);
+    public static List<Biome.SpawnListEntry> getSpawnableList(@Nonnull final Biome biome, @Nonnull final EnumCreatureType creatureType) {
+        @Nonnull final List<Biome.SpawnListEntry> spawns = new ArrayList<>(biome.getSpawnableList(creatureType));
+        @Nonnull final BiomeData biomeData = NetherEx.BIOME_DATA_MANAGER.getBiomeData(biome);
 
         if(biomeData != BiomeData.EMPTY) spawns.addAll(biomeData.getEntitySpawns(creatureType));
         return spawns;

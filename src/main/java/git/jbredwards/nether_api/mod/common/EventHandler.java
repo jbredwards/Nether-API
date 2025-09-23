@@ -50,7 +50,7 @@ final class EventHandler
         if(NetherAPI.isBiomesOPlentyLoaded) BiomesOPlentyHandler.registerBiomes(event.registry, event.world);
         if(NetherAPI.isJourneyIntoTheLightLoaded) JITLHandler.registerBiomes(event.registry);
         if(NetherAPI.isNethercraftLoaded) NethercraftHandler.registerBiomes(event.registry);
-        if(NetherAPI.isNetherExLoaded) NetherExHandler.registerBiomes(event.registry);
+        if(NetherAPI.isNetherExLoaded) NetherExHandler.registerBiomes(event.registry, event.world);
         //vanilla
         event.registry.registerBiome(Biomes.HELL, NetherAPIConfig.hellWeight);
     }

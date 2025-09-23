@@ -33,31 +33,52 @@ public interface INetherAPIRegistry
     List<INetherAPIRegistry> REGISTRIES = new LinkedList<>();
 
     /**
+     * Removes all the biomes and structures from the generation list.
+     * @since 1.0.0
+     */
+    void clear();
+
+    /**
+     * @return true if this registry currently has no biomes or structures.
+     * @since 1.3.0
+     */
+    default boolean isEmpty() {
+        return getBiomeEntries().isEmpty() && getStructures().isEmpty();
+    }
+
+    /**
      * @return an immutable list containing all the Biomes in the generation list.
      * @since 1.3.0
      */
+    @Nonnull
     List<BiomeManager.BiomeEntry> getBiomeEntries();
 
     /**
      * Adds the Biome to the generation list, with the provided weight.
+     * @since 1.0.0
      */
-    void registerBiome(@Nonnull Biome biome, int weight);
+    void registerBiome(@Nonnull final Biome biome, final int weight);
+
+    /**
+     * Adds the BiomeEntry to the generation list.
+     * @since 1.4.0
+     */
+    default void registerBiome(@Nonnull final BiomeManager.BiomeEntry biomeEntry) {
+        registerBiome(biomeEntry.biome, biomeEntry.itemWeight);
+    }
 
     /**
      * Removes the Biome from the generation list if present.
      * @return true if the biome was removed from the generation list.
+     * @since 1.0.0
      */
-    boolean removeBiome(@Nonnull Biome biome);
-
-    /**
-     * Removes all the biomes and structures from the Nether generation list.
-     */
-    void clear();
+    boolean removeBiome(@Nonnull final Biome biome);
 
     /**
      * @return an immutable list containing all the structure handlers in the generation list.
      * @since 1.3.0
      */
+    @Nonnull
     List<INetherAPIStructureEntry> getStructures();
 
     /**
@@ -66,7 +87,7 @@ public interface INetherAPIRegistry
      *
      * @since 1.3.0
      */
-    void registerStructure(@Nonnull INetherAPIStructureEntry structureEntry);
+    void registerStructure(@Nonnull final INetherAPIStructureEntry structureEntry);
 
     /**
      * Adds the structure handler to the generation list. Structures do not have to be registered in order to generate,
@@ -77,7 +98,7 @@ public interface INetherAPIRegistry
      *
      * @since 1.3.0
      */
-    void registerStructure(@Nonnull String commandName, @Nonnull Function<INetherAPIChunkGenerator, MapGenStructure> structureFactory);
+    void registerStructure(@Nonnull final String commandName, @Nonnull final Function<INetherAPIChunkGenerator, MapGenStructure> structureFactory);
 
     /**
      * Removes the structure handler from the generation list if present.
@@ -85,11 +106,5 @@ public interface INetherAPIRegistry
      *
      * @since 1.3.0
      */
-    boolean removeStructure(@Nonnull String commandName);
-
-    /**
-     * @return true if this registry currently has no biomes or structures.
-     * @since 1.3.0
-     */
-    default boolean isEmpty() { return getBiomeEntries().isEmpty() && getStructures().isEmpty(); }
+    boolean removeStructure(@Nonnull final String commandName);
 }
