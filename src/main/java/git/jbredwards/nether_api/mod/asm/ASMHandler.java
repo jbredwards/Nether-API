@@ -107,9 +107,13 @@ public final class ASMHandler implements IFMLLoadingPlugin
             {
                 // Change nether generators to not use hardcoded height values.
                 register(new Transformer_NetherHeight_Natura(),
+                        "com.progwml6.natura.world.worldgen.berry.nether.NetherBerryBushGenerator",
+                        "com.progwml6.natura.world.worldgen.trees.nether.BloodwoodTreeGenerator",
                         "com.progwml6.natura.world.worldgen.GlowshroomGenerator",
+                        "com.progwml6.natura.world.worldgen.NetherMinableGenerator",
                         "com.progwml6.natura.world.worldgen.NetherTreesGenerator",
-                        "com.progwml6.natura.world.worldgen.VineGenerator");
+                        "com.progwml6.natura.world.worldgen.VineGenerator",
+                        "maxhyper.dynamictreesnatura.worldgen.BiomeDataBasePopulator");
             }
             // Nethercraft Classic:
             {
