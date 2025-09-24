@@ -14,25 +14,36 @@ import git.jbredwards.nether_api.mod.common.compat.stygian_end.StygianEndHandler
 import git.jbredwards.nether_api.mod.common.network.MessageTeleportFX;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderNether;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.world.DimensionType;
+import net.minecraftforge.client.resource.ISelectiveResourceReloadListener;
+import net.minecraftforge.client.resource.VanillaResourceType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLModContainer;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  *
  * @author jbred
  *
  */
-@Mod(modid = NetherAPI.MODID, name = NetherAPI.NAME, version = NetherAPI.VERSION, dependencies = NetherAPI.DEPENDENCIES)
+@Mod(modid = NetherAPI.MODID, name = NetherAPI.NAME, version = NetherAPI.VERSION, dependencies = NetherAPI.DEPENDENCIES,
+guiFactory = "git.jbredwards.nether_api.mod.client.config.NetherAPIGuiFactory")
 public final class NetherAPI
 {
     // Mod Constants
@@ -88,6 +99,18 @@ public final class NetherAPI
     @Mod.EventHandler
     static void initClient(@Nonnull final FMLInitializationEvent event) {
         if(isStygianEndLoaded) StygianEndHandler.initClient();
+        Optional.ofNullable(Loader.instance().getIndexedModList().get(MODID)).ifPresent(mod -> {
+            // Remove "disable" button in mod gui.
+            ReflectionHelper.setPrivateValue(FMLModContainer.class, (FMLModContainer)mod, ModContainer.Disableable.NEVER, "disableability");
+            // Allow this mod's description and credits to be translated.
+            @Nullable final String[] creditsKey = new String[1], descKey = new String[1];
+            ((IReloadableResourceManager)Minecraft.getMinecraft().getResourceManager()).registerReloadListener((ISelectiveResourceReloadListener)(manager, condition) -> {
+                if(condition.test(VanillaResourceType.LANGUAGES) && mod.getMetadata() != null) {
+                    mod.getMetadata().credits = I18n.format(creditsKey[0] == null ? creditsKey[0] = mod.getMetadata().credits : creditsKey[0]).replace("\\n", "\n");
+                    mod.getMetadata().description = I18n.format(descKey[0] == null ? descKey[0] = mod.getMetadata().description : descKey[0]);
+                }
+            });
+        });
     }
 
     // Register dimension overrides
