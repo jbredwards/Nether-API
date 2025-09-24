@@ -38,7 +38,6 @@ import net.minecraftforge.event.terraingen.TerrainGen;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -50,17 +49,15 @@ import java.util.Random;
 public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherAPIChunkGenerator
 {
     @Nonnull protected final NoiseGeneratorPerlin terrainNoiseGen;
+
+    @Nonnull protected final MapGenStructure[] moddedStructures;
     @Nonnull protected Biome[] biomesForGeneration = new Biome[0];
 
-    @Nonnull
-    protected final List<MapGenStructure> moddedStructures = new LinkedList<>();
     public ChunkGeneratorNether(@Nonnull World worldIn, boolean generateStructures, long seed) {
         super(worldIn, generateStructures, seed);
         terrainNoiseGen = new NoiseGeneratorPerlin(rand, 4);
-        magmaGen = new WorldGenMinable(Blocks.MAGMA.getDefaultState(), 33,
-                state -> state == NETHERRACK || state.isFullCube() && state.getMaterial() != Material.ROCK);
-
-        NetherAPIRegistry.NETHER.getStructures().forEach(entry -> moddedStructures.add(entry.getStructureFactory().apply(this)));
+        magmaGen = new WorldGenMinable(Blocks.MAGMA.getDefaultState(), 33, state -> state == NETHERRACK || state.isFullCube() && state.getMaterial() != Material.ROCK);
+        moddedStructures = NetherAPIRegistry.NETHER.getStructures().stream().map(entry -> entry.getStructureFactory().apply(this)).toArray(MapGenStructure[]::new);
     }
 
     @SuppressWarnings({"DuplicateExpressions", "PointlessArithmeticExpression"})
@@ -164,7 +161,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
         if(NetherAPIConfig.hellCaves) genNetherCaves.generate(world, x, z, primer);
         if(areStructuresEnabled()) {
             if(genNetherBridge != null) genNetherBridge.generate(world, x, z, primer);
-            moddedStructures.forEach(structure -> structure.generate(world, x, z, primer));
+            for(@Nonnull final MapGenStructure structure : moddedStructures) structure.generate(world, x, z, primer);
         }
 
         final Chunk chunk = new Chunk(world, primer, x, z);
@@ -179,7 +176,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
 
     @Override
     public void populate(int chunkX, int chunkZ) {
-        //ensure forge's fix is active when this runs, otherwise the console gets spammed
+        //ensure forge's fix is active when this runs, otherwise world gen loads neighboring chunks.
         //if you're using this mod, you don't care about the nether being 1:1 with vanilla 1.12 lol
         final boolean prevFixVanillaCascading = ForgeModContainer.fixVanillaCascading;
         ForgeModContainer.fixVanillaCascading = true;
@@ -188,7 +185,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
         @Nonnull final Biome biome = world.getBiome(pos.add(16, 0, 16));
         @Nonnull final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
 
-        moddedStructures.forEach(structure -> structure.generateStructure(world, rand, chunkPos));
+        for(@Nonnull final MapGenStructure structure : moddedStructures) structure.generateStructure(world, rand, chunkPos);
         if(!(biome instanceof INetherBiome)) populateWithVanilla(chunkX, chunkZ);
         else { //allow mods to populate chunks differently
             BlockFalling.fallInstantly = true;
@@ -214,10 +211,10 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
 
         BlockFalling.fallInstantly = true;
         ForgeEventFactory.onChunkPopulate(true, this, world, rand, chunkX, chunkZ, false);
-        if(genNetherBridge != null) genNetherBridge.generateStructure(world, rand, chunkPos);
 
         @Nonnull final BlockPos pos = new BlockPos(originX, 0, originZ);
         @Nonnull final Biome biome = world.getBiome(pos.add(16, 0, 16));
+        if(genNetherBridge != null && !(biome instanceof INetherBiome)) genNetherBridge.generateStructure(world, rand, chunkPos);
 
         // lava "waterfalls"
         if(TerrainGen.populate(this, world, rand, chunkX, chunkZ, false, PopulateChunkEvent.Populate.EventType.NETHER_LAVA))
@@ -271,7 +268,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
                 return genNetherBridge.getSpawnList();
 
             //modded
-            else for(final MapGenStructure structure : moddedStructures) {
+            else for(@Nonnull final MapGenStructure structure : moddedStructures) {
                 if(structure instanceof ISpawningStructure) {
                     final List<Biome.SpawnListEntry> possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
                     if(!possibleCreatures.isEmpty()) return possibleCreatures;
@@ -291,7 +288,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
                 return genNetherBridge.getNearestStructurePos(worldIn, position, findUnexplored);
 
             //modded
-            else for(final MapGenStructure structure : moddedStructures)
+            else for(@Nonnull final MapGenStructure structure : moddedStructures)
                 if(structure.getStructureName().equals(structureName)) return structure.getNearestStructurePos(worldIn, position, findUnexplored);
         }
 
@@ -305,7 +302,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
             if("Fortress".equals(structureName) && genNetherBridge != null) return genNetherBridge.isInsideStructure(pos);
 
             //modded
-            else for(final MapGenStructure structure : moddedStructures)
+            else for(@Nonnull final MapGenStructure structure : moddedStructures)
                 if(structure.getStructureName().equals(structureName)) return structure.isInsideStructure(pos);
         }
 
@@ -316,7 +313,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     public void recreateStructures(@Nonnull Chunk chunkIn, int x, int z) {
         if(areStructuresEnabled()) {
             genNetherBridge.generate(world, x, z, null);
-            moddedStructures.forEach(structure -> structure.generate(world, x, z, null));
+            for(@Nonnull final MapGenStructure structure : moddedStructures) structure.generate(world, x, z, null);
         }
     }
 

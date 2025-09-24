@@ -32,7 +32,6 @@ import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -46,7 +45,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
     @Nonnull protected final NoiseGeneratorPerlin terrainNoiseGen;
     @Nonnull protected final MapGenCavesEnd genEndCaves = new MapGenCavesEnd();
 
-    @Nonnull protected final List<MapGenStructure> moddedStructures = new LinkedList<>();
+    @Nonnull protected final MapGenStructure[] moddedStructures;
     @Nonnull protected Biome[] biomesForGeneration = new Biome[0];
 
     public ChunkGeneratorTheEnd(@Nonnull World worldIn, boolean generateStructures, @Nonnull BiomeProviderTheEnd biomeProvider, @Nonnull BlockPos spawnCoord) {
@@ -54,7 +53,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
         terrainNoiseGen = new NoiseGeneratorPerlin(rand, 4);
         islandNoise = biomeProvider.islandNoise;
 
-        NetherAPIRegistry.THE_END.getStructures().forEach(entry -> moddedStructures.add(entry.getStructureFactory().apply(this)));
+        moddedStructures = NetherAPIRegistry.THE_END.getStructures().stream().map(entry -> entry.getStructureFactory().apply(this)).toArray(MapGenStructure[]::new);
     }
 
     public void buildSurfaces(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer) {
@@ -85,7 +84,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
         if(NetherAPIConfig.endCaves) genEndCaves.generate(world, chunkX, chunkZ, primer);
         if(areStructuresEnabled()) {
             if(endCityGen != null) endCityGen.generate(world, chunkX, chunkZ, primer);
-            moddedStructures.forEach(structure -> structure.generate(world, chunkX, chunkZ, primer));
+            for(@Nonnull final MapGenStructure structure : moddedStructures) structure.generate(world, chunkX, chunkZ, primer);
         }
 
         final Chunk chunk = new Chunk(world, primer, chunkX, chunkZ);
@@ -98,7 +97,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
 
     @Override
     public void populate(int chunkX, int chunkZ) {
-        // ensure forge's fix is active when this runs, otherwise world gen could load neighboring chunks
+        // ensure forge's fix is active when this runs, otherwise world gen could load neighboring chunks.
         // if you're using this mod, you don't care about the end being 1:1 with vanilla 1.12 lol
         final boolean prevFixVanillaCascading = ForgeModContainer.fixVanillaCascading;
         ForgeModContainer.fixVanillaCascading = true;
@@ -107,7 +106,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
         final Biome biome = world.getBiome(pos.add(16, 0, 16));
         final ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
 
-        moddedStructures.forEach(structure -> structure.generateStructure(world, rand, chunkPos));
+        for(@Nonnull final MapGenStructure structure : moddedStructures) structure.generateStructure(world, rand, chunkPos);
         if(!(biome instanceof IEndBiome)) populateWithVanilla(chunkX, chunkZ);
         else { //allow mods to populate chunks differently
             BlockFalling.fallInstantly = true;
@@ -126,11 +125,11 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
     public void populateWithVanilla(int chunkX, int chunkZ) {
         BlockFalling.fallInstantly = true;
         ForgeEventFactory.onChunkPopulate(true, this, world, rand, chunkX, chunkZ, false);
-        if(areStructuresEnabled()) endCityGen.generateStructure(world, rand, new ChunkPos(chunkX, chunkZ));
 
         final BlockPos pos = new BlockPos(chunkX << 4, 0, chunkZ << 4);
         final Biome biome = world.getBiome(pos.add(16, 0, 16));
-        
+
+        if(areStructuresEnabled() && !(biome instanceof IEndBiome)) endCityGen.generateStructure(world, rand, new ChunkPos(chunkX, chunkZ));
         if((long)chunkX * (long)chunkX + (long)chunkZ * (long)chunkZ > 4096L) {
             final float height = getIslandHeightValue(chunkX, chunkZ, 1, 1);
 
@@ -181,7 +180,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
     public List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull EnumCreatureType creatureType, @Nonnull BlockPos pos) {
         // modded
         if(areStructuresEnabled()) {
-            for(final MapGenStructure structure : moddedStructures) {
+            for(@Nonnull final MapGenStructure structure : moddedStructures) {
                 if(structure instanceof ISpawningStructure) {
                     final List<Biome.SpawnListEntry> possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
                     if(!possibleCreatures.isEmpty()) return possibleCreatures;
@@ -202,7 +201,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
                 return endCityGen.getNearestStructurePos(worldIn, position, findUnexplored);
 
             // modded
-            else for(final MapGenStructure structure : moddedStructures)
+            else for(@Nonnull final MapGenStructure structure : moddedStructures)
                 if(structure.getStructureName().equals(structureName)) return structure.getNearestStructurePos(worldIn, position, findUnexplored);
         }
 
@@ -217,7 +216,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
             if("EndCity".equals(structureName) && endCityGen != null) return endCityGen.isInsideStructure(pos);
 
             // modded
-            else for(final MapGenStructure structure : moddedStructures)
+            else for(@Nonnull final MapGenStructure structure : moddedStructures)
                 if(structure.getStructureName().equals(structureName)) return structure.isInsideStructure(pos);
         }
 
@@ -226,7 +225,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
 
     @Override
     public void recreateStructures(@Nonnull Chunk chunkIn, int x, int z) {
-        if(areStructuresEnabled()) moddedStructures.forEach(structure -> structure.generate(world, x, z, null));
+        if(areStructuresEnabled()) for(@Nonnull final MapGenStructure structure : moddedStructures) structure.generate(world, x, z, null);
     }
 
     // ========================
