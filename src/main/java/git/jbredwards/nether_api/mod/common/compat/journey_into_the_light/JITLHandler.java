@@ -187,37 +187,35 @@ public final class JITLHandler
             catch(final IllegalAccessException e) { throw new RuntimeException(e); } // should never pass
 
             final Chunk chunk = event.getWorld().getChunk(event.getChunkX(), event.getChunkZ());
-            final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(chunk.x << 4, 0, chunk.z << 4);
-
-            for(int x = 0; x < 16; x++, pos.x++) {
-                for(int z = 0; z < 16; z++, pos.z++) {
-                    final Biome biome = chunk.getBiome(pos, event.getWorld().getBiomeProvider());
-                    if(biome instanceof BiomeJITL) {
-                        final NetherBiome netherBiome = ((BiomeJITL)biome).netherBiome;
-                        if(netherBiome != null) {
-                            for(int y = 5; y < event.getWorld().getActualHeight() - 5; y++) {
-                                pos.setY(y);
-                                if(chunk.getBlockState(pos).isFullCube()) {
-                                    final Material above = chunk.getBlockState(pos.up()).getMaterial();
-                                    if(!above.isLiquid() && !above.isSolid()) {
-                                        netherBiome.genSurfColumn(chunk, pos, event.getRand());
-                                        if(event.getRand().nextFloat() < plantDensity) netherBiome.genFloorObjects(chunk, pos, event.getRand());
-                                    }
-
-                                    else {
-                                        final Material below = chunk.getBlockState(pos.down()).getMaterial();
-                                        if(!below.isLiquid() && !below.isSolid()) {
-                                            if(event.getRand().nextFloat() < plantDensity) netherBiome.genCeilObjects(chunk, pos, event.getRand());
-                                        }
-                                    }
-
-                                    // NetherBiome::genWallObjects is unused in JITL, no need to implement logic for it here.
+            BlockPos.getAllInBoxMutable(chunk.x << 4, 0, chunk.z << 4, (chunk.x << 4) | 15, 0, (chunk.z << 4) | 15).forEach(pos -> {
+                final Biome biome = chunk.getBiome(pos, event.getWorld().getBiomeProvider());
+                if(biome instanceof BiomeJITL) {
+                    final NetherBiome netherBiome = ((BiomeJITL)biome).netherBiome;
+                    if(netherBiome != null) {
+                        for(int y = 5; y < event.getWorld().getActualHeight() - 5; y++) {
+                            pos.setY(y);
+                            if(chunk.getBlockState(pos).isFullCube()) {
+                                final Material above = chunk.getBlockState(pos.up()).getMaterial();
+                                if(!above.isLiquid() && !above.isSolid()) {
+                                    netherBiome.genSurfColumn(chunk, pos, event.getRand());
+                                    if(event.getRand().nextFloat() < plantDensity) netherBiome.genFloorObjects(chunk, pos, event.getRand());
                                 }
+
+                                else {
+                                    final Material below = chunk.getBlockState(pos.down()).getMaterial();
+                                    if(!below.isLiquid() && !below.isSolid()) {
+                                        if(event.getRand().nextFloat() < plantDensity) netherBiome.genCeilObjects(chunk, pos, event.getRand());
+                                    }
+                                }
+
+                                // NetherBiome::genWallObjects is unused in JITL, no need to implement logic for it here.
                             }
                         }
+
+                        pos.setY(0);
                     }
                 }
-            }
+            });
 
             BlockFalling.fallInstantly = false;
         }
