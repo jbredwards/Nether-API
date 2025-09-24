@@ -155,7 +155,6 @@ public final class ASMHandler implements IFMLLoadingPlugin
             {
                 // Fixes vanilla attempting to spawn particles from the server using a client-side method.
                 register(new Transformer_MC_10369(),
-                        "com.therandomlabs.randompatches.patch.ServerWorldEventHandlerPatch",
                         "net.minecraft.block.BlockLiquid",
                         "net.minecraft.block.BlockPumpkin",
                         "net.minecraft.block.BlockRedstoneTorch",
@@ -188,6 +187,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Handle biome ambient sounds and particles from this mod's end.
                 register(new TransformerWorldClient(),
                         "net.minecraft.client.multiplayer.WorldClient");
+                // Don't let other mods introduce particle bugs.
+                register(new TransformerWorldServer(),
+                        "net.minecraft.world.WorldServer");
             }
         }
 

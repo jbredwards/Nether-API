@@ -25,8 +25,10 @@ import org.objectweb.asm.tree.*;
 import javax.annotation.Nonnull;
 
 /**
- * <a href="https://bugs.mojang.com/browse/MC-10369">MC-10369</a> - Server side particle spawning does not create particles for client.
- * <p> Note that <a href="https://bugs.mojang.com/browse/MC-2518">MC-2518</a> is fixed by Forge.
+ * <a href="https://web.archive.org/web/20240229143258/https://bugs.mojang.com/browse/MC-10369">MC-10369</a> - Server side particle spawning does not create particles for client.
+ * <p> Note that <a href="https://web.archive.org/web/20240229143258/https://bugs.mojang.com/browse/MC-2518">MC-2518</a>
+ * & <a href="https://web.archive.org/web/20240229143352/https://bugs.mojang.com/browse/MC-96974">MC-96974</a> are fixed by Forge.
+ * </p>
  * @author jbred
  *
  */
@@ -293,17 +295,6 @@ public final class Transformer_MC_10369 implements ITransformer
                     }
 
                     return BreakType.CONTINUE;
-                });
-            }
-
-            // RandomPatches mod compat:
-            // Disable RandomPatches' particle fix (since it can cause bugs with other mods in general, like particles being spawned twice)
-            case "com.therandomlabs.randompatches.patch.ServerWorldEventHandlerPatch": {
-                transformMethod(basicClass, method -> method.name.equals("apply"), (method, insn) -> {
-                    method.instructions.clear();
-                    method.instructions.add(new InsnNode(ICONST_1));
-                    method.instructions.add(new InsnNode(IRETURN));
-                    return BreakType.METHODS;
                 });
             }
         }
