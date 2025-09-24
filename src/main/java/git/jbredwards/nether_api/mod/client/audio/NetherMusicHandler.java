@@ -39,7 +39,7 @@ public final class NetherMusicHandler
         if(currentType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) currentType = null;
         final Biome biome = mc.world.getBiome(new BlockPos(mc.player.getPositionEyes(mc.getRenderPartialTicks())));
         if(biome instanceof INetherBiome) {
-            final IMusicType musicType = ((INetherBiome)biome).getMusicType();
+            final IMusicType musicType = mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic() ? ((INetherBiome)biome).getBossMusicType() : ((INetherBiome)biome).getMusicType();
             if(currentType == null) currentType = musicType.getMusicType();
             else if(musicType.replacesCurrentMusic(currentType)) currentType = musicType.getMusicType();
         }

@@ -53,4 +53,12 @@ public interface INetherBiome
     @Nonnull
     @SideOnly(Side.CLIENT)
     default IMusicType getMusicType() { return new VanillaMusicType(MusicTicker.MusicType.NETHER); }
+
+    /**
+     * @return the boss music that plays while players are in this biome.
+     * @since 1.4.0
+     */
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    default IMusicType getBossMusicType() { return getMusicType(); }
 }

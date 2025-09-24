@@ -12,8 +12,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nonnull;
 
 /**
- * Allows nether biomes to have their own music, called by
- * {@link git.jbredwards.nether_api.api.biome.INetherBiome#getMusicType INetherBiome::getMusicType}.
+ * Allows End and Nether biomes to have their own music, used by
+ * {@link git.jbredwards.nether_api.api.biome.IEndBiome IEndBiome} and
+ * {@link git.jbredwards.nether_api.api.biome.INetherBiome INetherBiome}.
  *
  * @since 1.0.0
  * @author jbred
