@@ -116,8 +116,8 @@ public final class NetherAPI
     // Register dimension overrides
     @Mod.EventHandler
     static void serverAboutToStart(@Nonnull final FMLServerAboutToStartEvent event) {
-        DimensionManager.getProviderType(DimensionType.NETHER.getId()).clazz = WorldProviderNether.class;
-        DimensionManager.getProviderType(DimensionType.THE_END.getId()).clazz = WorldProviderTheEnd.class;
+        if(DimensionManager.isDimensionRegistered(DimensionType.NETHER.getId())) DimensionManager.getProviderType(DimensionType.NETHER.getId()).clazz = WorldProviderNether.class;
+        if(DimensionManager.isDimensionRegistered(DimensionType.THE_END.getId())) DimensionManager.getProviderType(DimensionType.THE_END.getId()).clazz = WorldProviderTheEnd.class;
     }
 
     // Ensure all registries are cleared before another world is loaded
