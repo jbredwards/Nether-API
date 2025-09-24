@@ -148,18 +148,13 @@ public final class TransformerMapGenCavesHell implements ITransformer
                  * }
                  *
                  * New code:
-                 * if (Hooks.canCarveThrough(iblockstate1, p_180704_5_, i3, i2, j3, biome) == true || iblockstate1.getBlock() == Blocks.DIRT || iblockstate1.getBlock() == Blocks.GRASS)
+                 * if (Hooks.getCarveState(iblockstate1, p_180704_5_, i3, i2, j3, biome).getBlock() == Blocks.NETHERRACK || iblockstate1.getBlock() == Blocks.DIRT || iblockstate1.getBlock() == Blocks.GRASS)
                  * {
                  *     ...
                  * }
                  */
                 else if(insn.getOpcode() == ALOAD && ((VarInsnNode)insn).var == (DEOBFUSCATED ? 59 : 61)) {
-                    method.instructions.remove(insn.getNext());
-                    method.instructions.remove(insn.getNext());
-
-                    ((JumpInsnNode)insn.getNext()).setOpcode(IF_ICMPEQ);
-                    method.instructions.insert(insn, new InsnNode(ICONST_1));
-                    method.instructions.insert(insn, genHookMethod("canCarveThrough", "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/chunk/ChunkPrimer;IIILnet/minecraft/world/biome/Biome;)Z"));
+                    method.instructions.insert(insn, genHookMethod("getCarveState", "(Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/world/chunk/ChunkPrimer;IIILnet/minecraft/world/biome/Biome;)Lnet/minecraft/block/state/IBlockState;"));
                     method.instructions.insert(insn, new VarInsnNode(ALOAD, biome.value));
                     method.instructions.insert(insn, new VarInsnNode(ILOAD, 53));
                     method.instructions.insert(insn, new VarInsnNode(ILOAD, DEOBFUSCATED ? 56 : 58));
@@ -242,6 +237,12 @@ public final class TransformerMapGenCavesHell implements ITransformer
             return world.getBiome(new BlockPos((chunkX << 4) + x, 0, (chunkZ << 4) + z));
         }
 
+        @Nonnull
+        public static IBlockState getCarveState(@Nonnull IBlockState state, @Nonnull ChunkPrimer primer, int x, int y, int z, @Nonnull Biome biome) {
+            return (canCarveThrough(state, primer, x, y, z, biome) ? Blocks.NETHERRACK : Blocks.AIR).getDefaultState();
+        }
+
+        // helper
         public static boolean canCarveThrough(@Nonnull IBlockState state, @Nonnull ChunkPrimer primer, int x, int y, int z, @Nonnull Biome biome) {
             if(state.getBlock() instanceof INetherCarvable) return ((INetherCarvable)state.getBlock()).canNetherCarveThrough(state, primer, x, y, z);
             return state.getBlock() == Blocks.NETHERRACK || state.getBlock() == Blocks.SOUL_SAND || state.getBlock() == Blocks.END_STONE //built-in
