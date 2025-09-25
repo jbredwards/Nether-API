@@ -203,7 +203,7 @@ public final class TransformerBetterNetherGenerator implements ITransformer
         }
 
         // Fix TONS of bad block flags
-        else if(transformedName.startsWith("paulevs.betternether.biomes")) {
+        else if(transformedName.startsWith("paulevs.betternether.biomes.") || transformedName.startsWith("paulevs.betternether.structures.plants.")) {
             return transformMethod(basicClass, method -> true, (method, insn) -> {
                 if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "setBlockState" : "func_175656_a")) {
                     method.instructions.insertBefore(insn, genBlockFlags());

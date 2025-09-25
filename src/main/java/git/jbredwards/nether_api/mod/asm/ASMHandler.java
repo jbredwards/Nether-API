@@ -11,6 +11,7 @@ import com.google.common.collect.Streams;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherConfigLoader;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherFirefly;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherGenerator;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.Transformer_NetherHeight_BetterNether;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.*;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLGenerator;
@@ -53,6 +54,10 @@ public final class ASMHandler implements IFMLLoadingPlugin
         public Transformer() {
             // BetterNether:
             {
+                // Change nether generators to not use hardcoded height values.
+                register(new Transformer_NetherHeight_BetterNether(),
+                        "paulevs.betternether.structures.plants.StructureEye",
+                        "paulevs.betternether.structures.plants.StructureStalagnate");
                 // Prevent BetterNether from resetting its enabled biomes config cache.
                 register(new TransformerBetterNetherConfigLoader(),
                         "paulevs.betternether.config.ConfigLoader");
