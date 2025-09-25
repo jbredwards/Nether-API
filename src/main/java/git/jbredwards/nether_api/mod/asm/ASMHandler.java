@@ -21,6 +21,7 @@ import git.jbredwards.nether_api.mod.asm.transformers.modded.nethercraft.Transfo
 import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.TransformerNetherEXBiomes;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.TransformerNetherExOverride;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.Transformer_NetherHeight_NetherEx;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.quark.TransformerQuarkCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndBiomes;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.vanilla.*;
@@ -141,6 +142,12 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "logictechcorp.netherex.handler.WorldHandler",
                         "logictechcorp.netherex.world.biome.data.BiomeDataManagerNetherEx",
                         "logictechcorp.netherex.NetherEx");
+            }
+            // Quark:
+            {
+                // Fix Quark nether fossil cascading world gen.
+                register(new TransformerQuarkCascadingFix(),
+                        "vazkii.quark.world.world.NetherFossilGenerator");
             }
             // Stygian End:
             {
