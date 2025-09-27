@@ -61,6 +61,37 @@ public final class NetherAPIConfig
         public static int heatSandsWeight = 6;
     }
 
+    @Config(modid = NetherAPI.MODID, name = "nether_api/nether_hexed_kingdom")
+    public static final class NetherHexedKingdom
+    {
+        @Config.LangKey("config.nether_api.compat.hexed.bullionTempleMinHeight") public static int bullionTempleMinHeight = 48;
+        @Config.LangKey("config.nether_api.compat.hexed.bullionTempleMaxHeight") public static int bullionTempleMaxHeight = 79;
+
+        @Config.LangKey("config.nether_api.compat.hexed.damnedPrisonMinHeight") public static int damnedPrisonMinHeight = 31;
+        @Config.LangKey("config.nether_api.compat.hexed.damnedPrisonMaxHeight") public static int damnedPrisonMaxHeight = 32;
+
+        @Config.LangKey("config.nether_api.compat.hexed.greedMinesMinHeight") public static int greedMinesMinHeight = 31;
+        @Config.LangKey("config.nether_api.compat.hexed.greedMinesMaxHeight") public static int greedMinesMaxHeight = 38;
+
+        @Config.LangKey("config.nether_api.compat.hexed.ironCladMinHeight") public static int ironCladMinHeight = 29;
+        @Config.LangKey("config.nether_api.compat.hexed.ironCladMaxHeight") public static int ironCladMaxHeight = 29;
+
+        @Config.LangKey("config.nether_api.compat.hexed.lostOutpostMinHeight") public static int lostOutpostMinHeight = 48;
+        @Config.LangKey("config.nether_api.compat.hexed.lostOutpostMaxHeight") public static int lostOutpostMaxHeight = 71;
+
+        @Config.LangKey("config.nether_api.compat.hexed.magmaCubeNestMinHeight") public static int magmaCubeNestMinHeight = 32;
+        @Config.LangKey("config.nether_api.compat.hexed.magmaCubeNestMaxHeight") public static int magmaCubeNestMaxHeight = 39;
+
+        @Config.LangKey("config.nether_api.compat.hexed.towerOfRedSunMinHeight") public static int towerOfRedSunMinHeight = 33;
+        @Config.LangKey("config.nether_api.compat.hexed.towerOfRedSunMaxHeight") public static int towerOfRedSunMaxHeight = 44;
+
+        @Config.LangKey("config.nether_api.compat.hexed.wrathTowerMinHeight") public static int wrathTowerMinHeight = 31;
+        @Config.LangKey("config.nether_api.compat.hexed.wrathTowerMaxHeight") public static int wrathTowerMaxHeight = 32;
+
+        @Config.LangKey("config.nether_api.compat.hexed.wretchedLookoutMinHeight") public static int wretchedLookoutMinHeight = 64;
+        @Config.LangKey("config.nether_api.compat.hexed.wretchedLookoutMaxHeight") public static int wretchedLookoutMaxHeight = 103;
+    }
+
     @Config(modid = NetherAPI.MODID, name = "nether_api/nethercraft")
     public static final class Nethercraft
     {

@@ -13,6 +13,7 @@ import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.Transf
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherGenerator;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.Transformer_NetherHeight_BetterNether;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.*;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.hexed.TransformerNetherHexedKingdom;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLGenerator;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLTowerFix;
@@ -120,6 +121,11 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "com.progwml6.natura.world.worldgen.NetherTreesGenerator",
                         "com.progwml6.natura.world.worldgen.VineGenerator",
                         "maxhyper.dynamictreesnatura.worldgen.BiomeDataBasePopulator");
+            }
+            // Nether Hexed Kingdom
+            {
+                // Allow structures to work with increased nether height, and fix some cascading world gen issues.
+                register(new TransformerNetherHexedKingdom());
             }
             // Nethercraft Classic:
             {

@@ -72,13 +72,18 @@ public interface ITransformer extends IClassTransformer, Opcodes
     }
 
     @Nonnull
+    default String genHookClass() {
+        return getClass().getName().replace('.', '/') + "$Hooks";
+    }
+
+    @Nonnull
     default FieldInsnNode genHookField(@Nonnull final String name, @Nonnull final String desc) {
-        return new FieldInsnNode(GETSTATIC, getClass().getName().replace('.', '/') + "$Hooks", name, desc);
+        return new FieldInsnNode(GETSTATIC, genHookClass(), name, desc);
     }
 
     @Nonnull
     default MethodInsnNode genHookMethod(@Nonnull final String name, @Nonnull final String desc) {
-        return new MethodInsnNode(INVOKESTATIC, getClass().getName().replace('.', '/') + "$Hooks", name, desc, false);
+        return new MethodInsnNode(INVOKESTATIC, genHookClass(), name, desc, false);
     }
 
     // --------
