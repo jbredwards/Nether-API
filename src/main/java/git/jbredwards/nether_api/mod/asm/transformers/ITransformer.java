@@ -8,9 +8,8 @@ package git.jbredwards.nether_api.mod.asm.transformers;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.*;
+import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
@@ -111,5 +110,56 @@ public interface ITransformer extends IClassTransformer, Opcodes
     @Nonnull
     default MethodInsnNode genHeightMethod() {
         return new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/world/World", DEOBFUSCATED ? "getActualHeight" : "func_72940_L", "()I", false);
+    }
+
+    @Nonnull
+    default byte[] transformParent(@Nonnull final byte[] basicClass, @Nonnull final String oldSuperName, @Nonnull final String newSuperName) {
+        @Nonnull final ClassReader reader = new ClassReader(basicClass);
+        if(oldSuperName.equals(reader.getSuperName())) {
+            @Nonnull final ClassWriter writer = new ClassWriter(0);
+            reader.accept(new ClassVisitor(ASM5, writer) {
+                @Override
+                public void visit(final int version, final int access, @Nonnull final String name, @Nonnull final String signature, @Nonnull final String superName, @Nonnull final String[] interfaces) {
+                    super.visit(version, access, name, signature, newSuperName, interfaces);
+                }
+
+                @Nonnull
+                @Override
+                public MethodVisitor visitMethod(final int access, @Nonnull final String name, @Nonnull final String desc, @Nonnull final String signature, @Nonnull final String[] exceptions) {
+                    @Nonnull final MethodVisitor old = super.visitMethod(access, name, desc, signature, exceptions);
+                    return "<init>".equals(name) ? new MethodVisitor(api, old) {
+                        @Override
+                        public void visitMethodInsn(final int opcode, @Nonnull final String owner, @Nonnull final String name, @Nonnull final String desc, final boolean itf) {
+                            super.visitMethodInsn(opcode, oldSuperName.equals(owner) ? newSuperName : owner, name, desc, itf);
+                        }
+                    } : old;
+                }
+            }, 0);
+
+            return writer.toByteArray();
+        }
+
+        return basicClass;
+    }
+
+    default void transformPlantable(@Nonnull final ClassNode classNode, @Nonnull final String plantType) {
+        if(!classNode.interfaces.contains("net/minecraftforge/common/IPlantable")) {
+            classNode.interfaces.add("net/minecraftforge/common/IPlantable");
+
+            @Nonnull final MethodNode plant = new MethodNode(ACC_PUBLIC, "getPlant", "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;", null, null);
+            @Nonnull final MethodNode type = new MethodNode(ACC_PUBLIC, "getPlantType", "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraftforge/common/EnumPlantType;", null, null);
+            classNode.methods.removeIf(method -> method.name.equals(plant.name) || method.name.equals(type.name));
+            classNode.methods.add(plant);
+            classNode.methods.add(type);
+
+            @Nonnull final GeneratorAdapter plantAdapter = new GeneratorAdapter(plant, plant.access, plant.name, plant.desc);
+            plantAdapter.loadThis();
+            plantAdapter.visitMethodInsn(INVOKEVIRTUAL, classNode.name, DEOBFUSCATED ? "getDefaultState" : "func_176223_P", "()Lnet/minecraft/block/state/IBlockState;", false);
+            plantAdapter.returnValue();
+
+            @Nonnull final GeneratorAdapter typeAdapter = new GeneratorAdapter(type, type.access, type.name, type.desc);
+            typeAdapter.visitFieldInsn(GETSTATIC, "git/jbredwards/nether_api/api/util/PlantUtils", plantType, "Lnet/minecraftforge/common/EnumPlantType;");
+            typeAdapter.returnValue();
+        }
     }
 }

@@ -9,6 +9,7 @@ import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.gen.structure.template.Template;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -68,6 +69,11 @@ public final class TransformerNetherHexedKingdom implements ITransformer
                     method.instructions.remove(insn);
                 }
 
+                // Remove broken entities.
+                else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "getTemplate" : "func_186237_a")) {
+                    method.instructions.insert(insn, genHookMethod("fixTemplate", "(Lnet/minecraft/world/gen/structure/template/Template;)Lnet/minecraft/world/gen/structure/template/Template;"));
+                }
+
                 return BreakType.CONTINUE;
             });
         }
@@ -78,15 +84,15 @@ public final class TransformerNetherHexedKingdom implements ITransformer
     @SuppressWarnings("unused")
     public enum Hooks
     {
-        BullionTemple(() -> NetherAPIConfig.NetherHexedKingdom.bullionTempleMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.bullionTempleMaxHeight),
-        DamnedPrison(() -> NetherAPIConfig.NetherHexedKingdom.damnedPrisonMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.damnedPrisonMaxHeight),
-        GreedMines(() -> NetherAPIConfig.NetherHexedKingdom.greedMinesMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.greedMinesMaxHeight),
-        IronClad(() -> NetherAPIConfig.NetherHexedKingdom.ironCladMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.ironCladMaxHeight),
-        LostOutpost(() -> NetherAPIConfig.NetherHexedKingdom.lostOutpostMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.lostOutpostMaxHeight),
-        MagmaCubeNest(() -> NetherAPIConfig.NetherHexedKingdom.magmaCubeNestMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.magmaCubeNestMaxHeight),
-        TowerOfRedSun(() -> NetherAPIConfig.NetherHexedKingdom.towerOfRedSunMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.towerOfRedSunMaxHeight),
-        WrathTower(() -> NetherAPIConfig.NetherHexedKingdom.wrathTowerMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.wrathTowerMaxHeight),
-        WretchedLookout(() -> NetherAPIConfig.NetherHexedKingdom.wretchedLookoutMinHeight, () -> NetherAPIConfig.NetherHexedKingdom.wretchedLookoutMaxHeight);
+        BullionTemple(() -> NetherAPIConfig.NHK.bullionTempleMinHeight, () -> NetherAPIConfig.NHK.bullionTempleMaxHeight),
+        DamnedPrison(() -> NetherAPIConfig.NHK.damnedPrisonMinHeight, () -> NetherAPIConfig.NHK.damnedPrisonMaxHeight),
+        GreedMines(() -> NetherAPIConfig.NHK.greedMinesMinHeight, () -> NetherAPIConfig.NHK.greedMinesMaxHeight),
+        IronClad(() -> NetherAPIConfig.NHK.ironCladMinHeight, () -> NetherAPIConfig.NHK.ironCladMaxHeight),
+        LostOutpost(() -> NetherAPIConfig.NHK.lostOutpostMinHeight, () -> NetherAPIConfig.NHK.lostOutpostMaxHeight),
+        MagmaCubeNest(() -> NetherAPIConfig.NHK.magmaCubeNestMinHeight, () -> NetherAPIConfig.NHK.magmaCubeNestMaxHeight),
+        TowerOfRedSun(() -> NetherAPIConfig.NHK.towerOfRedSunMinHeight, () -> NetherAPIConfig.NHK.towerOfRedSunMaxHeight),
+        WrathTower(() -> NetherAPIConfig.NHK.wrathTowerMinHeight, () -> NetherAPIConfig.NHK.wrathTowerMaxHeight),
+        WretchedLookout(() -> NetherAPIConfig.NHK.wretchedLookoutMinHeight, () -> NetherAPIConfig.NHK.wretchedLookoutMaxHeight);
 
         @Nonnull
         private final IntSupplier minHeightForGen, maxHeightForGen;
@@ -104,6 +110,12 @@ public final class TransformerNetherHexedKingdom implements ITransformer
         @Nonnull
         public static BlockPos fixPosition(@Nonnull final BlockPos pos, @Nonnull final Random rand, @Nonnull final Hooks settings, final int offset) {
             return new BlockPos(pos.getX() - 8 + offset, MathHelper.getInt(rand, settings.getMinHeightForGen(), settings.getMaxHeightForGen()), pos.getZ() - 8 + offset);
+        }
+
+        @Nonnull
+        public static Template fixTemplate(@Nonnull final Template template) {
+            template.entities.removeIf(info -> info.entityData.getString("id").isEmpty());
+            return template;
         }
     }
 }

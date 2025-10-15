@@ -9,6 +9,7 @@ import git.jbredwards.nether_api.api.audio.IDarkSoundAmbience;
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.api.biome.IEndBiome;
 import git.jbredwards.nether_api.api.event.NetherAPIFogColorEvent;
+import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.client.audio.TheEndMusicHandler;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderTheEnd;
@@ -21,6 +22,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderEnd;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.end.DragonFightManager;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenEndGateway;
@@ -67,7 +69,8 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
                     if(exitPortalLocation == null) {
                         exitPortalLocation = world.getTopSolidOrLiquidBlock(WorldGenEndPodium.END_PODIUM_LOCATION).down();
                         // ensure the exit portal pos is on the ground, and not on top of any previously existing portal
-                        while(world.getBlockState(exitPortalLocation).getBlock() == Blocks.BEDROCK && exitPortalLocation.getY() > world.getSeaLevel())
+                        @Nonnull final Chunk chunk = world.getChunk(exitPortalLocation);
+                        while(exitPortalLocation.getY() > world.getSeaLevel() && chunk.getBlockState(exitPortalLocation).getBlock() == Blocks.BEDROCK)
                             exitPortalLocation = exitPortalLocation.down();
                     }
 
@@ -75,9 +78,6 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
                 }
             };
         }
-
-        // setup clientside handlers
-        // TODO else setSkyRenderer(new EndSkyRenderHandler());
     }
 
     @Nonnull
@@ -124,9 +124,7 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
      */
     @Nonnull
     public Random createSeedRandom(@Nonnull final BlockPos pos) {
-        final Random rand = new Random(world.getSeed());
-        rand.setSeed(((rand.nextLong() >> 2 + 1) * (pos.getX() >> 4) + (rand.nextLong() >> 2 + 1) * (pos.getZ() >> 4)) ^ world.getSeed());
-        return rand;
+        return NetherGenerationUtils.createSeedRandom(world.getSeed(), pos.getX() >> 4, pos.getZ() >> 4);
     }
 
     /**

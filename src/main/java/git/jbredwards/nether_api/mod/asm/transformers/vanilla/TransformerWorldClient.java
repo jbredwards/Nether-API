@@ -73,7 +73,7 @@ public final class TransformerWorldClient implements ITransformer
     {
         @SideOnly(Side.CLIENT)
         public static void spawnBiomeAmbientParticle(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
-            if(!state.isFullCube()) {
+            if(Minecraft.getMinecraft().gameSettings.particleSetting < 2 && !state.isFullCube()) {
                 final IParticleFactory[] factories = IAmbienceWorldProvider.getAmbienceOrFallback(world, pos, world.getBiome(pos), IParticleFactory[].class, IAmbienceWorldProvider::getAmbientParticles, IAmbienceBiome::getAmbientParticles, null);
                 if(factories == null || factories.length == 0) return;
 
@@ -81,7 +81,7 @@ public final class TransformerWorldClient implements ITransformer
                 for(final IParticleFactory factory : factories) {
                     final Particle particle = factory.createParticle(-1, world, pos.getX() + rand.nextDouble(), pos.getY() + rand.nextDouble(), pos.getZ() + rand.nextDouble(), 0, 0, 0);
                     if(particle != null) {
-                        Minecraft.getMinecraft().effectRenderer.addEffect(particle);
+                        if(Minecraft.getMinecraft().gameSettings.particleSetting == 0 || rand.nextInt(3) != 0) Minecraft.getMinecraft().effectRenderer.addEffect(particle);
                         return;
                     }
                 }

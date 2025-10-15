@@ -6,9 +6,11 @@
 package git.jbredwards.nether_api.mod.common.compat.betternether;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
+import net.minecraft.block.Block;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.init.Biomes;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
@@ -22,8 +24,6 @@ import paulevs.betternether.config.ConfigLoader;
 import paulevs.betternether.entities.EntityFirefly;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.ObjIntConsumer;
 
@@ -36,6 +36,11 @@ public final class BetterNetherHandler
 {
     @Nonnull static final Set<NetherBiome> GEN_BIOMES = new HashSet<>();
     @Nonnull static final Map<NetherBiome, BiomeBetterNether> BIOME_LOOKUP = new HashMap<>();
+
+    @SuppressWarnings("ConstantValue")
+    public static boolean isModern() {
+        return WeightedRandom.Item.class.isAssignableFrom(NetherBiome.class);
+    }
 
     public static void registerBiomes(@Nonnull final INetherAPIRegistry registry) {
         GEN_BIOMES.forEach(netherBiome -> {
@@ -56,7 +61,7 @@ public final class BetterNetherHandler
     public static int getWeight(@Nonnull final BiomeBetterNether biome) {
         if(biome.cachedWeight == -1) {
             // using a forked version of the mod
-            if(biome.netherBiome instanceof WeightedRandom.Item) biome.cachedWeight = ConfigLoader.mustInitBiome(biome.netherBiome) ? biome.netherBiome.itemWeight : 0;
+            if(isModern()) biome.cachedWeight = ConfigLoader.mustInitBiome(biome.netherBiome) ? biome.netherBiome.itemWeight : 0;
 
             // using the original mod, config disable already handled via biome != null in registerBiomes
             else biome.cachedWeight = 1;
@@ -99,6 +104,9 @@ public final class BetterNetherHandler
 
     // exists because this mod adds BetterNether biomes as real biomes
     public static void init() {
+        // ensure netherrack is set as a valid terrain block (needed for TransformerBetterNetherPlants)
+        if(isModern()) ObfuscationReflectionHelper.<Set<Block>, ConfigLoader>getPrivateValue(ConfigLoader.class, null, "NETHER_TERRAIN").add(Blocks.NETHERRACK);
+
         // fix fireflies
         Biomes.HELL.getSpawnableList(EnumCreatureType.AMBIENT).removeIf(entry -> entry.entityClass == EntityFirefly.class);
         if(BiomeRegister.BIOME_GRASSLANDS != null) EntityRegistry.addSpawn(EntityFirefly.class, 100, 5, 10, EnumCreatureType.AMBIENT, getBiomeFromLookup(BiomeRegister.BIOME_GRASSLANDS));
@@ -106,7 +114,6 @@ public final class BetterNetherHandler
 
         // remove ghasts from biomes that have cacti, as to prevent lots of really annoying damage sounds from playing
         if(BiomeRegister.BIOME_GRAVEL_DESERT != null)
-            getBiomeFromLookup(BiomeRegister.BIOME_GRAVEL_DESERT).getSpawnableList(EnumCreatureType.MONSTER)
-                    .removeIf(entry -> EntityGhast.class.isAssignableFrom(entry.entityClass));
+            getBiomeFromLookup(BiomeRegister.BIOME_GRAVEL_DESERT).getSpawnableList(EnumCreatureType.MONSTER).removeIf(entry -> EntityGhast.class.isAssignableFrom(entry.entityClass));
     }
 }

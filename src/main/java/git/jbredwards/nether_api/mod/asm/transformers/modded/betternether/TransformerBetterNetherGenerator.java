@@ -5,14 +5,18 @@
 
 package git.jbredwards.nether_api.mod.asm.transformers.modded.betternether;
 
+import biomesoplenty.common.biome.nether.BiomeVisceralHeap;
+import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BiomeBetterNether;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import org.objectweb.asm.tree.*;
 import paulevs.betternether.biomes.BiomeRegister;
 import paulevs.betternether.biomes.NetherBiome;
+import paulevs.betternether.world.BNWorldGenerator;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -221,10 +225,25 @@ public final class TransformerBetterNetherGenerator implements ITransformer
     @SuppressWarnings("unused")
     public static final class Hooks
     {
+        // A dummy NetherBiome object that only invokes the eye plant feature generation.
+        @Nonnull
+        private static final NetherBiome VISCERAL_FEATURES = new NetherBiome(BiomeRegister.BIOME_EMPTY_NETHER.getName()) {
+            @Override
+            public void genCeilObjects(@Nonnull final World world, @Nonnull final BlockPos pos, @Nonnull final Random random) {
+                if(BNWorldGenerator.hasEyeGen && random.nextDouble() < NetherAPIConfig.BetterNether.visceralEyeGen && random.nextDouble() * 4 + 0.5 < getFeatureNoise(pos)) BNWorldGenerator.eyeGen.generate(world, pos.down(), random);
+            }
+        };
+
         @Nonnull
         public static NetherBiome getNetherBiome(@Nonnull final World world, final int wx, final int wz) {
-            final Biome biome = world.getBiome(new BlockPos(wx, 0, wz));
-            return biome instanceof BiomeBetterNether ? ((BiomeBetterNether)biome).netherBiome : BiomeRegister.BIOME_EMPTY_NETHER;
+            @Nonnull final Biome biome = world.getBiome(new BlockPos(wx, 0, wz));
+            if(biome instanceof BiomeBetterNether) return ((BiomeBetterNether)biome).netherBiome;
+            // Allow eye vines to also generate in BOP visceral heap biomes.
+            else if(NetherAPI.isBiomesOPlentyLoaded) {
+                if(biome instanceof BiomeVisceralHeap) return VISCERAL_FEATURES;
+            }
+
+            return BiomeRegister.BIOME_EMPTY_NETHER;
         }
 
         @Nonnull

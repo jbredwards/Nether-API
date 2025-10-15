@@ -54,18 +54,18 @@ public interface INetherAPIRegistry
     List<BiomeManager.BiomeEntry> getBiomeEntries();
 
     /**
-     * Adds the Biome to the generation list, with the provided weight.
-     * @since 1.0.0
-     */
-    void registerBiome(@Nonnull final Biome biome, final int weight);
-
-    /**
      * Adds the BiomeEntry to the generation list.
      * @since 1.4.0
      */
     default void registerBiome(@Nonnull final BiomeManager.BiomeEntry biomeEntry) {
         registerBiome(biomeEntry.biome, biomeEntry.itemWeight);
     }
+
+    /**
+     * Adds the Biome to the generation list, with the provided weight.
+     * @since 1.0.0
+     */
+    void registerBiome(@Nonnull final Biome biome, final int weight);
 
     /**
      * Removes the Biome from the generation list if present.
@@ -84,6 +84,7 @@ public interface INetherAPIRegistry
     /**
      * Adds the structure handler to the generation list. Structures do not have to be registered in order to generate,
      * but do if you want them to be able to spawn mobs within its area (like nether fortresses do), and if you want /locate to work with it.
+     * <p> All structures have to also be registered in {@link net.minecraft.world.gen.structure.MapGenStructureIO MapGenStructureIO}. </p>
      *
      * @since 1.3.0
      */
@@ -92,6 +93,7 @@ public interface INetherAPIRegistry
     /**
      * Adds the structure handler to the generation list. Structures do not have to be registered in order to generate,
      * but do if you want them to be able to spawn mobs within its area (like nether fortresses do), and if you want /locate to work with it.
+     * <p> All structures have to also be registered in {@link net.minecraft.world.gen.structure.MapGenStructureIO MapGenStructureIO}. </p>
      *
      * @param commandName the name of the structure used by the /locate command (should match the result of calling the structure's {@link MapGenStructure#getStructureName()} method).
      * @param structureFactory responsible for initializing the structure during the construction of the registry's respective {@link INetherAPIChunkGenerator}.

@@ -8,24 +8,26 @@ package git.jbredwards.nether_api.mod.asm;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Streams;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherConfigLoader;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherFirefly;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.TransformerBetterNetherGenerator;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.Transformer_NetherHeight_BetterNether;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.*;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.*;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.dynamictrees.TransformerSpeciesHellbark;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.dynamictrees.Transformer_NetherHeight_DynamicTrees;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.hexed.TransformerNetherHexedKingdom;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLCascadingFix;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLGenerator;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.TransformerJITLTowerFix;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.*;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.libraryex.TransformerLibraryExCascadingFix;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.natura.TransformerBlockNetherSapling;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.natura.TransformerBlockTaintedSoil;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.natura.Transformer_NetherHeight_Natura;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.nethercraft.TransformerBlockGlowWoodSapling;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.nethercraft.TransformerBlockNetherDirt;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.nethercraft.TransformerBlockNetherReed;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.nethercraft.TransformerNethercraftEvents;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.TransformerNetherEXBiomes;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.TransformerNetherExOverride;
-import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.Transformer_NetherHeight_NetherEx;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.*;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.quark.TransformerQuarkCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndBiomes;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndCascadingFix;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndGrass;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndPlant;
 import git.jbredwards.nether_api.mod.asm.transformers.vanilla.*;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
@@ -67,6 +69,28 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "paulevs.betternether.entities.EntityFirefly");
                 // Allow BetterNether to use real biomes instead of pseudo-biomes.
                 register(new TransformerBetterNetherGenerator());
+                // Allow BetterNether plants to recognize modded soil blocks.
+                register(new TransformerBetterNetherPlants(),
+                        "paulevs.betternether.blocks.BlockBlackApple",
+                        "paulevs.betternether.blocks.BlockBlackAppleSeed",
+                        "paulevs.betternether.blocks.BlockBlackBush",
+                        "paulevs.betternether.blocks.BlockEggPlant",
+                        "paulevs.betternether.blocks.BlockEyeSeed",
+                        "paulevs.betternether.blocks.BlockEyeVine",
+                        "paulevs.betternether.blocks.BlockInkBush",
+                        "paulevs.betternether.blocks.BlockInkBushSeed",
+                        "paulevs.betternether.blocks.BlockLucisSpore",
+                        "paulevs.betternether.blocks.BlockMold",
+                        "paulevs.betternether.blocks.BlockNetherGrass",
+                        "paulevs.betternether.blocks.BlockNetherReed",
+                        "paulevs.betternether.blocks.BlockOrangeMushroom",
+                        "paulevs.betternether.blocks.BlockStalagnateSeed",
+                        "paulevs.betternether.blocks.BlockStalagnateSeedBottom",
+                        "paulevs.betternether.blocks.BlockWartSeed");
+                // Add support for new EnumPlantTypes to BetterNether soil blocks.
+                register(new TransformerBlockNetherMycelium(),
+                        "paulevs.betternether.blocks.BlockNetherMycelium",
+                        "paulevs.betternether.blocks.BlockNetherrackMoss");
             }
             // Biomes O' Plenty:
             {
@@ -90,9 +114,36 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 register(new TransformerBiomesOPlentyFluids(),
                         "biomesoplenty.common.fluids.BloodFluid",
                         "biomesoplenty.common.fluids.HoneyFluid");
+                // Support modded "Netherrack"-like soil blocks.
+                register(new TransformerBlockBOPFlower(),
+                        "biomesoplenty.common.block.BlockBOPFlower");
+                // Add support for new EnumPlantTypes to BOP soil blocks.
+                register(new TransformerBlockBOPGrass(),
+                        "biomesoplenty.common.block.BlockBOPGrass");
+                // Support modded "Netherrack"-like soil blocks.
+                register(new TransformerBlockBOPSapling(),
+                        "biomesoplenty.common.block.BlockBOPSapling");
+            }
+            // Dynamic Trees
+            {
+                // Change nether generators to not use hardcoded height values.
+                register(new Transformer_NetherHeight_DynamicTrees(),
+                        "com.ferreusveritas.dynamictrees.worldgen.WorldGeneratorTrees$GroundFinder");
+                // Fix some bugs with the BOP hellback dynamic trees species.
+                register(new TransformerSpeciesHellbark(),
+                        "dynamictreesbop.trees.TreeHellbark$SpeciesHellbark");
             }
             // Journey Into The Light:
             {
+                // Add support for new EnumPlantTypes to Journey Into The Light soil blocks.
+                register(new TransformerBlockMod(),
+                        "net.slayer.api.block.BlockMod");
+                // Allow nether saplings to be planted on the blocks they generate on.
+                register(new TransformerBlockModSapling(),
+                        "net.journey.blocks.base.BlockModSapling");
+                // Support modded "Netherrack"-like and "Soul Sand"-like soil blocks
+                register(new TransformerGroundPredicate(),
+                        "net.journey.api.block.GroundPredicate");
                 // Fix cascading world gen problems with Journey Into The Light.
                 register(new TransformerJITLCascadingFix(),
                         "net.journey.dimension.base.WorldGenJourney",
@@ -121,6 +172,13 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "com.progwml6.natura.world.worldgen.NetherTreesGenerator",
                         "com.progwml6.natura.world.worldgen.VineGenerator",
                         "maxhyper.dynamictreesnatura.worldgen.BiomeDataBasePopulator");
+                // Support modded "Netherrack" blocks.
+                register(new TransformerBlockNetherSapling(),
+                        "com.progwml6.natura.nether.block.saplings.BlockNetherSapling",
+                        "com.progwml6.natura.nether.block.saplings.BlockNetherSapling2");
+                // Add support for new EnumPlantType to tainted soil.
+                register(new TransformerBlockTaintedSoil(),
+                        "com.progwml6.natura.nether.block.soil.BlockTaintedSoil");
             }
             // Nether Hexed Kingdom
             {
@@ -129,6 +187,17 @@ public final class ASMHandler implements IFMLLoadingPlugin
             }
             // Nethercraft Classic:
             {
+                // Support modded "Netherrack"-like soil blocks.
+                register(new TransformerBlockGlowWoodSapling(),
+                        "com.legacy.nethercraft.blocks.natural.BlockGlowWoodSapling",
+                        "com.legacy.nethercraft.blocks.natural.BlockNetherMushroom");
+                // Add support for new EnumPlantTypes to Nethercraft's soil blocks.
+                register(new TransformerBlockNetherDirt(),
+                        "com.legacy.nethercraft.blocks.natural.BlockNetherDirt",
+                        "com.legacy.nethercraft.blocks.natural.BlockNetherFarmland");
+                // Support modded "Netherrack"-like and "Soul Sand"-like soil blocks, as well as Heat Sand.
+                register(new TransformerBlockNetherReed(),
+                        "com.legacy.nethercraft.blocks.natural.BlockNetherReed");
                 // Ensure all Nethercraft world generation is kept to within one biome.
                 register(new TransformerNethercraftEvents(),
                         "com.legacy.nethercraft.entities.hostile.EntityBloodyZombie",
@@ -141,10 +210,16 @@ public final class ASMHandler implements IFMLLoadingPlugin
             }
             // NetherEx:
             {
+                // Support modded "Soul Sand"-like soil blocks.
+                register(new TransformerBlockThornstalk(),
+                        "logictechcorp.netherex.block.BlockThornstalk");
                 // Change nether generators to not use hardcoded height values.
                 register(new Transformer_NetherHeight_NetherEx(),
                         "logictechcorp.netherex.handler.BiomeTraitGenerationHandler",
                         "logictechcorp.netherex.world.biome.data.BiomeDataNetherEx");
+                // Support the conversion of certain modded netherrack blocks.
+                register(new TransformerInputHandler(),
+                        "logictechcorp.netherex.handler.InputHandler");
                 // Change NetherEx's nether biome super classes.
                 register(new TransformerNetherEXBiomes());
                 // Disable NetherEx's nether override.
@@ -168,6 +243,14 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 register(new TransformerStygianEndCascadingFix(),
                         "fluke.stygian.world.feature.WorldGenEnderCanopy",
                         "fluke.stygian.world.feature.WorldGenEndVolcano");
+                // Add support for new EnumPlantTypes to Stygian End's soil block.
+                register(new TransformerStygianEndGrass(),
+                        "fluke.stygian.block.BlockEndGrass");
+                // Support modded "End Stone"-like soil blocks
+                register(new TransformerStygianEndPlant(),
+                        "fluke.stygian.block.BlockEndGlowPlant",
+                        "fluke.stygian.block.BlockEndCanopySapling",
+                        "fluke.stygian.block.BlockEndTallGrass");
             }
             // Vanilla:
             {
@@ -187,6 +270,18 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // All BiomeHell instances use netherrack as their top and filler blocks.
                 register(new TransformerBiomeHell(),
                         "net.minecraft.world.biome.BiomeHell");
+                // Add support for new EnumPlantTypes to Vanilla soil blocks.
+                register(new TransformerBlock(),
+                        "net.minecraft.block.Block");
+                // Support modded "End Stone"-like soil blocks.
+                register(new TransformerBlockChorusFlower(),
+                        "net.minecraft.block.BlockChorusFlower");
+                // Support modded "End Stone"-like soil blocks.
+                register(new TransformerBlockChorusPlant(),
+                        "net.minecraft.block.BlockChorusPlant");
+                // Allow shrubs to be used in Nether world generation.
+                register(new TransformerBlockTallGrass(),
+                        "net.minecraft.block.BlockTallGrass");
                 // Add registered structures to the /locate tab completion list.
                 register(new TransformerCommandLocate(),
                         "net.minecraft.command.CommandLocate");

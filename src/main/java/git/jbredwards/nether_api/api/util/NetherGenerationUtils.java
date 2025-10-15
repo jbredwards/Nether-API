@@ -27,6 +27,7 @@ public final class NetherGenerationUtils
 {
     /**
      * At the given x and z positions, replaces "stateToFill" with the provided top and filler blocks. Also generates the random gravel and soul sand for the biome.
+     * @since 1.0.0
      */
     public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn, @Nonnull IBlockState liquidBlockIn) {
         buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, stateToFill, topBlockIn, fillerBlockIn, liquidBlockIn, Blocks.GRAVEL.getDefaultState(), Blocks.SOUL_SAND.getDefaultState());
@@ -97,5 +98,16 @@ public final class NetherGenerationUtils
                 prevCheckState = checkState;
             }
         }
+    }
+
+    /**
+     * @return A new Random whose seed is based on a combination of the world seed + chunk pos.
+     * @since 1.4.0
+     */
+    @Nonnull
+    public static Random createSeedRandom(final long seed, final int chunkX, final int chunkZ) {
+        @Nonnull final Random rand = new Random(seed);
+        rand.setSeed(((rand.nextLong() >> 2 + 1) * chunkX + (rand.nextLong() >> 2 + 1) * chunkZ) ^ seed);
+        return rand;
     }
 }

@@ -37,6 +37,17 @@ public final class NetherAPIConfig
     @Config.LangKey("config.nether_api.hellWeight")
     public static int hellWeight = 8;
 
+    @Config(modid = NetherAPI.MODID, name = "nether_api/betternether")
+    public static final class BetterNether
+    {
+        @Config.LangKey("config.nether_api.compat.betternether.moldOnMyceliumOnly")
+        public static boolean moldOnMyceliumOnly = true;
+
+        @Config.RangeDouble(min = 0, max = 1)
+        @Config.LangKey("config.nether_api.compat.betternether.visceralEyeGen")
+        public static double visceralEyeGen = 0.125;
+    }
+
     @Config(modid = NetherAPI.MODID, name = "nether_api/biomes_o_plenty")
     public static final class BOP
     {
@@ -62,7 +73,7 @@ public final class NetherAPIConfig
     }
 
     @Config(modid = NetherAPI.MODID, name = "nether_api/nether_hexed_kingdom")
-    public static final class NetherHexedKingdom
+    public static final class NHK
     {
         @Config.LangKey("config.nether_api.compat.hexed.bullionTempleMinHeight") public static int bullionTempleMinHeight = 48;
         @Config.LangKey("config.nether_api.compat.hexed.bullionTempleMaxHeight") public static int bullionTempleMaxHeight = 79;

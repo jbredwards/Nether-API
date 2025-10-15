@@ -1,4 +1,8 @@
 # Config
+config.nether_api.compat.betternether.moldOnMyceliumOnly=Only Mycelium Supports Mold
+config.nether_api.compat.betternether.moldOnMyceliumOnly.tooltip=
+config.nether_api.compat.betternether.visceralEyeGen=Visceral Heap Eyeball Vine Frequency
+config.nether_api.compat.betternether.visceralEyeGen.tooltip=While the Biomes O' Plenty mod is installed, Nether API allows BetterNether's Eyeball Vine plants to also generate inside Biomes O' Plenty's Visceral Heap nether biome. This setting controls the chance of an Eyeball Vine generating for each ceiling block in a Visceral Heap biome.
 config.nether_api.compat.bop.dependentHellBiomes=World-Type Dependency
 config.nether_api.compat.bop.dependentHellBiomes.tooltip=Nether biomes from the Biomes O' Plenty mod can only generate if the world-type is set to "Biomes O' Plenty".
 config.nether_api.compat.hexed.bullionTempleMaxHeight=Bullion Temple Max Height
@@ -74,6 +78,8 @@ config.nether_api.tallNether.tooltip=Generate the Nether with a height of 256. Â
 configgui.nether_api.compat=Mod Compatibility
 configgui.nether_api.compat.tooltip=Compatibility settings for other mods.
 configgui.nether_api.title=Nether API Configuration
+nether_api/betternether=BetterNether
+nether_api/betternether.tooltip=Compatibility settings for while the BetterNether mod is installed.
 nether_api/biomes_o_plenty=Biomes O' Plenty
 nether_api/biomes_o_plenty.tooltip=Compatibility settings for while the Biomes O' Plenty mod is installed.
 nether_api/journey_into_the_light=Journey Into The Light
@@ -90,3 +96,6 @@ nether_api/vanilla.tooltip=Vanilla settings.
 # Misc
 mod.nether_api.credits=\n- jbredwards: creator and maintainer\n- CleanroomMC: creating TemplateDevEnv\n- Nischhelm: compatibility with old BetterNether versions
 mod.nether_api.description=Serves as a library for anyone wanting to add End or Nether biomes, also unifies other mods' End and Nether biomes!
+tile.nether_api:rooty_endstone.name=Rooty End Stone
+tile.nether_api:rooty_netherrack.name=Rooty Netherrack
+tile.nether_api:rooty_soulsand.name=Rooty Soul Sand

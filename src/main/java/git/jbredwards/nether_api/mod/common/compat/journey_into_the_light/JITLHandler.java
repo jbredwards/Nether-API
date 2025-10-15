@@ -11,6 +11,7 @@ import net.journey.dimension.nether.JNWorldGenerator;
 import net.journey.dimension.nether.biomes.*;
 import net.journey.dimension.nether.biomes.structure.IStructureWorld;
 import net.journey.entity.mob.nether.*;
+import net.journey.init.blocks.JourneyBlocks;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EnumCreatureType;
@@ -27,6 +28,7 @@ import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.slayer.api.block.BlockModLeaves;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -97,6 +99,10 @@ public final class JITLHandler
             final BiomeJITL biome = getBiomeFromLookup(BiomeRegister.BIOME_FOREST_EDGE);
             EntityRegistry.addSpawn(EntityHellCow.class, 15, 1, 1, EnumCreatureType.MONSTER, biome);
         }
+
+        // fix certain leaves not dropping their saplings
+        ObfuscationReflectionHelper.setPrivateValue(BlockModLeaves.class, (BlockModLeaves)JourneyBlocks.sizzlerWoodLeaves, JourneyBlocks.netherSapling, "sapling");
+        ObfuscationReflectionHelper.setPrivateValue(BlockModLeaves.class, (BlockModLeaves)JourneyBlocks.earthenNetherLeaves, JourneyBlocks.EARTHEN_SAPLING, "sapling");
     }
 
     @Nonnull

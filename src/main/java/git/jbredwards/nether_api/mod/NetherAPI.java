@@ -8,6 +8,8 @@ package git.jbredwards.nether_api.mod;
 import git.jbredwards.nether_api.Tags;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
+import git.jbredwards.nether_api.mod.common.compat.biomesoplenty.BiomesOPlentyHandler;
+import git.jbredwards.nether_api.mod.common.compat.dynamictrees.DynamicTreesHandler;
 import git.jbredwards.nether_api.mod.common.compat.journey_into_the_light.JITLHandler;
 import git.jbredwards.nether_api.mod.common.compat.nethercraft.NethercraftHandler;
 import git.jbredwards.nether_api.mod.common.compat.stygian_end.StygianEndHandler;
@@ -53,7 +55,7 @@ public final class NetherAPI
             "after:betternether@[0.1.8.6,);" +
             "after:biomesoplenty@[7.0.1.2444,);" +
             "after:journey@1.0.6.11;" +
-            "after:natura@1.12.2-4.3.2.69;" +
+            "after:natura@[1.12.2-4.3.2.69,);" +
             "after:nethercraft@1.0.2;" +
             "after:netherex@2.2.5;" +
             "after:stygian@[1.0.4,);";
@@ -61,7 +63,9 @@ public final class NetherAPI
     // Mod Compatibility
     public static final boolean isBetterNetherLoaded = Loader.isModLoaded("betternether");
     public static final boolean isBiomesOPlentyLoaded = Loader.isModLoaded("biomesoplenty");
+    public static final boolean isDynamicTreesLoaded = Loader.isModLoaded("dynamictrees");
     public static final boolean isJourneyIntoTheLightLoaded = Loader.isModLoaded("journey");
+    public static final boolean isNetherHexedKingdomLoaded = Loader.isModLoaded("netherhexedkingdommod");
     public static final boolean isNethercraftLoaded = Loader.isModLoaded("nethercraft");
     public static final boolean isNetherExLoaded = Loader.isModLoaded("netherex");
     public static final boolean isStygianEndLoaded = Loader.isModLoaded("stygian");
@@ -75,6 +79,7 @@ public final class NetherAPI
     @Mod.EventHandler
     static void construct(@Nonnull final FMLConstructionEvent event) {
         if(isBetterNetherLoaded) MinecraftForge.EVENT_BUS.register(BetterNetherHandler.class);
+        if(isDynamicTreesLoaded) MinecraftForge.EVENT_BUS.register(DynamicTreesHandler.class);
         if(isJourneyIntoTheLightLoaded) MinecraftForge.EVENT_BUS.register(JITLHandler.class);
         if(isNethercraftLoaded) MinecraftForge.EVENT_BUS.register(NethercraftHandler.class);
     }
@@ -89,6 +94,7 @@ public final class NetherAPI
     @Mod.EventHandler
     static void init(@Nonnull final FMLInitializationEvent event) {
         if(isBetterNetherLoaded) BetterNetherHandler.init();
+        if(isBiomesOPlentyLoaded) BiomesOPlentyHandler.init();
         if(isJourneyIntoTheLightLoaded) JITLHandler.init();
         if(isNethercraftLoaded) NethercraftHandler.init();
         if(isStygianEndLoaded) StygianEndHandler.init();
@@ -98,6 +104,7 @@ public final class NetherAPI
     @SideOnly(Side.CLIENT)
     @Mod.EventHandler
     static void initClient(@Nonnull final FMLInitializationEvent event) {
+        if(isBiomesOPlentyLoaded) BiomesOPlentyHandler.initClient();
         if(isStygianEndLoaded) StygianEndHandler.initClient();
         Optional.ofNullable(Loader.instance().getIndexedModList().get(MODID)).ifPresent(mod -> {
             // Remove "disable" button in mod gui.

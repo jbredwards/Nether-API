@@ -16,8 +16,10 @@ import net.minecraft.block.BlockChorusFlower;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityEndGateway;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -28,6 +30,7 @@ import net.minecraft.world.gen.ChunkGeneratorEnd;
 import net.minecraft.world.gen.NoiseGeneratorPerlin;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.ForgeModContainer;
+import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.event.ForgeEventFactory;
 
 import javax.annotation.Nonnull;
@@ -148,8 +151,11 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
                     final int y = world.getHeight(pos.add(xOffset, 0, zOffset)).getY();
 
                     if(y > 0 && world.isAirBlock(pos.add(xOffset, y, zOffset))) {
-                        final IBlockState ground = world.getBlockState(pos.add(xOffset, y - 1, zOffset));
-                        if(ground == END_STONE) BlockChorusFlower.generatePlant(world, pos.add(xOffset, y, zOffset), rand, 8);
+                        final BlockPos soil = pos.add(xOffset, y - 1, zOffset);
+                        final IBlockState ground = world.getBlockState(soil);
+                        if(ground.getBlock().canSustainPlant(ground, world, soil, EnumFacing.UP, (IPlantable)Blocks.CHORUS_FLOWER)) {
+                            BlockChorusFlower.generatePlant(world, soil.up(), rand, 8);
+                        }
                     }
                 }
             }

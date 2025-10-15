@@ -50,9 +50,6 @@ public class GuiConfigTranslucent extends GuiConfig
                         owningScreen.allRequireWorldRestart || configElement.requiresWorldRestart(), owningScreen.allRequireMcRestart || configElement.requiresMcRestart(),
                         owningScreen.title, ((owningScreen.titleLine2 == null ? "" : owningScreen.titleLine2) + " > " + name));
             }
-
-            @Override
-            public boolean enabled() { return !configElement.getChildElements().isEmpty(); }
         } : entry);
     }
 

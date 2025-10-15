@@ -5,6 +5,7 @@
 
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
+import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenSpikes;
@@ -69,9 +70,7 @@ public final class TransformerDragonSpawnManager implements ITransformer
     {
         @Nonnull
         public static Random createRandom(@Nonnull World world, @Nonnull WorldGenSpikes.EndSpike spike) {
-            final Random rand = new Random(world.getSeed());
-            rand.setSeed(((rand.nextLong() >> 2 + 1) * spike.getCenterX() + (rand.nextLong() >> 2 + 1) * spike.getCenterZ()) ^ world.getSeed());
-            return rand;
+            return NetherGenerationUtils.createSeedRandom(world.getSeed(), spike.getCenterX(), spike.getCenterZ());
         }
     }
 }

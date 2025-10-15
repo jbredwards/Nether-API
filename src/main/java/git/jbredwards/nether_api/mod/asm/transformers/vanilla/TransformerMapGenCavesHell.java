@@ -52,17 +52,15 @@ public final class TransformerMapGenCavesHell implements ITransformer
                  *
                  * New code:
                  * // Increase max allowed generation height for nether caves to match the nether height
-                 * if (l > this.world.getActualHeight() - 8)
+                 * if (l > this.world.getActualHeight())
                  * {
-                 *     l = this.world.getActualHeight() - 8;
+                 *     l = this.world.getActualHeight();
                  * }
                  */
                 if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 120) {
                     method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
                     method.instructions.insertBefore(insn, new FieldInsnNode(GETFIELD, "net/minecraft/world/gen/MapGenBase", DEOBFUSCATED ? "world" : "field_75039_c", "Lnet/minecraft/world/World;"));
                     method.instructions.insertBefore(insn, genHeightMethod());
-                    method.instructions.insertBefore(insn, new IntInsnNode(BIPUSH, 8));
-                    method.instructions.insertBefore(insn, new InsnNode(ISUB));
                     method.instructions.remove(insn);
                 }
                 /*
