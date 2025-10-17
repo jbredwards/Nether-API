@@ -8,6 +8,7 @@ package git.jbredwards.nether_api.mod.common.world.gen;
 import git.jbredwards.nether_api.api.biome.IEndBiome;
 import git.jbredwards.nether_api.api.structure.ISpawningStructure;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
+import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd;
@@ -59,8 +60,15 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
         moddedStructures = NetherAPIRegistry.THE_END.getStructures().stream().map(entry -> entry.getStructureFactory().apply(this)).toArray(MapGenStructure[]::new);
     }
 
+    @Override
+    public void setBlocksInChunk(int x, int z, @Nonnull ChunkPrimer primer) {
+        if(VoidIslandControlHandler.isVoid(world)) return;
+
+        super.setBlocksInChunk(x, z, primer);
+    }
+
     public void buildSurfaces(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer) {
-        if(!ForgeEventFactory.onReplaceBiomeBlocks(this, chunkX, chunkZ, primer, world)) return;
+        if(VoidIslandControlHandler.isVoid(world) || !ForgeEventFactory.onReplaceBiomeBlocks(this, chunkX, chunkZ, primer, world)) return;
         final double[] terrainNoise = terrainNoiseGen.getRegion(null, chunkX << 4, chunkZ << 4, 16, 16, 0.0625, 0.0625, 1);
         for(int posX = 0; posX < 16; posX++) {
             for(int posZ = 0; posZ < 16; posZ++) {

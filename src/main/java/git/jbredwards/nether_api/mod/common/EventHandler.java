@@ -20,7 +20,9 @@ import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldSettings;
 import net.minecraftforge.event.entity.living.LivingDestroyBlockEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -36,7 +38,7 @@ import javax.annotation.Nonnull;
 final class EventHandler
 {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    static void registerHardcodedEnd(@Nonnull NetherAPIRegistryEvent.End event) {
+    static void registerHardcodedEnd(@Nonnull final NetherAPIRegistryEvent.End event) {
         //built-in supported mods, other mods must use the event themselves
         if(NetherAPI.isStygianEndLoaded) StygianEndHandler.registerBiomes(event.registry);
         //vanilla
@@ -44,7 +46,7 @@ final class EventHandler
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    static void registerHardcodedNether(@Nonnull NetherAPIRegistryEvent.Nether event) {
+    static void registerHardcodedNether(@Nonnull final NetherAPIRegistryEvent.Nether event) {
         //built-in supported mods, other mods must use the event themselves
         if(NetherAPI.isBetterNetherLoaded) BetterNetherHandler.registerBiomes(event.registry);
         if(NetherAPI.isBiomesOPlentyLoaded) BiomesOPlentyHandler.registerBiomes(event.registry, event.world);
@@ -56,7 +58,7 @@ final class EventHandler
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    static void handleDragonResistantBlocks(@Nonnull LivingDestroyBlockEvent event) {
+    static void handleDragonResistantBlocks(@Nonnull final LivingDestroyBlockEvent event) {
         if(event.getEntity() instanceof EntityDragon) {
             // prevent the ender dragon from breaking parts of the exit portal
             if(event.getState().getBlock() instanceof BlockTorch) event.setCanceled(true);
@@ -68,5 +70,10 @@ final class EventHandler
                 if(event.getEntity().getExplosionResistance(explosion, world, pos, event.getState()) >= 1200) event.setCanceled(true);
             }
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    static void handleRespawnWorldData(@Nonnull final WorldEvent.Load event) {
+        if(NetherAPIConfig.worldForSpawn.test(event.getWorld())) event.getWorld().initialize(new WorldSettings(event.getWorld().getWorldInfo()));
     }
 }

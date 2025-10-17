@@ -11,6 +11,7 @@ import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
+import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import net.minecraft.block.BlockFalling;
@@ -63,6 +64,8 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     @SuppressWarnings({"DuplicateExpressions", "PointlessArithmeticExpression"})
     @Override
     public void prepareHeights(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer) {
+        if(VoidIslandControlHandler.isVoid(world)) return;
+
         final int lavaHeight = (world.getSeaLevel() >> 1) + 1;
         final int noiseHeight = (world.getActualHeight() >> 3) + 1;
         final int noiseWidthX = 5;
@@ -118,7 +121,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
 
     @Override
     public void buildSurfaces(int chunkX, int chunkZ, @Nonnull ChunkPrimer primer) {
-        if(!ForgeEventFactory.onReplaceBiomeBlocks(this, chunkX, chunkZ, primer, world)) return;
+        if(VoidIslandControlHandler.isVoid(world) || !ForgeEventFactory.onReplaceBiomeBlocks(this, chunkX, chunkZ, primer, world)) return;
         final int originX = chunkX << 4;
         final int originZ = chunkZ << 4;
 

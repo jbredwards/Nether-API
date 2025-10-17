@@ -13,6 +13,7 @@ import git.jbredwards.nether_api.mod.common.compat.dynamictrees.DynamicTreesHand
 import git.jbredwards.nether_api.mod.common.compat.journey_into_the_light.JITLHandler;
 import git.jbredwards.nether_api.mod.common.compat.nethercraft.NethercraftHandler;
 import git.jbredwards.nether_api.mod.common.compat.stygian_end.StygianEndHandler;
+import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
 import git.jbredwards.nether_api.mod.common.network.MessageTeleportFX;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderNether;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd;
@@ -58,7 +59,8 @@ public final class NetherAPI
             "after:natura@[1.12.2-4.3.2.69,);" +
             "after:nethercraft@1.0.2;" +
             "after:netherex@2.2.5;" +
-            "after:stygian@[1.0.4,);";
+            "after:stygian@[1.0.4,);" +
+            "after:voidislandcontrol@[1.5.3,);";
 
     // Mod Compatibility
     public static final boolean isBetterNetherLoaded = Loader.isModLoaded("betternether");
@@ -69,6 +71,7 @@ public final class NetherAPI
     public static final boolean isNethercraftLoaded = Loader.isModLoaded("nethercraft");
     public static final boolean isNetherExLoaded = Loader.isModLoaded("netherex");
     public static final boolean isStygianEndLoaded = Loader.isModLoaded("stygian");
+    public static final boolean isVoidIslandControlLoaded = Loader.isModLoaded("voidislandcontrol");
 
     // Packet handler
     @Nonnull
@@ -82,6 +85,7 @@ public final class NetherAPI
         if(isDynamicTreesLoaded) MinecraftForge.EVENT_BUS.register(DynamicTreesHandler.class);
         if(isJourneyIntoTheLightLoaded) MinecraftForge.EVENT_BUS.register(JITLHandler.class);
         if(isNethercraftLoaded) MinecraftForge.EVENT_BUS.register(NethercraftHandler.class);
+        if(isVoidIslandControlLoaded) MinecraftForge.EVENT_BUS.register(VoidIslandControlHandler.class);
     }
 
     // Register packets

@@ -31,13 +31,16 @@ repositories {
 dependencies {
     compileOnly rfg.deobf('curse.maven:better-nether-continuation-878052:5035082')
     compileOnly rfg.deobf('curse.maven:biomes-o-plenty-220318:2842510')
-    compileOnly rfg.deobf('curse.maven:dynamictrees-252818:3812473')
     compileOnly rfg.deobf('curse.maven:journey-into-the-light-354673:3449157')
     compileOnly rfg.deobf('curse.maven:libraryex-298965:3374254')
     compileOnly rfg.deobf('curse.maven:natura-74120:2711439')
     compileOnly rfg.deobf('curse.maven:nethercraft-classic-342087:2827467')
     compileOnly rfg.deobf('curse.maven:netherex-248039:3374256')
     compileOnly rfg.deobf('maven.modrinth:stygian-endunoffical:1.0.5')
+
+    compileOnly rfg.deobf('curse.maven:dynamictrees-252818:3812473')
+    compileOnly rfg.deobf('curse.maven:just-enough-dimensions-254317:3840727')
+    compileOnly rfg.deobf('curse.maven:void-island-control-257655:2666967')
 
     // Include StripLatestForgeRequirements by default for the dev env, saves everyone a hassle
     runtimeOnly 'com.cleanroommc:strip-latest-forge-requirements:1.0'

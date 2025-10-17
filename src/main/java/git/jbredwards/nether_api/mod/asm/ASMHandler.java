@@ -297,6 +297,15 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Allow IEndBiome instances to specify whether they're an applicable biome.
                 register(new TransformerMapGenEndCity(),
                         "net.minecraft.world.gen.structure.MapGenEndCity");
+                // Allow the Nether or End to be set as base spawn dimensions.
+                register(new TransformerNetHandlerPlayClient(),
+                        "net.minecraft.client.network.NetHandlerPlayClient",
+                        "net.minecraft.server.management.PlayerList",
+                        "net.minecraft.server.MinecraftServer",
+                        "net.minecraftforge.fml.common.network.handshake.NetworkDispatcher");
+                // Allow for custom obsidian platform generation.
+                register(new TransformerTeleporter(),
+                        "net.minecraft.world.Teleporter");
                 // Handle biome ambient sounds and particles from this mod's end.
                 register(new TransformerWorldClient(),
                         "net.minecraft.client.multiplayer.WorldClient");

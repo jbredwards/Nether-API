@@ -6,6 +6,8 @@
 package git.jbredwards.nether_api.mod.common.config;
 
 import git.jbredwards.nether_api.mod.NetherAPI;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -13,7 +15,14 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.function.Predicate;
 
+/**
+ *
+ * @author jbred
+ *
+ */
 @Config(modid = NetherAPI.MODID, name = "nether_api/vanilla")
 @Mod.EventBusSubscriber(modid = NetherAPI.MODID)
 public final class NetherAPIConfig
@@ -23,6 +32,9 @@ public final class NetherAPIConfig
 
     @Config.LangKey("config.nether_api.hellCaves")
     public static boolean hellCaves = true;
+
+    @Config.LangKey("config.nether_api.initialDragon")
+    public static boolean initialDragon = true;
 
     @Deprecated // DO NOT USE THIS!!! INSTEAD CALL -> world.getActualHeight()
     @Config.RequiresWorldRestart
@@ -36,6 +48,24 @@ public final class NetherAPIConfig
     @Config.RequiresWorldRestart
     @Config.LangKey("config.nether_api.hellWeight")
     public static int hellWeight = 8;
+
+    @Nonnull
+    @Config.RequiresWorldRestart
+    @Config.LangKey("config.nether_api.worldForSpawn")
+    public static WorldForSpawn worldForSpawn = WorldForSpawn.DEFAULT;
+    public enum WorldForSpawn implements Predicate<World>
+    {
+        DEFAULT(null),
+        END(DimensionType.THE_END),
+        NETHER(DimensionType.NETHER);
+
+        @Nullable
+        private final DimensionType type;
+        WorldForSpawn(@Nullable final DimensionType typeIn) { type = typeIn; }
+
+        @Override
+        public boolean test(@Nonnull final World world) { return world.provider.getDimensionType() == type; }
+    }
 
     @Config(modid = NetherAPI.MODID, name = "nether_api/betternether")
     public static final class BetterNether

@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 public class MapGenCavesEnd extends MapGenCavesHell
 {
     public static boolean generateOnStartIsland = false;
-    public static int chance = 3, roomChance = 4;
+    public static int chance = 3, roomChance = 4, maxY = 80;
 
     @Override
     public void generate(@Nonnull World worldIn, int x, int z, @Nonnull ChunkPrimer primer) {
@@ -33,7 +33,7 @@ public class MapGenCavesEnd extends MapGenCavesHell
             final int max = rand.nextInt(rand.nextInt(rand.nextInt(10) + 1) + 1);
             for(int i = 0; i < max; i++) {
                 final double x = (chunkX << 4) + rand.nextInt(16);
-                final double y = MathHelper.getInt(rand, 10, 80);
+                final double y = MathHelper.getInt(rand, 10, maxY);
                 final double z = (chunkZ << 4) + rand.nextInt(16);
                 int tunnels = 1;
                 
