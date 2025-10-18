@@ -6,8 +6,6 @@
 package git.jbredwards.nether_api.mod.common.config;
 
 import git.jbredwards.nether_api.mod.NetherAPI;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.World;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -15,8 +13,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.function.Predicate;
 
 /**
  *
@@ -49,23 +45,14 @@ public final class NetherAPIConfig
     @Config.LangKey("config.nether_api.hellWeight")
     public static int hellWeight = 8;
 
+    @Config.RequiresWorldRestart
+    @Config.LangKey("config.nether_api.initialSpawnDim")
+    public static int initialSpawnDim = 0;
+
     @Nonnull
     @Config.RequiresWorldRestart
-    @Config.LangKey("config.nether_api.worldForSpawn")
-    public static WorldForSpawn worldForSpawn = WorldForSpawn.DEFAULT;
-    public enum WorldForSpawn implements Predicate<World>
-    {
-        DEFAULT(null),
-        END(DimensionType.THE_END),
-        NETHER(DimensionType.NETHER);
-
-        @Nullable
-        private final DimensionType type;
-        WorldForSpawn(@Nullable final DimensionType typeIn) { type = typeIn; }
-
-        @Override
-        public boolean test(@Nonnull final World world) { return world.provider.getDimensionType() == type; }
-    }
+    @Config.LangKey("config.nether_api.respawnDims")
+    public static String[] respawnDims = new String[0];
 
     @Config(modid = NetherAPI.MODID, name = "nether_api/betternether")
     public static final class BetterNether

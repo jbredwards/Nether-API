@@ -297,12 +297,18 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Allow IEndBiome instances to specify whether they're an applicable biome.
                 register(new TransformerMapGenEndCity(),
                         "net.minecraft.world.gen.structure.MapGenEndCity");
-                // Allow the Nether or End to be set as base spawn dimensions.
+                // Allow more than just the Overworld to be set as an initial spawn dimension.
                 register(new TransformerNetHandlerPlayClient(),
                         "net.minecraft.client.network.NetHandlerPlayClient",
                         "net.minecraft.server.management.PlayerList",
                         "net.minecraft.server.MinecraftServer",
                         "net.minecraftforge.fml.common.network.handshake.NetworkDispatcher");
+                // Allow any dimension to permit respawns.
+                register(new TransformerPlayerChunkMap(),
+                        "net.minecraft.server.management.PlayerChunkMap",
+                        "net.minecraft.server.management.PlayerList",
+                        "net.minecraft.world.gen.ChunkProviderServer",
+                        "net.minecraft.world.WorldServer");
                 // Allow for custom obsidian platform generation.
                 register(new TransformerTeleporter(),
                         "net.minecraft.world.Teleporter");

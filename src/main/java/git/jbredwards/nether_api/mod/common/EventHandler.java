@@ -14,6 +14,7 @@ import git.jbredwards.nether_api.mod.common.compat.nethercraft.NethercraftHandle
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.compat.stygian_end.StygianEndHandler;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
+import git.jbredwards.nether_api.mod.common.world.PlayerSpawnLogic;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Biomes;
@@ -74,6 +75,8 @@ final class EventHandler
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     static void handleRespawnWorldData(@Nonnull final WorldEvent.Load event) {
-        if(NetherAPIConfig.worldForSpawn.test(event.getWorld())) event.getWorld().initialize(new WorldSettings(event.getWorld().getWorldInfo()));
+        if(PlayerSpawnLogic.canSpawnInDimension(event.getWorld().provider, null)) {
+            event.getWorld().initialize(new WorldSettings(event.getWorld().getWorldInfo()));
+        }
     }
 }

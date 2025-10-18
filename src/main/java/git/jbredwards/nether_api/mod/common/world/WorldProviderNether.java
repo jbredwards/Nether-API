@@ -19,20 +19,15 @@ import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.audio.MusicTicker;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderHell;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -58,26 +53,6 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
         biomeProvider = new BiomeProviderNether(world);
         doesWaterVaporize = true;
         nether = true;
-
-        // setup serverside handlers
-        if(world instanceof WorldServer) {
-            @Nonnull final NBTTagCompound nbt = world.getWorldInfo().getDimensionData(getDimension());
-
-            if(nbt.hasKey(NetherAPI.MODID + ":allowRespawn", Constants.NBT.TAG_ANY_NUMERIC)) allowRespawn = nbt.getBoolean(NetherAPI.MODID + ":allowRespawn");
-            else nbt.setBoolean(NetherAPI.MODID + ":allowRespawn", allowRespawn = (ALLOW_RESPAWN != null ? ALLOW_RESPAWN : NetherAPIConfig.worldForSpawn.test(world)));
-
-            if(nbt.hasKey(NetherAPI.MODID + ":allowSleep", Constants.NBT.TAG_ANY_NUMERIC)) allowRespawn = nbt.getBoolean(NetherAPI.MODID + ":allowSleep");
-            else nbt.setBoolean(NetherAPI.MODID + ":allowSleep", allowSleep = (ALLOW_SLEEP != null ? ALLOW_SLEEP : NetherAPIConfig.worldForSpawn.test(world)));
-        }
-    }
-
-    @Override
-    public void onWorldSave() {
-        @Nonnull final NBTTagCompound nbt = new NBTTagCompound();
-
-        nbt.setBoolean(NetherAPI.MODID + ":allowRespawn", allowRespawn);
-        nbt.setBoolean(NetherAPI.MODID + ":allowSleep", allowSleep);
-        world.getWorldInfo().setDimensionData(getDimension(), nbt);
     }
 
     @Nonnull
@@ -137,12 +112,6 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     // remove hardcoded spawn logic
     // ----------------------------
 
-    @Nullable public static Boolean ALLOW_RESPAWN = null;
-    @Nullable public static Boolean ALLOW_SLEEP = null;
-
-    protected boolean allowRespawn = false;
-    protected boolean allowSleep = false;
-
     @Override
     public boolean canCoordinateBeSpawn(final int x, final int z) {
         if(world.getHeight(x, z) == 0) return false;
@@ -157,28 +126,6 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
         @Nonnull final IBlockState state = chunk.getBlockState(pos);
         return !state.getMaterial().isLiquid() && isAirBlock(chunk, pos.move(EnumFacing.UP, 2))
                 && (world.isRemote || state.canEntitySpawn(FakePlayerFactory.getMinecraft(DimensionManager.getWorld(0))));
-    }
-
-    @Override
-    public boolean canDropChunk(final int x, final int z) {
-        return !canRespawnHere() || !world.isSpawnChunk(x, z);
-    }
-
-    @Nonnull
-    @Override
-    public WorldSleepResult canSleepAt(@Nonnull final EntityPlayer player, @Nonnull final BlockPos pos) {
-        return allowSleep ? WorldSleepResult.ALLOW : WorldSleepResult.BED_EXPLODES;
-    }
-
-    @Override
-    public boolean canRespawnHere() {
-        return allowRespawn || super.canRespawnHere();
-    }
-
-    @Override
-    public int getRespawnDimension(@Nonnull final EntityPlayerMP player) {
-        if(player.hasSpawnDimension()) return player.getSpawnDimension();
-        else return canRespawnHere() ? getDimension() : 0;
     }
 
     @Nonnull

@@ -20,8 +20,6 @@ import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorTheEnd;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.entity.boss.EntityDragon;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EntitySelectors;
@@ -88,23 +86,7 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
         if(world instanceof WorldServer) {
             @Nonnull final NBTTagCompound nbt = world.getWorldInfo().getDimensionData(getDimension());
             dragonFightManager = new FightManager((WorldServer)world, nbt.getCompoundTag("DragonFight"));
-
-            if(nbt.hasKey(NetherAPI.MODID + ":allowRespawn", Constants.NBT.TAG_ANY_NUMERIC)) allowRespawn = nbt.getBoolean(NetherAPI.MODID + ":allowRespawn");
-            else nbt.setBoolean(NetherAPI.MODID + ":allowRespawn", allowRespawn = (ALLOW_RESPAWN != null ? ALLOW_RESPAWN : NetherAPIConfig.worldForSpawn.test(world)));
-
-            if(nbt.hasKey(NetherAPI.MODID + ":allowSleep", Constants.NBT.TAG_ANY_NUMERIC)) allowRespawn = nbt.getBoolean(NetherAPI.MODID + ":allowSleep");
-            else nbt.setBoolean(NetherAPI.MODID + ":allowSleep", allowSleep = (ALLOW_SLEEP != null ? ALLOW_SLEEP : NetherAPIConfig.worldForSpawn.test(world)));
         }
-    }
-
-    @Override
-    public void onWorldSave() {
-        @Nonnull final NBTTagCompound nbt = new NBTTagCompound();
-        if(dragonFightManager != null) nbt.setTag("DragonFight", dragonFightManager.getCompound());
-
-        nbt.setBoolean(NetherAPI.MODID + ":allowRespawn", allowRespawn);
-        nbt.setBoolean(NetherAPI.MODID + ":allowSleep", allowSleep);
-        world.getWorldInfo().setDimensionData(getDimension(), nbt);
     }
 
     @Nonnull
@@ -249,12 +231,6 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
     // remove hardcoded spawn logic
     // ----------------------------
 
-    @Nullable public static Boolean ALLOW_RESPAWN = null;
-    @Nullable public static Boolean ALLOW_SLEEP = null;
-
-    protected boolean allowRespawn = false;
-    protected boolean allowSleep = false;
-
     @Override
     public boolean canCoordinateBeSpawn(final int x, final int z) {
         if(world.getHeight(x, z) == 0) return false;
@@ -265,28 +241,6 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
         @Nonnull final IBlockState state = world.getBlockState(pos);
         return state.getBlock() != Blocks.OBSIDIAN && !state.getMaterial().isLiquid() && world.isAirBlock(pos.up(2))
                 && (world.isRemote || state.canEntitySpawn(FakePlayerFactory.getMinecraft(DimensionManager.getWorld(0))));
-    }
-
-    @Override
-    public boolean canDropChunk(final int x, final int z) {
-        return !canRespawnHere() || !world.isSpawnChunk(x, z);
-    }
-
-    @Nonnull
-    @Override
-    public WorldSleepResult canSleepAt(@Nonnull final EntityPlayer player, @Nonnull final BlockPos pos) {
-        return allowSleep ? WorldSleepResult.ALLOW : WorldSleepResult.BED_EXPLODES;
-    }
-
-    @Override
-    public boolean canRespawnHere() {
-        return allowRespawn || super.canRespawnHere();
-    }
-
-    @Override
-    public int getRespawnDimension(@Nonnull final EntityPlayerMP player) {
-        if(player.hasSpawnDimension()) return player.getSpawnDimension();
-        else return canRespawnHere() ? getDimension() : 0;
     }
 
     @Nonnull

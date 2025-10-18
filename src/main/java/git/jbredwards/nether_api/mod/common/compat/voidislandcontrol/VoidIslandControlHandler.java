@@ -35,7 +35,7 @@ public final class VoidIslandControlHandler
 
     @Nonnull
     public static BlockPos getEndSpawnPos(@Nonnull final BlockPos fallback) {
-        if(NetherAPI.isVoidIslandControlLoaded) return new BlockPos(0, ConfigOptions.islandSettings.islandYLevel, 0);
+        if(NetherAPI.isVoidIslandControlLoaded) if(ConfigOptions.worldGenSettings.endVoid) return new BlockPos(0, ConfigOptions.islandSettings.islandYLevel, 0);
         return fallback;
     }
 
