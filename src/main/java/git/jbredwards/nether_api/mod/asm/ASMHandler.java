@@ -23,11 +23,13 @@ import git.jbredwards.nether_api.mod.asm.transformers.modded.nethercraft.Transfo
 import git.jbredwards.nether_api.mod.asm.transformers.modded.nethercraft.TransformerBlockNetherReed;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.nethercraft.TransformerNethercraftEvents;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.*;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.perfectspawn.TransformerAsmHandler;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.quark.TransformerQuarkCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndBiomes;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndGrass;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.stygian_end.TransformerStygianEndPlant;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.voidislandcontrol.TransformerEventHandler;
 import git.jbredwards.nether_api.mod.asm.transformers.vanilla.*;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
@@ -43,7 +45,7 @@ import java.util.Map;
  * @author jbred
  *
  */
-@IFMLLoadingPlugin.SortingIndex(1001)
+@IFMLLoadingPlugin.SortingIndex(1002)
 @IFMLLoadingPlugin.Name("Nether API Plugin")
 @IFMLLoadingPlugin.MCVersion("1.12.2")
 public final class ASMHandler implements IFMLLoadingPlugin
@@ -124,7 +126,7 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 register(new TransformerBlockBOPSapling(),
                         "biomesoplenty.common.block.BlockBOPSapling");
             }
-            // Dynamic Trees
+            // Dynamic Trees:
             {
                 // Change nether generators to not use hardcoded height values.
                 register(new Transformer_NetherHeight_DynamicTrees(),
@@ -180,7 +182,7 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 register(new TransformerBlockTaintedSoil(),
                         "com.progwml6.natura.nether.block.soil.BlockTaintedSoil");
             }
-            // Nether Hexed Kingdom
+            // Nether Hexed Kingdom:
             {
                 // Allow structures to work with increased nether height, and fix some cascading world gen issues.
                 register(new TransformerNetherHexedKingdom());
@@ -229,6 +231,12 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "logictechcorp.netherex.world.biome.data.BiomeDataManagerNetherEx",
                         "logictechcorp.netherex.NetherEx");
             }
+            // Perfect Spawn:
+            {
+                // Use the fallback value.
+                register(new TransformerAsmHandler(),
+                        "lumien.perfectspawn.handler.AsmHandler");
+            }
             // Quark:
             {
                 // Fix Quark nether fossil cascading world gen.
@@ -251,6 +259,12 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "fluke.stygian.block.BlockEndGlowPlant",
                         "fluke.stygian.block.BlockEndCanopySapling",
                         "fluke.stygian.block.BlockEndTallGrass");
+            }
+            // Void Island Control:
+            {
+                // Don't crash the event handler if the player spawns in another dimension.
+                register(new TransformerEventHandler(),
+                        "com.bartz24.voidislandcontrol.EventHandler");
             }
             // Vanilla:
             {
@@ -300,6 +314,7 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Allow more than just the Overworld to be set as an initial spawn dimension.
                 register(new TransformerNetHandlerPlayClient(),
                         "net.minecraft.client.network.NetHandlerPlayClient",
+                        "net.minecraft.entity.player.EntityPlayer",
                         "net.minecraft.server.management.PlayerList",
                         "net.minecraft.server.MinecraftServer",
                         "net.minecraftforge.fml.common.network.handshake.NetworkDispatcher");
@@ -315,9 +330,15 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Handle biome ambient sounds and particles from this mod's end.
                 register(new TransformerWorldClient(),
                         "net.minecraft.client.multiplayer.WorldClient");
+                // Fix player spawn locations in other dimensions.
+                register(new TransformerWorldProvider(),
+                        "net.minecraft.world.WorldProvider",
+                        "net.minecraft.world.WorldProviderEnd",
+                        "net.minecraft.world.WorldProviderHell");
                 // Don't let other mods introduce particle bugs.
                 register(new TransformerWorldServer(),
-                        "net.minecraft.world.WorldServer");
+                        "net.minecraft.world.WorldServer",
+                        "net.minecraft.world.WorldServerMulti");
             }
         }
 

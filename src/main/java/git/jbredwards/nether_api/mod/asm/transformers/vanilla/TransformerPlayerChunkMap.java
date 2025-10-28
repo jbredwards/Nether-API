@@ -9,13 +9,23 @@ import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.world.PlayerSpawnLogic;
 import io.netty.util.internal.IntegerHolder;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.play.server.SPacketChangeGameState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldSettings;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraftforge.common.DimensionManager;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.OptionalInt;
+import java.util.function.IntPredicate;
 
 /**
  * Allow any dimension to permit respawns
@@ -49,6 +59,26 @@ public final class TransformerPlayerChunkMap implements ITransformer
                         method.instructions.insertBefore(insn, new InsnNode(ACONST_NULL));
                         method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/common/world/PlayerSpawnLogic", "canSpawnInDimension", "(Lnet/minecraft/world/WorldProvider;Lnet/minecraft/entity/player/EntityPlayer;)Z", false));
                         method.instructions.remove(insn);
+                        if(transformedName.endsWith("PlayerChunkMap")) return BreakType.METHODS;
+                    }
+                    /*
+                     * Old code:
+                     * if (settings.isBonusChestEnabled())
+                     * {
+                     *     ...
+                     * }
+                     *
+                     * New code:
+                     * // Only create bonus chest in the Overworld.
+                     * if (Hooks.isBonusChestEnabled(settings, this))
+                     * {
+                     *     ...
+                     * }
+                     */
+                    else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "isBonusChestEnabled" : "func_77167_c")) {
+                        method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
+                        method.instructions.insertBefore(insn, genHookMethod("isBonusChestEnabled", "(Lnet/minecraft/world/WorldSettings;Lnet/minecraft/world/World;)Z"));
+                        method.instructions.remove(insn);
                         return BreakType.METHODS;
                     }
 
@@ -61,14 +91,14 @@ public final class TransformerPlayerChunkMap implements ITransformer
                 return transformMethod(basicClass, method -> method.name.equals(DEOBFUSCATED ? "recreatePlayerEntity" : "func_72368_a"), (method, insn) -> {
                     /*
                      * Old code:
-                     * else if (!this.world.provider.canRespawnHere())
+                     * else if (!world.provider.canRespawnHere())
                      * {
                      *     ...
                      * }
                      *
                      * New code:
                      * // Check override and config settings.
-                     * else if (!git.jbredwards.nether_api.mod.common.world.PlayerSpawnLogic.canSpawnInDimension(this.world.provider, playerIn))
+                     * else if (!git.jbredwards.nether_api.mod.common.world.PlayerSpawnLogic.canSpawnInDimension(world.provider, playerIn))
                      * {
                      *     ...
                      * }
@@ -84,14 +114,18 @@ public final class TransformerPlayerChunkMap implements ITransformer
                      *
                      * New code:
                      * // Always respect player-set spawn dimensions.
-                     * if (server.getWorld(dimension = Hooks.getFallbackDimension(playerIn, dimension)) == null) dimension = 0;
+                     * if (server.getWorld(dimension = Hooks.getRespawnDimension(playerIn, world, dimension, conqueredEnd)) == null) dimension = 0;
                      */
-                    else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "getWorld" : "func_71218_a")) {
-                        method.instructions.insert(insn, new VarInsnNode(ISTORE, 2));
-                        method.instructions.insert(insn, genHookMethod("getFallbackDimension", "(Lnet/minecraft/entity/player/EntityPlayer;I)I"));
-                        method.instructions.insert(insn, new VarInsnNode(ILOAD, 2));
-                        method.instructions.insert(insn, new VarInsnNode(ALOAD, 1));
-                        if(++index.value == 2) return BreakType.METHODS;
+                    else if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "getWorld" : "func_71218_a") && ++index.value == 2) {
+                        method.instructions.insertBefore(insn, new InsnNode(POP));
+                        method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 1));
+                        method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 4));
+                        method.instructions.insertBefore(insn, new VarInsnNode(ILOAD, 2));
+                        method.instructions.insertBefore(insn, new VarInsnNode(ILOAD, 3));
+                        method.instructions.insertBefore(insn, genHookMethod("getRespawnDimension", "(Lnet/minecraft/entity/player/EntityPlayerMP;Lnet/minecraft/world/World;IZ)I"));
+                        method.instructions.insertBefore(insn, new VarInsnNode(ISTORE, 2));
+                        method.instructions.insertBefore(insn, new VarInsnNode(ILOAD, 2));
+                        return BreakType.METHODS;
                     }
 
                     return BreakType.CONTINUE;
@@ -136,8 +170,58 @@ public final class TransformerPlayerChunkMap implements ITransformer
             return provider.canDropChunk(x, z) && (!manager.world.isSpawnChunk(x, z) || !PlayerSpawnLogic.canSpawnInDimension(provider, null));
         }
 
-        public static int getFallbackDimension(@Nonnull final EntityPlayer player, final int fallback) {
+        // Helper.
+        @Nonnull
+        private static OptionalInt findValidDimension(@Nonnull final EntityPlayerMP player, @Nonnull final boolean[] spawnPointObstructed, @Nonnull final Integer[] dimensions, @Nonnull final IntPredicate filter) {
+            return Arrays.stream(dimensions).mapToInt(Integer::intValue).filter(filter.and(dimension -> {
+                @Nullable final BlockPos bedPos = player.getBedLocation(dimension);
+                if(bedPos == null) return false;
+
+                @Nullable final World world = player.server.getWorld(dimension);
+                final boolean isValid = world != null && EntityPlayer.getBedSpawnLocation(world, bedPos, player.isSpawnForced(dimension)) != null;
+
+                if(!isValid) spawnPointObstructed[0] = true;
+                return isValid;
+            })).findFirst();
+        }
+
+        public static int getRespawnDimension(@Nonnull final EntityPlayerMP player, @Nullable final World world, final int dimension, final boolean conqueredEnd) {
+            // Always respect any mod-set respawn dimension override, except the End's exit portal, which shouldn't be treated like normal respawning.
+            if(player.hasSpawnDimension() && (!conqueredEnd || player.dimension != player.getSpawnDimension())) return player.getSpawnDimension();
+            final boolean canRespawnHere = !conqueredEnd && world != null && PlayerSpawnLogic.canSpawnInDimension(world.provider, player);
+
+            final int defaultDimension;
+            if(canRespawnHere && player.dimension != 0) defaultDimension = player.dimension;
+            else { // Force the End's exit portal to warp into a non-End "player spawn dimension".
+                final int initialDimension = PlayerSpawnLogic.getInitialSpawnDimension(player.getGameProfile());
+                defaultDimension = conqueredEnd && player.dimension == initialDimension ? 0 : initialDimension;
+            }
+
+            // No special dimension is set, send to spawn point dimension or to the default spawn dimension.
+            if(canRespawnHere || dimension == 0 || dimension == defaultDimension) {
+                @Nonnull final boolean[] spawnPointObstructed = new boolean[1];
+                final int respawnDimension = (!conqueredEnd && player.getBedLocation() != null ? findValidDimension(player, spawnPointObstructed, new Integer[] {player.dimension}, id -> true) : OptionalInt.empty())
+                        .orElseGet(() -> findValidDimension(player, spawnPointObstructed, DimensionManager.getStaticDimensionIDs(), conqueredEnd ? id -> id != player.dimension : id -> true).orElse(defaultDimension));
+
+                // PlayerList only sends the "bed is obstructed" warning for beds in the same dimension, this fixes that.
+                if(spawnPointObstructed[0]) {
+                    @Nullable final World respawnWorld = player.server.getWorld(respawnDimension);
+                    if(respawnWorld == null && player.getBedLocation(0) == null || player.getBedLocation(respawnDimension) == null) player.connection.sendPacket(new SPacketChangeGameState(0, 0));
+                }
+
+                return respawnDimension;
+            }
+
+            // Special logic found.
+            else return dimension;
+        }
+
+        public static int getSpawnDimension(@Nonnull final EntityPlayerMP player, final int fallback) {
             return player.hasSpawnDimension() ? player.getSpawnDimension() : fallback;
+        }
+
+        public static boolean isBonusChestEnabled(@Nonnull final WorldSettings settings, @Nonnull final World world) {
+            return settings.isBonusChestEnabled() && world.provider.getDimension() == 0;
         }
     }
 }

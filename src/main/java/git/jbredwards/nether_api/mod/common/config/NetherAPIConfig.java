@@ -32,6 +32,15 @@ public final class NetherAPIConfig
     @Config.LangKey("config.nether_api.initialDragon")
     public static boolean initialDragon = true;
 
+    @Config.RequiresWorldRestart
+    @Config.LangKey("config.nether_api.initialSpawnDim")
+    public static int initialSpawnDim = 0;
+
+    @Nonnull
+    @Config.RequiresWorldRestart
+    @Config.LangKey("config.nether_api.respawnDims")
+    public static String[] respawnDims = new String[0];
+
     @Deprecated // DO NOT USE THIS!!! INSTEAD CALL -> world.getActualHeight()
     @Config.RequiresWorldRestart
     @Config.LangKey("config.nether_api.tallNether")
@@ -44,15 +53,6 @@ public final class NetherAPIConfig
     @Config.RequiresWorldRestart
     @Config.LangKey("config.nether_api.hellWeight")
     public static int hellWeight = 8;
-
-    @Config.RequiresWorldRestart
-    @Config.LangKey("config.nether_api.initialSpawnDim")
-    public static int initialSpawnDim = 0;
-
-    @Nonnull
-    @Config.RequiresWorldRestart
-    @Config.LangKey("config.nether_api.respawnDims")
-    public static String[] respawnDims = new String[0];
 
     @Config(modid = NetherAPI.MODID, name = "nether_api/betternether")
     public static final class BetterNether

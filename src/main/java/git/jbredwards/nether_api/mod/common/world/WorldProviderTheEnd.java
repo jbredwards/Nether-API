@@ -17,14 +17,12 @@ import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandC
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderTheEnd;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorTheEnd;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderEnd;
@@ -39,14 +37,12 @@ import net.minecraft.world.gen.feature.WorldGenSpikes;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -143,8 +139,8 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
                     @Nonnull final List<EntityDragon> dragons = world.getEntities(EntityDragon.class, EntitySelectors.IS_ALIVE);
                     if(!dragons.isEmpty()) dragons.get(0).setDead(); // For worlds that were upgraded from 1.8 or earlier.
 
+                    generatePortal(true);
                     spawnNewGateway();
-                    generatePortal(false);
 
                     dragonKilled = true;
                     previouslyKilled = false;
@@ -156,13 +152,13 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
         }
 
         @Override
-        public void generateGateway(@Nonnull BlockPos pos) {
+        public void generateGateway(@Nonnull final BlockPos pos) {
             if(!scanForLegacyFight) world.playEvent(Constants.WorldEvents.GATEWAY_SPAWN_EFFECTS, pos, 0);
             END_GATEWAY.generate(world, createSeedRandom(pos), pos);
         }
 
         @Override
-        public void generatePortal(boolean active) {
+        public void generatePortal(final boolean active) {
             if(exitPortalLocation == null) {
                 exitPortalLocation = world.getTopSolidOrLiquidBlock(WorldGenEndPodium.END_PODIUM_LOCATION).down();
                 final int exitPortalMinY = Math.max(world.getSeaLevel(), 2);
@@ -173,10 +169,10 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
                     exitPortalLocation = exitPortalLocation.down();
 
                 // prevent portals from spawning into the void
-                if(exitPortalLocation.getY() < exitPortalMinY) exitPortalLocation = new BlockPos(exitPortalLocation.getX(), exitPortalMinY, exitPortalLocation.getZ());
+                if(exitPortalLocation.getY() < 2) exitPortalLocation = new BlockPos(exitPortalLocation.getX(), exitPortalMinY, exitPortalLocation.getZ());
             }
 
-            EXIT_PORTAL.create(active && (initialDragon || initialDragonKilled)).generate(world, createSeedRandom(exitPortalLocation), exitPortalLocation);
+            EXIT_PORTAL.create(spawnPortalLit(active)).generate(world, createSeedRandom(exitPortalLocation), exitPortalLocation);
         }
 
         @Override
@@ -184,6 +180,24 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
             if(dragon.getUniqueID().equals(dragonUniqueId)) initialDragonKilled = true;
             super.processDragonDeath(dragon);
         }
+
+        protected boolean spawnPortalLit(final boolean active) {
+            if(!active) return false;
+            else if(initialDragonKilled) return true;
+            else if(initialPortalLit != null) return initialPortalLit;
+            else return PlayerSpawnLogic.getInitialSpawnDimension(null) != getDimension();
+        }
+    }
+
+    @Nullable
+    protected static Boolean initialPortalLit = null;
+    public static void overrideInitialPortalLit(final boolean value) { initialPortalLit = value; }
+
+    @Nonnull
+    @Override
+    public BlockPos getRandomizedSpawnPoint() {
+        OBSIDIAN_PLATFORM.generate(world, new Random(world.getSeed()), getSpawnCoordinate());
+        return super.getRandomizedSpawnPoint();
     }
 
     // --------------
@@ -196,14 +210,6 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
     @Override
     public IDarkSoundAmbience getDarkAmbienceSound(@Nonnull final Biome biome) {
         return biome instanceof IAmbienceBiome ? ((IAmbienceBiome)biome).getDarkAmbienceSound() : null;
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public boolean doesXZShowFog(final int x, final int z) {
-        if(forceExtraEndFog) return true;
-        @Nonnull final Biome biome = world.getBiome(new BlockPos(x, 0, z));
-        return biome instanceof IEndBiome && ((IEndBiome)biome).hasExtraXZFog(world, x, z);
     }
 
     @Nonnull
@@ -227,45 +233,11 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
         return TheEndMusicHandler.getMusicType();
     }
 
-    // ----------------------------
-    // remove hardcoded spawn logic
-    // ----------------------------
-
+    @SideOnly(Side.CLIENT)
     @Override
-    public boolean canCoordinateBeSpawn(final int x, final int z) {
-        if(world.getHeight(x, z) == 0) return false;
-
-        @Nonnull final BlockPos pos = world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z));
-        if(world.getBiome(pos).ignorePlayerSpawnSuitability()) return true;
-
-        @Nonnull final IBlockState state = world.getBlockState(pos);
-        return state.getBlock() != Blocks.OBSIDIAN && !state.getMaterial().isLiquid() && world.isAirBlock(pos.up(2))
-                && (world.isRemote || state.canEntitySpawn(FakePlayerFactory.getMinecraft(DimensionManager.getWorld(0))));
-    }
-
-    @Nonnull
-    @Override
-    public BlockPos getRandomizedSpawnPoint() {
-        @Nonnull BlockPos ret = Objects.requireNonNull(getSpawnCoordinate());
-        OBSIDIAN_PLATFORM.generate(world, new Random(world.getSeed()), ret);
-
-        int spawnFuzz = 50;
-        final int border = MathHelper.floor(world.getWorldBorder().getClosestDistance(ret.getX(), ret.getZ()));
-        if(border < spawnFuzz) spawnFuzz = border;
-
-        if(border != 0) {
-            if(spawnFuzz < 2) spawnFuzz = 2;
-            final int spawnFuzzHalf = spawnFuzz >> 1;
-            final int spawnAttempts = 1000; // Same # of spawn attempts as Overworld.
-
-            for(int i = 0; i < spawnAttempts; i++) {
-                final int x = ret.getX() + spawnFuzzHalf - world.rand.nextInt(spawnFuzz);
-                final int z = ret.getZ() + spawnFuzzHalf - world.rand.nextInt(spawnFuzz);
-
-                if(canCoordinateBeSpawn(x, z)) return world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z));
-            }
-        }
-
-        return world.getTopSolidOrLiquidBlock(ret);
+    public boolean doesXZShowFog(final int x, final int z) {
+        if(forceExtraEndFog) return true;
+        @Nonnull final Biome biome = world.getBiome(new BlockPos(x, 0, z));
+        return biome instanceof IEndBiome && ((IEndBiome)biome).hasExtraXZFog(world, x, z);
     }
 }

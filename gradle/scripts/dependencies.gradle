@@ -40,6 +40,7 @@ dependencies {
 
     compileOnly rfg.deobf('curse.maven:dynamictrees-252818:3812473')
     compileOnly rfg.deobf('curse.maven:just-enough-dimensions-254317:3840727')
+    compileOnly rfg.deobf('curse.maven:perfect-spawn-221418:2543507')
     compileOnly rfg.deobf('curse.maven:void-island-control-257655:2666967')
 
     // Include StripLatestForgeRequirements by default for the dev env, saves everyone a hassle

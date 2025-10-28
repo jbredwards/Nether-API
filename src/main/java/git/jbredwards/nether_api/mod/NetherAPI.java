@@ -7,6 +7,7 @@ package git.jbredwards.nether_api.mod;
 
 import git.jbredwards.nether_api.Tags;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
+import git.jbredwards.nether_api.mod.common.command.CommandNetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import git.jbredwards.nether_api.mod.common.compat.biomesoplenty.BiomesOPlentyHandler;
 import git.jbredwards.nether_api.mod.common.compat.dynamictrees.DynamicTreesHandler;
@@ -15,6 +16,7 @@ import git.jbredwards.nether_api.mod.common.compat.nethercraft.NethercraftHandle
 import git.jbredwards.nether_api.mod.common.compat.stygian_end.StygianEndHandler;
 import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
 import git.jbredwards.nether_api.mod.common.network.MessageTeleportFX;
+import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderNether;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd;
 import net.minecraft.client.Minecraft;
@@ -67,9 +69,11 @@ public final class NetherAPI
     public static final boolean isBiomesOPlentyLoaded = Loader.isModLoaded("biomesoplenty");
     public static final boolean isDynamicTreesLoaded = Loader.isModLoaded("dynamictrees");
     public static final boolean isJourneyIntoTheLightLoaded = Loader.isModLoaded("journey");
+    public static final boolean isJustEnoughDimensionsLoaded = Loader.isModLoaded("justenoughdimensions");
     public static final boolean isNetherHexedKingdomLoaded = Loader.isModLoaded("netherhexedkingdommod");
     public static final boolean isNethercraftLoaded = Loader.isModLoaded("nethercraft");
     public static final boolean isNetherExLoaded = Loader.isModLoaded("netherex");
+    public static final boolean isPerfectSpawnLoaded = Loader.isModLoaded("perfectspawn");
     public static final boolean isStygianEndLoaded = Loader.isModLoaded("stygian");
     public static final boolean isVoidIslandControlLoaded = Loader.isModLoaded("voidislandcontrol");
 
@@ -81,6 +85,7 @@ public final class NetherAPI
     // Register actual biomes for pseudo biomes
     @Mod.EventHandler
     static void construct(@Nonnull final FMLConstructionEvent event) {
+        NetherAPIRegistry.init();
         if(isBetterNetherLoaded) MinecraftForge.EVENT_BUS.register(BetterNetherHandler.class);
         if(isDynamicTreesLoaded) MinecraftForge.EVENT_BUS.register(DynamicTreesHandler.class);
         if(isJourneyIntoTheLightLoaded) MinecraftForge.EVENT_BUS.register(JITLHandler.class);
@@ -129,6 +134,12 @@ public final class NetherAPI
     static void serverAboutToStart(@Nonnull final FMLServerAboutToStartEvent event) {
         if(DimensionManager.isDimensionRegistered(DimensionType.NETHER.getId())) DimensionManager.getProviderType(DimensionType.NETHER.getId()).clazz = WorldProviderNether.class;
         if(DimensionManager.isDimensionRegistered(DimensionType.THE_END.getId())) DimensionManager.getProviderType(DimensionType.THE_END.getId()).clazz = WorldProviderTheEnd.class;
+    }
+
+    // Register commands
+    @Mod.EventHandler
+    static void serverStarting(@Nonnull final FMLServerStartingEvent event) {
+        event.registerServerCommand(new CommandNetherAPI());
     }
 
     // Ensure all registries are cleared before another world is loaded

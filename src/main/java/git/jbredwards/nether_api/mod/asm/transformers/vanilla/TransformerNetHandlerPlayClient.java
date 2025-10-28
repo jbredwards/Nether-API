@@ -6,13 +6,12 @@
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
 import com.mojang.authlib.GameProfile;
+import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.world.PlayerSpawnLogic;
 import io.netty.util.internal.IntegerHolder;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
+import net.minecraft.util.text.translation.I18n;
+import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,6 +53,26 @@ public final class TransformerNetHandlerPlayClient implements ITransformer
             }
             /*
              * Old code:
+             * return spawnDimension != null ? spawnDimension : 0;
+             *
+             * New code:
+             * // Default to spawn dimension override instead of overworld.
+             * return spawnDimension != null ? spawnDimension : Hooks.getSpawnDim(0, this.getGameProfile());
+             */
+            case "net.minecraft.entity.player.EntityPlayer": {
+                return transformMethod(basicClass, method -> method.name.equals("getSpawnDimension"), (method, insn) -> {
+                    if(insn.getOpcode() == ICONST_0) {
+                        method.instructions.insert(insn, genHookMethod("getSpawnDim", "(ILcom/mojang/authlib/GameProfile;)I"));
+                        method.instructions.insert(insn, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraft/entity/player/EntityPlayer", DEOBFUSCATED ? "getGameProfile" : "func_146103_bH", "()Lcom/mojang/authlib/GameProfile;", false));
+                        method.instructions.insert(insn, new VarInsnNode(ALOAD, 0));
+                        return BreakType.METHODS;
+                    }
+
+                    return BreakType.CONTINUE;
+                });
+            }
+            /*
+             * Old code:
              * server.getWorld(0);
              *
              * New code:
@@ -66,6 +85,11 @@ public final class TransformerNetHandlerPlayClient implements ITransformer
                     if(insn instanceof MethodInsnNode && (((MethodInsnNode)insn).name.equals("getWorld") || ((MethodInsnNode)insn).name.equals("func_71218_a"))) {
                         method.instructions.insertBefore(insn, "net.minecraft.server.management.PlayerList".equals(transformedName) ? new VarInsnNode(ALOAD, 1) : new InsnNode(ACONST_NULL));
                         method.instructions.insertBefore(insn, genHookMethod("getSpawnDim", "(ILcom/mojang/authlib/GameProfile;)I"));
+                    }
+
+                    else if(insn instanceof LdcInsnNode && ((LdcInsnNode)insn).cst.equals("Preparing start region for level 0")) {
+                        method.instructions.insertBefore(insn, genHookMethod("getStartingRegionString", "()Ljava/lang/String;"));
+                        method.instructions.remove(insn);
                     }
 
                     return BreakType.CONTINUE;
@@ -103,6 +127,11 @@ public final class TransformerNetHandlerPlayClient implements ITransformer
     {
         public static int getSpawnDim(final int fallback, @Nullable final GameProfile profile) {
             return PlayerSpawnLogic.getInitialSpawnDimension(profile);
+        }
+
+        @Nonnull
+        public static String getStartingRegionString() {
+            return I18n.translateToLocalFormatted("info." + NetherAPI.MODID + ".loadStartRegion", getSpawnDim(0, null));
         }
     }
 }

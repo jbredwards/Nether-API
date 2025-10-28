@@ -7,6 +7,7 @@ package git.jbredwards.nether_api.api.registry;
 
 import git.jbredwards.nether_api.api.structure.INetherAPIStructureEntry;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.BiomeManager;
@@ -31,6 +32,13 @@ public interface INetherAPIRegistry
      */
     @Nonnull
     List<INetherAPIRegistry> REGISTRIES = new LinkedList<>();
+
+    /**
+     * @return The unique name for this registry instance.
+     * @since 1.4.0
+     */
+    @Nonnull
+    ResourceLocation getRegistryName();
 
     /**
      * Removes all the biomes and structures from the generation list.

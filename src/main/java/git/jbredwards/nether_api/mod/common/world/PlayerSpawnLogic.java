@@ -13,6 +13,7 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import it.unimi.dsi.fastutil.ints.Int2BooleanMap;
 import it.unimi.dsi.fastutil.ints.Int2BooleanOpenHashMap;
+import lumien.perfectspawn.handler.AsmHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.JsonUtils;
@@ -126,7 +127,7 @@ public final class PlayerSpawnLogic
 
             if(data == null) {
                 overworld.setData(ID, data = new WorldRespawnData(ID));
-                data.initial = NetherAPIConfig.initialSpawnDim;
+                data.initial = NetherAPI.isPerfectSpawnLoaded ? perfectSpawnDim() : NetherAPIConfig.initialSpawnDim;
                 data.respawn.putAll(Arrays.stream(NetherAPIConfig.respawnDims)
                         .map(config -> {
                             try {
@@ -149,5 +150,8 @@ public final class PlayerSpawnLogic
 
             return data;
         }
+
+        // Compatibility with the Perfect Spawn mod.
+        private static int perfectSpawnDim() { return AsmHandler.overrideInitialDimension(NetherAPIConfig.initialSpawnDim); }
     }
 }

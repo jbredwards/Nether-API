@@ -9,9 +9,11 @@ import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistryListener;
 import git.jbredwards.nether_api.api.structure.INetherAPIStructureEntry;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.BiomeManager;
+import net.minecraftforge.registries.GameData;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -24,12 +26,24 @@ import java.util.function.Function;
  */
 public class NetherAPIRegistry implements INetherAPIRegistry
 {
-    @Nonnull
-    public static final NetherAPIRegistry NETHER = new NetherAPIRegistry(), THE_END = new NetherAPIRegistry();
-    public NetherAPIRegistry() { REGISTRIES.add(this); }
+    public static NetherAPIRegistry NETHER, THE_END;
+    public static void init() {
+        NETHER = new NetherAPIRegistry("nether");
+        THE_END = new NetherAPIRegistry("end");
+    }
 
+    public NetherAPIRegistry(@Nonnull final String namespace) {
+        location = GameData.checkPrefix(namespace, true);
+        REGISTRIES.add(this);
+    }
+
+    @Nonnull protected final ResourceLocation location;
     @Nonnull protected final List<BiomeManager.BiomeEntry> biomeEntries = new ArrayList<>();
     @Nonnull protected final List<INetherAPIStructureEntry> structureEntries = new ArrayList<>();
+
+    @Nonnull
+    @Override
+    public ResourceLocation getRegistryName() { return location; }
 
     @Nonnull
     @Override

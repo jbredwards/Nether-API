@@ -76,6 +76,7 @@ final class EventHandler
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     static void handleRespawnWorldData(@Nonnull final WorldEvent.Load event) {
         if(PlayerSpawnLogic.canSpawnInDimension(event.getWorld().provider, null)) {
+            System.out.println("Initializing level " + event.getWorld().provider.getDimension() + "...");
             event.getWorld().initialize(new WorldSettings(event.getWorld().getWorldInfo()));
         }
     }

@@ -71,6 +71,12 @@ config.nether_api.hellCaves=Nether Caves
 config.nether_api.hellCaves.tooltip=Generate caves throughout the Nether.
 config.nether_api.hellWeight=Vanilla's Hell Biome Generation Weight
 config.nether_api.hellWeight.tooltip=The generation weight of Vanilla's Hell biome. The higher this value is, the higher chance the biome has of spawning compared to others.
+config.nether_api.initialDragon=Automatic Ender Dragon
+config.nether_api.initialDragon.tooltip=The End dimension creates an Ender Dragon when it's first loaded. An End Gateway is automatically created if this setting is disabled, to still allow exploration of the outer end islands.
+config.nether_api.initialSpawnDim=Player Spawn Dimension
+config.nether_api.initialSpawnDim.tooltip=The default spawn dimension for players. This is only used for players without a spawn point.
+config.nether_api.respawnDims=Player Respawn Dimension Overrides
+config.nether_api.respawnDims.tooltip=Allows additional dimensions (aside from the Overworld) to allow or deny players (without a spawn point there) from respawning within them. By default, the Overworld allows respawning and the End & Nether don't (they kick you back to the "Player Spawn Dimension" when you die). §rHere's an example config entry: §o{DimId: 1, Respawn: true}§r
 config.nether_api.tallNether=Tall Nether §lHOVER OVER ME!
 config.nether_api.tallNether.tooltip=Generate the Nether with a height of 256. §4WARNING: Only enable this feature for new worlds (or old worlds if you reset the Nether first)! This feature can cause additional world generation lag, so if you experience any performance issues, it's recommended to install the following mods: §oAlfheim Lighting Engine, CensoredASM, Nothirium, and VintageFix. §r§cNote: For many mods that generate their own nether features, you'll have to adjust their configs to account for the new height. Currently all mods with builtin support (and do not require manual config editing) are as follows: §oBetterNether, Biomes O' Plenty, Journey Into The Light, Natura, Nethercraft Classic, and NetherEx. It's also assumed that any mods using Nether API as a dependency have automatic support for this feature.§r
 
@@ -94,7 +100,11 @@ nether_api/vanilla=Vanilla
 nether_api/vanilla.tooltip=Vanilla settings.
 
 # Misc
-mod.nether_api.credits=\n- jbredwards: creator and maintainer\n- CleanroomMC: creating TemplateDevEnv\n- Nischhelm: compatibility with old BetterNether versions
+commands.nether_api.list.fail=There is no such registry with name %s
+commands.nether_api.list.usage=/nether_api list [biomes|structures] [registryId]
+commands.nether_api.nether_api.usage=/nether_api <subcommand>
+info.nether_api.loadStartRegion=Preparing start region for level %s
+mod.nether_api.credits=\n- jbredwards: creator and maintainer\n- CleanroomMC: creating TemplateDevEnv\n- Nischhelm: fixed compatibility with old BetterNether versions
 mod.nether_api.description=Serves as a library for anyone wanting to add End or Nether biomes, also unifies other mods' End and Nether biomes!
 tile.nether_api:rooty_endstone.name=Rooty End Stone
 tile.nether_api:rooty_netherrack.name=Rooty Netherrack

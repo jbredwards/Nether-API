@@ -17,18 +17,12 @@ import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandC
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.audio.MusicTicker;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -107,60 +101,4 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @SideOnly(Side.CLIENT)
     @Override
     public float[] calcSunriseSunsetColors(float celestialAngle, float partialTicks) { return null; }
-
-    // ----------------------------
-    // remove hardcoded spawn logic
-    // ----------------------------
-
-    @Override
-    public boolean canCoordinateBeSpawn(final int x, final int z) {
-        if(world.getHeight(x, z) == 0) return false;
-
-        @Nonnull final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, world.getSeaLevel(), z);
-        @Nonnull final Chunk chunk = world.getChunk(pos);
-        while(!isAirBlock(chunk, pos.move(EnumFacing.UP)));
-
-        if(pos.move(EnumFacing.DOWN).getY() == getActualHeight() - 1) return false; // Never spawn players on the nether roof.
-        else if(world.getBiome(pos).ignorePlayerSpawnSuitability()) return true;
-
-        @Nonnull final IBlockState state = chunk.getBlockState(pos);
-        return !state.getMaterial().isLiquid() && isAirBlock(chunk, pos.move(EnumFacing.UP, 2))
-                && (world.isRemote || state.canEntitySpawn(FakePlayerFactory.getMinecraft(DimensionManager.getWorld(0))));
-    }
-
-    @Nonnull
-    @Override
-    public BlockPos getRandomizedSpawnPoint() {
-        @Nonnull BlockPos ret = world.getSpawnPoint();
-
-        int spawnFuzz = 50;
-        final int border = MathHelper.floor(world.getWorldBorder().getClosestDistance(ret.getX(), ret.getZ()));
-        if(border < spawnFuzz) spawnFuzz = border;
-
-        if(border != 0) {
-            if(spawnFuzz < 2) spawnFuzz = 2;
-            final int spawnFuzzHalf = spawnFuzz >> 1;
-            final int spawnAttempts = 1000; // Same # of spawn attempts as Overworld.
-
-            for(int i = 0; i < spawnAttempts; i++) {
-                final int x = ret.getX() + spawnFuzzHalf - world.rand.nextInt(spawnFuzz);
-                final int z = ret.getZ() + spawnFuzzHalf - world.rand.nextInt(spawnFuzz);
-
-                if(canCoordinateBeSpawn(x, z)) {
-                    @Nonnull final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, world.getSeaLevel(), z);
-                    @Nonnull final Chunk chunk = world.getChunk(pos);
-
-                    while(!isAirBlock(chunk, pos.move(EnumFacing.UP)));
-                    return pos.move(EnumFacing.DOWN).toImmutable();
-                }
-            }
-        }
-
-        return ret;
-    }
-
-    private static boolean isAirBlock(@Nonnull final Chunk chunk, @Nonnull final BlockPos pos) {
-        @Nonnull final IBlockState state = chunk.getBlockState(pos);
-        return !state.getBlock().isAir(state, chunk.getWorld(), pos);
-    }
 }
