@@ -14,6 +14,8 @@ import git.jbredwards.nether_api.mod.asm.transformers.modded.dynamictrees.Transf
 import git.jbredwards.nether_api.mod.asm.transformers.modded.dynamictrees.Transformer_NetherHeight_DynamicTrees;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.hexed.TransformerNetherHexedKingdom;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.*;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.justenoughdimensions.TransformerDimensionTypeEntry;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.justenoughdimensions.TransformerWorldInfoUtils;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.libraryex.TransformerLibraryExCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.natura.TransformerBlockNetherSapling;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.natura.TransformerBlockTaintedSoil;
@@ -156,6 +158,15 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Fix Journey Into The Light's WorldGenNetherTower using bad registry names for spawners.
                 register(new TransformerJITLTowerFix(),
                         "net.journey.dimension.nether.gen.WorldGenNetherTower");
+            }
+            // Just Enough Dimensions:
+            {
+                // Ensure compatible Nether API world providers are used instead of old ones.
+                register(new TransformerDimensionTypeEntry(),
+                        "fi.dy.masa.justenoughdimensions.config.DimensionTypeEntry");
+                // Account for modded DerivedWorldInfo instances.
+                register(new TransformerWorldInfoUtils(),
+                        "fi.dy.masa.justenoughdimensions.util.world.WorldInfoUtils");
             }
             // LibraryEx:
             {

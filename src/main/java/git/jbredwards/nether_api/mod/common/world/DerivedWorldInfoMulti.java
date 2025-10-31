@@ -34,6 +34,21 @@ public class DerivedWorldInfoMulti extends DerivedWorldInfo
         dimension = dimensionIn;
     }
 
+    @Nonnull
+    @Override
+    public NBTTagCompound cloneNBTCompound(@Nullable final NBTTagCompound nbt) {
+        @Nonnull final NBTTagCompound compound = super.cloneNBTCompound(nbt);
+        if(dimension != 0) {
+            @Nonnull final Data data = Data.load(delegate, dimension);
+            compound.setBoolean("initialized", data.initialized);
+            compound.setInteger("SpawnX", data.x);
+            compound.setInteger("SpawnY", data.y);
+            compound.setInteger("SpawnZ", data.z);
+        }
+
+        return compound;
+    }
+
     @Override
     public boolean isInitialized() {
         if(dimension == 0) return super.isInitialized();

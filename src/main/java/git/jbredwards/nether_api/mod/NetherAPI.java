@@ -55,6 +55,7 @@ public final class NetherAPI
     @Nonnull
     public static final String MODID = Tags.MOD_ID, NAME = Tags.MOD_NAME, VERSION = Tags.VERSION, DEPENDENCIES =
             // Minimum supported mod versions, since earlier versions may cause ASM problems
+            "before:justenoughdimensions@[1.6.0-dev.20211009.214847,);" +
             "after:betternether@[0.1.8.6,);" +
             "after:biomesoplenty@[7.0.1.2444,);" +
             "after:journey@1.0.6.11;" +
@@ -69,7 +70,6 @@ public final class NetherAPI
     public static final boolean isBiomesOPlentyLoaded = Loader.isModLoaded("biomesoplenty");
     public static final boolean isDynamicTreesLoaded = Loader.isModLoaded("dynamictrees");
     public static final boolean isJourneyIntoTheLightLoaded = Loader.isModLoaded("journey");
-    public static final boolean isJustEnoughDimensionsLoaded = Loader.isModLoaded("justenoughdimensions");
     public static final boolean isNetherHexedKingdomLoaded = Loader.isModLoaded("netherhexedkingdommod");
     public static final boolean isNethercraftLoaded = Loader.isModLoaded("nethercraft");
     public static final boolean isNetherExLoaded = Loader.isModLoaded("netherex");
