@@ -1,11 +1,23 @@
 /*
- * Copyright (c) 2023-2025. jbredwards
- * All rights reserved.
+ * Copyright (C) <2025 to Present> <jbredwards>
+ *
+ * All rights are reserved, except where explicitly granted by the original
+ * copyright holder or where explicitly granted by the Mod Permissions License as
+ * published by Jbredwards, either version 1 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * See the Mod Permissions License for more details
+ * <https://www.github.com/jbredwards/mod-permissions-license>.
  */
 
 package git.jbredwards.nether_api.mod.client.audio;
 
 import git.jbredwards.nether_api.api.audio.IMusicType;
+import git.jbredwards.nether_api.api.audio.impl.VanillaMusicType;
 import git.jbredwards.nether_api.api.biome.IEndBiome;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.client.Minecraft;
@@ -32,24 +44,28 @@ import javax.annotation.Nullable;
 public final class TheEndMusicHandler
 {
     @Nonnull static final Minecraft mc = Minecraft.getMinecraft();
-    @Nullable static MusicTicker.MusicType currentType;
 
-    @Nullable
+    @Nullable static Biome prevBiome;
+    @Nullable static IMusicType prevType;
+
+    @Nonnull
     public static MusicTicker.MusicType getMusicType() {
-        if(currentType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) currentType = null;
-        final Biome biome = mc.world.getBiome(new BlockPos(mc.player.getPositionEyes(mc.getRenderPartialTicks())));
-        if(biome instanceof IEndBiome) {
-            final IMusicType musicType = mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic() ? ((IEndBiome)biome).getBossMusicType() : ((IEndBiome)biome).getMusicType();
-            if(currentType == null) currentType = musicType.getMusicType();
-            else if(musicType.replacesCurrentMusic(currentType)) currentType = musicType.getMusicType();
-        }
+        if(prevType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) prevType = null;
 
-        else if(currentType == null) currentType = mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic() ? MusicTicker.MusicType.END_BOSS : MusicTicker.MusicType.END;
-        return currentType;
+        @Nonnull final Biome biome = mc.world.getBiome(new BlockPos(mc.player.getPositionEyes(mc.getRenderPartialTicks())));
+        @Nonnull final IMusicType type;
+
+        if(biome instanceof IEndBiome) type = mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic() ? ((IEndBiome)biome).getBossMusicType() : ((IEndBiome)biome).getMusicType();
+        else type = new VanillaMusicType(mc.ingameGUI.getBossOverlay().shouldPlayEndBossMusic() ? MusicTicker.MusicType.END_BOSS : MusicTicker.MusicType.END);
+
+        if(prevType == null || type.replacesCurrentMusic(prevType.getMusicType()) || prevBiome != biome && prevType.isBiomeLocal()) prevType = type;
+        prevBiome = biome;
+
+        return prevType.getMusicType();
     }
 
     @SubscribeEvent
     static void resetCurrentMusicType(@Nonnull TickEvent.ClientTickEvent event) {
-        if(event.phase == TickEvent.Phase.START && currentType != null && (mc.player == null || mc.player.dimension != DimensionType.THE_END.getId())) currentType = null;
+        if(event.phase == TickEvent.Phase.START && prevType != null && (mc.player == null || mc.player.dimension != DimensionType.THE_END.getId())) prevType = null;
     }
 }

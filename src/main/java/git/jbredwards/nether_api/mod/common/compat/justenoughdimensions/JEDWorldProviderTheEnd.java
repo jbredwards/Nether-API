@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) <2025 to Present> <jbredwards>
+ *
+ * All rights are reserved, except where explicitly granted by the original
+ * copyright holder or where explicitly granted by the Mod Permissions License as
+ * published by Jbredwards, either version 1 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * See the Mod Permissions License for more details
+ * <https://www.github.com/jbredwards/mod-permissions-license>.
+ */
+
 package git.jbredwards.nether_api.mod.common.compat.justenoughdimensions;
 
 import fi.dy.masa.justenoughdimensions.util.ClientUtils;
@@ -19,7 +35,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.IChunkGenerator;
@@ -57,9 +72,10 @@ public final class JEDWorldProviderTheEnd extends WorldProviderTheEnd implements
     @Override
     public void setDimension(final int dim) {
         super.setDimension(dim);
-        if(!getWorldInfoHasBeenSet()) {
+
+        properties = JEDWorldProperties.getOrCreateProperties(dim);
+        if(world != null && !getWorldInfoHasBeenSet()) {
             @Nonnull final BlockPos oldSpawnPoint = getSpawnPoint();
-            properties = JEDWorldProperties.getOrCreateProperties(dim);
 
             WorldInfoUtils.loadAndSetCustomWorldInfo(world);
             worldInfoSet = true;
@@ -119,7 +135,7 @@ public final class JEDWorldProviderTheEnd extends WorldProviderTheEnd implements
     @Nonnull
     @Override
     public WorldSleepResult canSleepAt(@Nonnull final EntityPlayer player, @Nonnull final BlockPos pos) {
-        @Nullable final WorldProvider.WorldSleepResult val = properties.canSleepHere();
+        @Nullable final WorldSleepResult val = properties.canSleepHere();
         return val != null ? val : super.canSleepAt(player, pos);
     }
 

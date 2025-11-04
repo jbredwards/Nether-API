@@ -1,6 +1,17 @@
 /*
- * Copyright (c) 2023-2025. jbredwards
- * All rights reserved.
+ * Copyright (C) <2025 to Present> <jbredwards>
+ *
+ * All rights are reserved, except where explicitly granted by the original
+ * copyright holder or where explicitly granted by the Mod Permissions License as
+ * published by Jbredwards, either version 1 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * See the Mod Permissions License for more details
+ * <https://www.github.com/jbredwards/mod-permissions-license>.
  */
 
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
@@ -25,10 +36,8 @@ import org.objectweb.asm.tree.*;
 import javax.annotation.Nonnull;
 
 /**
- * <a href="https://web.archive.org/web/20240229143258/https://bugs.mojang.com/browse/MC-10369">MC-10369</a> - Server side particle spawning does not create particles for client.
- * <p> Note that <a href="https://web.archive.org/web/20240229143258/https://bugs.mojang.com/browse/MC-2518">MC-2518</a>
- * & <a href="https://web.archive.org/web/20240229143352/https://bugs.mojang.com/browse/MC-96974">MC-96974</a> are fixed by Forge.
- * </p>
+ * <a href="https://bugs-legacy.mojang.com/browse/MC-10369">MC-10369</a> - Server side particle spawning does not create particles for client.
+ * <p> Note that <a href="https://bugs-legacy.mojang.com/browse/MC-2518">MC-2518</a> & <a href="https://bugs-legacy.mojang.com/browse/MC-96974">MC-96974</a> are fixed by Forge.</p>
  * @author jbred
  *
  */

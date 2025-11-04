@@ -1,6 +1,17 @@
 /*
- * Copyright (c) 2025. jbredwards
- * All rights reserved.
+ * Copyright (C) <2025 to Present> <jbredwards>
+ *
+ * All rights are reserved, except where explicitly granted by the original
+ * copyright holder or where explicitly granted by the Mod Permissions License as
+ * published by Jbredwards, either version 1 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * See the Mod Permissions License for more details
+ * <https://www.github.com/jbredwards/mod-permissions-license>.
  */
 
 package git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty;
@@ -27,7 +38,7 @@ public final class TransformerBiomesOPlentyFluids implements ITransformer
          * @ASMGenerated
          * public boolean doesVaporize(FluidStack fluidStack)
          * {
-         *     return false;
+         *     return !NetherAPIConfig.BOP.placeableNetherFluids;
          * }
          */
         return transform(basicClass, classNode -> {
@@ -36,7 +47,9 @@ public final class TransformerBiomesOPlentyFluids implements ITransformer
             classNode.methods.add(method);
 
             @Nonnull final GeneratorAdapter adapter = new GeneratorAdapter(method, method.access, method.name, method.desc);
-            adapter.visitInsn(ICONST_0);
+            adapter.visitFieldInsn(GETSTATIC, "git/jbredwards/nether_api/mod/common/config/NetherAPIConfig$BOP", "placeableNetherFluids", "Z");
+            adapter.visitInsn(ICONST_1);
+            adapter.visitInsn(IXOR);
             adapter.returnValue();
         });
     }

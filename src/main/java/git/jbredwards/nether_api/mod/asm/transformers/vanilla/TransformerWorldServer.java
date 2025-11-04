@@ -1,6 +1,17 @@
 /*
- * Copyright (c) 2025. jbredwards
- * All rights reserved.
+ * Copyright (C) <2025 to Present> <jbredwards>
+ *
+ * All rights are reserved, except where explicitly granted by the original
+ * copyright holder or where explicitly granted by the Mod Permissions License as
+ * published by Jbredwards, either version 1 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * See the Mod Permissions License for more details
+ * <https://www.github.com/jbredwards/mod-permissions-license>.
  */
 
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
@@ -12,7 +23,7 @@ import javax.annotation.Nonnull;
 
 /**
  * Ensure that server-side particle spawning is not fixed by mods like Random Patches, RLMixins, and Universal Tweaks. Nether API
- * also fixes <a href="https://web.archive.org/web/20240229143258/https://bugs.mojang.com/browse/MC-10369">MC-10369</a>, but by
+ * also fixes <a href="https://bugs-legacy.mojang.com/browse/MC-10369">MC-10369</a>, but by
  * individually fixing each bug mentioned in the original report. See {@link Transformer_MC_10369}.
  * <p>
  * Applying a global fix causes bugs with many mods, like causing particles to be spawned twice.

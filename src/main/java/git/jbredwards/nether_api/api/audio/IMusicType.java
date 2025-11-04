@@ -1,6 +1,17 @@
 /*
- * Copyright (c) 2023-2025. jbredwards
- * All rights reserved.
+ * Copyright (C) <2025 to Present> <jbredwards>
+ *
+ * All rights are reserved, except where explicitly granted by the original
+ * copyright holder or where explicitly granted by the Mod Permissions License as
+ * published by Jbredwards, either version 1 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * See the Mod Permissions License for more details
+ * <https://www.github.com/jbredwards/mod-permissions-license>.
  */
 
 package git.jbredwards.nether_api.api.audio;
@@ -23,15 +34,25 @@ import javax.annotation.Nonnull;
 public interface IMusicType
 {
     /**
-     * @return the MusicType that gets played.
+     * Use {@link net.minecraftforge.client.EnumHelperClient#addMusicType EnumHelperClient::addMusicType} to create a custom MusicType.
+     * The result of that method should be saved to a static final field in your client proxy, and that field is what should be
+     * returned by this method.
+     *
+     * @return The MusicType that gets played.
      */
     @Nonnull
     @SideOnly(Side.CLIENT)
     MusicTicker.MusicType getMusicType();
 
     /**
-     * @return whether this should replace the currently playing music.
+     * @return Whether this should replace the currently playing music.
      */
     @SideOnly(Side.CLIENT)
-    boolean replacesCurrentMusic(@Nonnull MusicTicker.MusicType currentlyPlaying);
+    boolean replacesCurrentMusic(@Nonnull final MusicTicker.MusicType currentlyPlaying);
+
+    /**
+     * @return Whether this should only play while the player remains within the same biome.
+     * @since 1.4.0
+     */
+    default boolean isBiomeLocal() { return false; }
 }

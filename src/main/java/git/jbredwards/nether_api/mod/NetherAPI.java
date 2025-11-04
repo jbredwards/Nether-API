@@ -1,6 +1,17 @@
 /*
- * Copyright (c) 2023-2025. jbredwards
- * All rights reserved.
+ * Copyright (C) <2025 to Present> <jbredwards>
+ *
+ * All rights are reserved, except where explicitly granted by the original
+ * copyright holder or where explicitly granted by the Mod Permissions License as
+ * published by Jbredwards, either version 1 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE.
+ *
+ * See the Mod Permissions License for more details
+ * <https://www.github.com/jbredwards/mod-permissions-license>.
  */
 
 package git.jbredwards.nether_api.mod;
@@ -55,13 +66,14 @@ public final class NetherAPI
     @Nonnull
     public static final String MODID = Tags.MOD_ID, NAME = Tags.MOD_NAME, VERSION = Tags.VERSION, DEPENDENCIES =
             // Minimum supported mod versions, since earlier versions may cause ASM problems
-            "before:justenoughdimensions@[1.6.0-dev.20211009.214847,);" +
+            "before:justenoughdimensions@[1.6.0,);" +
             "after:betternether@[0.1.8.6,);" +
             "after:biomesoplenty@[7.0.1.2444,);" +
             "after:journey@1.0.6.11;" +
             "after:natura@[1.12.2-4.3.2.69,);" +
             "after:nethercraft@1.0.2;" +
             "after:netherex@2.2.5;" +
+            "after:perfectspawn@[2.1,);" +
             "after:stygian@[1.0.4,);" +
             "after:voidislandcontrol@[1.5.3,);";
 
