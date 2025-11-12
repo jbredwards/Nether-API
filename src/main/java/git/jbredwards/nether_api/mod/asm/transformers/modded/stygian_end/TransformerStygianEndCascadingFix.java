@@ -192,7 +192,7 @@ public final class TransformerStygianEndCascadingFix implements ITransformer
                                     if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "setBlockState" : "func_175656_a")) {
                                         method.instructions.insertBefore(insn, genBlockFlags());
 
-                                        if(DEOBFUSCATED) ((MethodInsnNode)insn).name = "func_180501_a";
+                                        if(!DEOBFUSCATED) ((MethodInsnNode)insn).name = "func_180501_a";
                                         ((MethodInsnNode)insn).desc = "(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;I)Z";
                                         break;
                                     }
