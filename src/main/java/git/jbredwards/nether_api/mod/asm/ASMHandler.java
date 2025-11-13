@@ -49,9 +49,14 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  *
@@ -63,9 +68,20 @@ import java.util.Map;
 @IFMLLoadingPlugin.MCVersion("1.12.2")
 public final class ASMHandler implements IFMLLoadingPlugin
 {
-    public ASMHandler() throws ClassNotFoundException {
+    @Override
+    public void injectData(@Nonnull final Map<String, Object> data) {
         // Ensure ITransformer is fully loaded before transforms start.
-        Class.forName("git.jbredwards.nether_api.mod.asm.transformers.ITransformer$BreakType");
+        try(@Nonnull final JarFile jar = new JarFile((File)data.get("coremodLocation"))) {
+            for(@Nonnull final Enumeration<JarEntry> it = jar.entries(); it.hasMoreElements();) {
+                @Nonnull final JarEntry entry = it.nextElement();
+                if(!entry.isDirectory() && entry.getName().startsWith("git/jbredwards/nether_api/mod/asm/transformers/ITransformer$")) {
+                    Class.forName(entry.getName().replace('/', '.').substring(0, entry.getName().length() - ".class".length()));
+                }
+            }
+        }
+
+        // Unpossible?
+        catch(@Nonnull final IOException | ClassNotFoundException e) { throw new RuntimeException(e); }
     }
 
     @SuppressWarnings({"UnstableApiUsage", "unused"})
@@ -398,9 +414,6 @@ public final class ASMHandler implements IFMLLoadingPlugin
     @Nullable
     @Override
     public String getSetupClass() { return null; }
-
-    @Override
-    public void injectData(@Nonnull Map<String, Object> data) {}
 
     @Nullable
     @Override
