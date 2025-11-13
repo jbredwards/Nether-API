@@ -27,6 +27,7 @@ import it.unimi.dsi.fastutil.ints.Int2BooleanOpenHashMap;
 import lumien.perfectspawn.handler.AsmHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -133,7 +134,10 @@ public final class PlayerSpawnLogic
 
         @Nonnull
         public static WorldRespawnData load() {
-            @Nonnull final World overworld = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(0);
+            @Nullable final MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            if(server == null) return new WorldRespawnData(ID);
+
+            @Nonnull final World overworld = server.getWorld(0);
             @Nullable WorldRespawnData data = (WorldRespawnData)overworld.loadData(WorldRespawnData.class, ID);
 
             if(data == null) {
