@@ -63,6 +63,11 @@ import java.util.Map;
 @IFMLLoadingPlugin.MCVersion("1.12.2")
 public final class ASMHandler implements IFMLLoadingPlugin
 {
+    public ASMHandler() throws ClassNotFoundException {
+        // Ensure ITransformer is fully loaded before transforms start.
+        Class.forName("git.jbredwards.nether_api.mod.asm.transformers.ITransformer$BreakType");
+    }
+
     @SuppressWarnings({"UnstableApiUsage", "unused"})
     public static final class Transformer implements IClassTransformer
     {
