@@ -176,8 +176,7 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
 
                 // ensure the exit portal pos is on the ground, and not on top of any previously existing portal
                 @Nonnull final Chunk chunk = world.getChunk(exitPortalLocation);
-                while(exitPortalLocation.getY() > exitPortalMinY && chunk.getBlockState(exitPortalLocation).getBlock() == Blocks.BEDROCK)
-                    exitPortalLocation = exitPortalLocation.down();
+                while(chunk.getBlockState(exitPortalLocation).getBlock() == Blocks.BEDROCK) exitPortalLocation = exitPortalLocation.down();
 
                 // prevent portals from spawning into the void
                 if(exitPortalLocation.getY() < 2) exitPortalLocation = new BlockPos(exitPortalLocation.getX(), exitPortalMinY, exitPortalLocation.getZ());
