@@ -17,25 +17,36 @@
 package git.jbredwards.nether_api.mod.common.compat.betternether;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
+import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import paulevs.betternether.biomes.BiomeRegister;
 import paulevs.betternether.biomes.NetherBiome;
 import paulevs.betternether.config.ConfigLoader;
 import paulevs.betternether.entities.EntityFirefly;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.ObjIntConsumer;
 
 /**
@@ -111,6 +122,25 @@ public final class BetterNetherHandler
         registerAction.accept(BiomeRegister.BIOME_WART_FOREST_EDGE, 7);
         registerAction.accept(BiomeRegister.BIOME_BONE_REEF, 8);
         registerAction.accept(BiomeRegister.BIOME_POOR_GRASSLANDS, 9);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    static void registerModels(@Nonnull final ModelBakeEvent event) {
+        // Wrap BetterNether's mushroom models, allowing them to be easily toggled.
+        event.getModelRegistry().putObject(new ModelResourceLocation("brown_mushroom"), new MushroomModelWrapper(event, new ModelResourceLocation("brown_mushroom"), new ModelResourceLocation(NetherAPI.MODID + ":brown_mushroom")));
+        event.getModelRegistry().putObject(new ModelResourceLocation("red_mushroom"), new MushroomModelWrapper(event, new ModelResourceLocation("red_mushroom"), new ModelResourceLocation(NetherAPI.MODID + ":red_mushroom")));
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    static void registerTextures(@Nonnull final TextureStitchEvent.Pre event) {
+        // Wrap BetterNether's mushroom models, allowing them to be easily toggled.
+        if(event.getMap() == Minecraft.getMinecraft().getTextureMapBlocks()) try {
+            ModelLoaderRegistry.getModel(new ModelResourceLocation(NetherAPI.MODID + ":brown_mushroom")).getTextures().forEach(event.getMap()::registerSprite);
+            ModelLoaderRegistry.getModel(new ModelResourceLocation(NetherAPI.MODID + ":red_mushroom")).getTextures().forEach(event.getMap()::registerSprite);
+        }
+        catch(@Nonnull final Exception ignored) {}
     }
 
     // exists because this mod adds BetterNether biomes as real biomes

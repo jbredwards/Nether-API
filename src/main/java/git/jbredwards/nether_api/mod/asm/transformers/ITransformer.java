@@ -157,20 +157,23 @@ public interface ITransformer extends IClassTransformer, Opcodes
         if(!classNode.interfaces.contains("net/minecraftforge/common/IPlantable")) {
             classNode.interfaces.add("net/minecraftforge/common/IPlantable");
 
-            @Nonnull final MethodNode plant = new MethodNode(ACC_PUBLIC, "getPlant", "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;", null, null);
-            @Nonnull final MethodNode type = new MethodNode(ACC_PUBLIC, "getPlantType", "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraftforge/common/EnumPlantType;", null, null);
-            classNode.methods.removeIf(method -> method.name.equals(plant.name) || method.name.equals(type.name));
-            classNode.methods.add(plant);
-            classNode.methods.add(type);
+            transformOverwrite(classNode, new MethodNode(ACC_PUBLIC, "getPlant", "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;", null, null), adapter -> {
+                adapter.loadThis();
+                adapter.visitMethodInsn(INVOKEVIRTUAL, classNode.name, DEOBFUSCATED ? "getDefaultState" : "func_176223_P", "()Lnet/minecraft/block/state/IBlockState;", false);
+            });
 
-            @Nonnull final GeneratorAdapter plantAdapter = new GeneratorAdapter(plant, plant.access, plant.name, plant.desc);
-            plantAdapter.loadThis();
-            plantAdapter.visitMethodInsn(INVOKEVIRTUAL, classNode.name, DEOBFUSCATED ? "getDefaultState" : "func_176223_P", "()Lnet/minecraft/block/state/IBlockState;", false);
-            plantAdapter.returnValue();
-
-            @Nonnull final GeneratorAdapter typeAdapter = new GeneratorAdapter(type, type.access, type.name, type.desc);
-            typeAdapter.visitFieldInsn(GETSTATIC, "git/jbredwards/nether_api/api/util/PlantUtils", plantType, "Lnet/minecraftforge/common/EnumPlantType;");
-            typeAdapter.returnValue();
+            transformOverwrite(classNode, new MethodNode(ACC_PUBLIC, "getPlantType", "(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraftforge/common/EnumPlantType;", null, null), adapter -> {
+                adapter.visitFieldInsn(GETSTATIC, "git/jbredwards/nether_api/api/util/PlantUtils", plantType, "Lnet/minecraftforge/common/EnumPlantType;");
+            });
         }
+    }
+
+    default void transformOverwrite(@Nonnull final ClassNode classNode, @Nonnull final MethodNode method, @Nonnull final Consumer<GeneratorAdapter> generator) {
+        classNode.methods.removeIf(candidate -> candidate.name.equals(method.name) && candidate.desc.equals(method.desc));
+        classNode.methods.add(method);
+
+        @Nonnull final GeneratorAdapter adapter = new GeneratorAdapter(method, method.access, method.name, method.desc);
+        generator.accept(adapter);
+        adapter.returnValue();
     }
 }

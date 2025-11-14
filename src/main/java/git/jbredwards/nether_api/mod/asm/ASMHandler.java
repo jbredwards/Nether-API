@@ -336,6 +336,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Support modded "End Stone"-like soil blocks.
                 register(new TransformerBlockChorusPlant(),
                         "net.minecraft.block.BlockChorusPlant");
+                // Allow BetterNether's 3d mushroom feature to have more render options.
+                register(new TransformerBlockMushroom(),
+                        "net.minecraft.block.BlockMushroom");
                 // Allow shrubs to be used in Nether world generation.
                 register(new TransformerBlockTallGrass(),
                         "net.minecraft.block.BlockTallGrass");

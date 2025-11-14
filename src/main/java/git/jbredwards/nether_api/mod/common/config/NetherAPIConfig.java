@@ -68,6 +68,17 @@ public final class NetherAPIConfig
     @Config(modid = NetherAPI.MODID, name = "nether_api/betternether")
     public static final class BetterNether
     {
+        @Nonnull
+        @Config.LangKey("config.nether_api.compat.betternether.betterMushroomModels")
+        public static MushroomModelOverride betterMushroomModels = MushroomModelOverride.Always;
+        public enum MushroomModelOverride
+        {
+            Always,
+            Nether,
+            Biome,
+            Never
+        }
+
         @Config.LangKey("config.nether_api.compat.betternether.moldOnMyceliumOnly")
         public static boolean moldOnMyceliumOnly = true;
 

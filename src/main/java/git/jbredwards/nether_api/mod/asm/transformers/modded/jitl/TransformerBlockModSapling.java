@@ -26,7 +26,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.slayer.api.block.BlockModGrass;
-import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.tree.MethodNode;
 
 import javax.annotation.Nonnull;
@@ -42,23 +41,18 @@ public final class TransformerBlockModSapling implements ITransformer
     @Override
     public byte[] transform(@Nonnull final String name, @Nonnull final String transformedName, @Nonnull final byte[] basicClass) {
         return transform(basicClass, classNode -> {
-            @Nonnull final MethodNode canBlockStayMethod = new MethodNode(ACC_PUBLIC, "canBlockStay", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z", null, null);
-            @Nonnull final GeneratorAdapter canBlockStay = new GeneratorAdapter(canBlockStayMethod, canBlockStayMethod.access, canBlockStayMethod.name, canBlockStayMethod.desc);
-            canBlockStay.loadThis();
-            canBlockStay.visitVarInsn(ALOAD, 1);
-            canBlockStay.visitVarInsn(ALOAD, 2);
-            canBlockStay.visitMethodInsn(INVOKESTATIC, genHookClass(), "canPlaceBlockAt", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", false);
-            canBlockStay.returnValue();
-            classNode.methods.add(canBlockStayMethod);
-
-            @Nonnull final MethodNode canPlaceBlockAtMethod = new MethodNode(ACC_PUBLIC, DEOBFUSCATED ? "canPlaceBlockAt" : "func_176196_c", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", null, null);
-            @Nonnull final GeneratorAdapter canPlaceBlockAt = new GeneratorAdapter(canPlaceBlockAtMethod, canPlaceBlockAtMethod.access, canPlaceBlockAtMethod.name, canPlaceBlockAtMethod.desc);
-            canPlaceBlockAt.loadThis();
-            canPlaceBlockAt.visitVarInsn(ALOAD, 1);
-            canPlaceBlockAt.visitVarInsn(ALOAD, 2);
-            canPlaceBlockAt.visitMethodInsn(INVOKESTATIC, genHookClass(), "canPlaceBlockAt", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", false);
-            canPlaceBlockAt.returnValue();
-            classNode.methods.add(canPlaceBlockAtMethod);
+            transformOverwrite(classNode, new MethodNode(ACC_PUBLIC, "canBlockStay", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z", null, null), adapter -> {
+                adapter.loadThis();
+                adapter.visitVarInsn(ALOAD, 1);
+                adapter.visitVarInsn(ALOAD, 2);
+                adapter.visitMethodInsn(INVOKESTATIC, genHookClass(), "canPlaceBlockAt", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", false);
+            });
+            transformOverwrite(classNode, new MethodNode(ACC_PUBLIC, DEOBFUSCATED ? "canPlaceBlockAt" : "func_176196_c", "(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", null, null), adapter -> {
+                adapter.loadThis();
+                adapter.visitVarInsn(ALOAD, 1);
+                adapter.visitVarInsn(ALOAD, 2);
+                adapter.visitMethodInsn(INVOKESTATIC, genHookClass(), "canPlaceBlockAt", "(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)Z", false);
+            });
         });
     }
 
