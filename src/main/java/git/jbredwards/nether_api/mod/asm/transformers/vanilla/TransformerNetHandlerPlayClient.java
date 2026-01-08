@@ -93,7 +93,7 @@ public final class TransformerNetHandlerPlayClient implements ITransformer
             case "net.minecraft.server.management.PlayerList":
             case "net.minecraft.server.MinecraftServer": {
                 return transformMethod(basicClass, method -> method.name.equals(DEOBFUSCATED ? "createPlayerForUser" : "func_148545_a") || method.name.equals(DEOBFUSCATED ? "initialWorldChunkLoad" : "func_71222_d"), (method, insn) -> {
-                    if(insn instanceof MethodInsnNode && (((MethodInsnNode)insn).name.equals("getWorld") || ((MethodInsnNode)insn).name.equals("func_71218_a"))) {
+                    if(insn instanceof MethodInsnNode && (((MethodInsnNode)insn).name.equals("getWorld") || ((MethodInsnNode)insn).name.equals("func_71218_a")) && ((MethodInsnNode)insn).desc.startsWith("(I)L")) {
                         method.instructions.insertBefore(insn, "net.minecraft.server.management.PlayerList".equals(transformedName) ? new VarInsnNode(ALOAD, 1) : new InsnNode(ACONST_NULL));
                         method.instructions.insertBefore(insn, genHookMethod("getSpawnDim", "(ILcom/mojang/authlib/GameProfile;)I"));
                     }
