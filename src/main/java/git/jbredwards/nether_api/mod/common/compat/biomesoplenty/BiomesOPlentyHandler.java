@@ -22,6 +22,7 @@ import biomesoplenty.api.block.BOPBlocks;
 import biomesoplenty.api.block.BlockQueries;
 import biomesoplenty.api.block.IBlockPosQuery;
 import biomesoplenty.api.enums.BOPClimates;
+import biomesoplenty.common.block.BlockBOPDoublePlant;
 import biomesoplenty.common.block.BlockColoring;
 import biomesoplenty.common.world.WorldTypeBOP;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
@@ -91,5 +92,9 @@ public final class BiomesOPlentyHandler
         Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler((state, world, pos, tintIndex)
                 -> tintIndex == 0 && MinecraftForgeClient.getRenderLayer() == null ? -1
                 : BlockColoring.GRASS_COLORING.colorMultiplier(state, world, pos, tintIndex), BOPBlocks.grass);
+
+        Minecraft.getMinecraft().getBlockColors().registerBlockColorHandler((state, world, pos, tintIndex)
+                -> tintIndex == 0 && MinecraftForgeClient.getRenderLayer() == null && state.getValue(BlockBOPDoublePlant.VARIANT) != BlockBOPDoublePlant.DoublePlantType.FLAX ? -1
+                : ((BlockBOPDoublePlant)BOPBlocks.double_plant).getBlockColor().colorMultiplier(state, world, pos, tintIndex), BOPBlocks.double_plant);
     }
 }
