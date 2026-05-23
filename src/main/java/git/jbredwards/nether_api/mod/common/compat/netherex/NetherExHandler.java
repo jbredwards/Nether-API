@@ -21,7 +21,9 @@ import logictechcorp.libraryex.event.LibExEventFactory;
 import logictechcorp.libraryex.world.biome.data.BiomeData;
 import logictechcorp.netherex.NetherEx;
 import logictechcorp.netherex.NetherExConfig;
+import logictechcorp.netherex.init.NetherExBlocks;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.item.Item;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
@@ -61,5 +63,11 @@ public final class NetherExHandler
 
         if(biomeData != BiomeData.EMPTY) spawns.addAll(biomeData.getEntitySpawns(creatureType));
         return spawns;
+    }
+
+    public static void init() {
+        // Add elder mushroom plants to creative tab.
+        Item.getItemFromBlock(NetherExBlocks.BROWN_ELDER_MUSHROOM).setCreativeTab(NetherEx.instance.getCreativeTab());
+        Item.getItemFromBlock(NetherExBlocks.RED_ELDER_MUSHROOM).setCreativeTab(NetherEx.instance.getCreativeTab());
     }
 }

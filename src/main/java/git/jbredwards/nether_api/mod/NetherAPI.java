@@ -25,6 +25,7 @@ import git.jbredwards.nether_api.mod.common.compat.biomesoplenty.BiomesOPlentyHa
 import git.jbredwards.nether_api.mod.common.compat.dynamictrees.DynamicTreesHandler;
 import git.jbredwards.nether_api.mod.common.compat.journey_into_the_light.JITLHandler;
 import git.jbredwards.nether_api.mod.common.compat.nethercraft.NethercraftHandler;
+import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.compat.stygian_end.StygianEndHandler;
 import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
 import git.jbredwards.nether_api.mod.common.network.MessageTeleportFX;
@@ -120,6 +121,7 @@ public final class NetherAPI
         if(isBiomesOPlentyLoaded) BiomesOPlentyHandler.init();
         if(isJourneyIntoTheLightLoaded) JITLHandler.init();
         if(isNethercraftLoaded) NethercraftHandler.init();
+        if(isNetherExLoaded) NetherExHandler.init();
         if(isStygianEndLoaded) StygianEndHandler.init();
     }
 
