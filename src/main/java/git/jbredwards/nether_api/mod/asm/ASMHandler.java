@@ -127,6 +127,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 register(new TransformerBlockNetherMycelium(),
                         "paulevs.betternether.blocks.BlockNetherMycelium",
                         "paulevs.betternether.blocks.BlockNetherrackMoss");
+                // Don't let eye vines carve through terrain.
+                register(new TransformerStructureEye(),
+                        "paulevs.betternether.structures.plants.StructureEye");
             }
             // Biomes O' Plenty:
             {

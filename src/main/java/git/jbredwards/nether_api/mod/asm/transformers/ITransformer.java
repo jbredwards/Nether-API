@@ -40,7 +40,11 @@ public interface ITransformer extends IClassTransformer, Opcodes
     enum BreakType { CONTINUE, INSTRUCTIONS, METHODS }
 
     default int getLocalVar(@Nonnull final MethodNode method, @Nonnull final String name) {
-        return method.localVariables == null ? -1 : method.localVariables.stream().filter(lv -> name.equals(lv.name)).mapToInt(lv -> lv.index).findFirst().orElse(-1);
+        return getLocalVar(method, name, -1);
+    }
+
+    default int getLocalVar(@Nonnull final MethodNode method, @Nonnull final String name, final int fallback) {
+        return method.localVariables == null ? -1 : method.localVariables.stream().filter(lv -> name.equals(lv.name)).mapToInt(lv -> lv.index).findFirst().orElse(fallback);
     }
 
     @Nonnull
