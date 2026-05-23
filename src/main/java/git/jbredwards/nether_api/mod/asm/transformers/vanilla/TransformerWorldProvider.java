@@ -91,7 +91,7 @@ public final class TransformerWorldProvider implements ITransformer
     public static final class Hooks
     {
         public static boolean canCoordinateBeSpawn(@Nonnull final World world, final int x, final int z) {
-            if(world.getHeight(x, z) == 0) return false; // Never spawn players into the void.
+            if(world.getChunk(x >> 4, z >> 4).getHeightValue(x & 15, z & 15) == 0) return false; // Never spawn players into the void.
 
             @Nonnull final Biome biome = world.getBiome(new BlockPos(x, 0, z));
             if(biome.ignorePlayerSpawnSuitability()) return true;
