@@ -109,4 +109,11 @@ public final class PlantUtils
             }
         };
     }
+
+    /**
+     * Internal. Initializes the new {@code EnumPlantType} instances.
+     */
+    public static void init() {
+        /* NO-OP */
+    }
 }
