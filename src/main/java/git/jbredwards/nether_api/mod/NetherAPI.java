@@ -84,6 +84,7 @@ public final class NetherAPI
     public static final boolean isBiomesOPlentyLoaded = Loader.isModLoaded("biomesoplenty");
     public static final boolean isDynamicTreesLoaded = Loader.isModLoaded("dynamictrees");
     public static final boolean isJourneyIntoTheLightLoaded = Loader.isModLoaded("journey");
+    public static final boolean isNaturaLoaded = Loader.isModLoaded("natura");
     public static final boolean isNetherHexedKingdomLoaded = Loader.isModLoaded("netherhexedkingdommod");
     public static final boolean isNethercraftLoaded = Loader.isModLoaded("nethercraft");
     public static final boolean isNetherExLoaded = Loader.isModLoaded("netherex");

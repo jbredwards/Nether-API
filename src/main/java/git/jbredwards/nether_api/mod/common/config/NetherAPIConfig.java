@@ -114,6 +114,14 @@ public final class NetherAPIConfig
         public static int heatSandsWeight = 6;
     }
 
+    @Config(modid = NetherAPI.MODID, name = "nether_api/natura")
+    public static final class Natura
+    {
+        @Config.RequiresMcRestart
+        @Config.LangKey("config.nether_api.compat.natura.limitNaturaNetherGenerators")
+        public static boolean limitNaturaNetherGenerators = true;
+    }
+
     @Config(modid = NetherAPI.MODID, name = "nether_api/nether_hexed_kingdom")
     public static final class NHK
     {

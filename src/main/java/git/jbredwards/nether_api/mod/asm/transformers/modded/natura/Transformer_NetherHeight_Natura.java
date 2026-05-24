@@ -20,6 +20,8 @@ import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBase;
 import com.ferreusveritas.dynamictrees.worldgen.BiomeDataBasePopulatorJson;
 import com.google.common.collect.Sets;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
+import git.jbredwards.nether_api.mod.common.compat.natura.NaturaHandler;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -79,15 +81,14 @@ public final class Transformer_NetherHeight_Natura implements ITransformer
                      *
                      * New code:
                      * // Only generate features in vanilla hell biome by default, as they do not fit in many modded ones
-                     * if (Hooks.canGenerate(Hooks.VALID_GLOWSHROOM_BIOMES, biome))
+                     * if (NaturaHandler.isValidGlowshroomBiome(biome))
                      * {
                      *     ...
                      * }
                      */
                     if(insn.getOpcode() == INVOKESTATIC && ((MethodInsnNode)insn).name.equals("hasType")) {
-                        method.instructions.remove(insn.getPrevious());
-                        method.instructions.insertBefore(insn.getPrevious(), genHookField("VALID_GLOWSHROOM_BIOMES", "Ljava/util/Set;"));
-                        method.instructions.insert(insn, genHookMethod("canGenerate", "(Ljava/util/Set;Lnet/minecraft/world/biome/Biome;)Z"));
+                        method.instructions.insertBefore(insn, new InsnNode(POP));
+                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/common/compat/natura/NaturaHandler", "isValidGlowshroomBiome", "(Lnet/minecraft/world/biome/Biome;)Z", false));
                         method.instructions.remove(insn);
                     }
                     /*
@@ -166,15 +167,14 @@ public final class Transformer_NetherHeight_Natura implements ITransformer
                      *
                      * New code:
                      * // Only generate features in vanilla hell biome by default, as they do not fit in many modded ones
-                     * if (this.shouldGenerateInDimension(world.provider.getDimension()) && Hooks.canGenerate(Hooks.VALID_MINABLE_BIOMES, biome))
+                     * if (this.shouldGenerateInDimension(world.provider.getDimension()) && NaturaHandler.isValidMinableBiome(biome))
                      * {
                      *     ...
                      * }
                      */
                     if(insn.getOpcode() == INVOKESTATIC && ((MethodInsnNode)insn).name.equals("hasType")) {
-                        method.instructions.remove(insn.getPrevious());
-                        method.instructions.insertBefore(insn.getPrevious(), genHookField("VALID_MINABLE_BIOMES", "Ljava/util/Set;"));
-                        method.instructions.insert(insn, genHookMethod("canGenerate", "(Ljava/util/Set;Lnet/minecraft/world/biome/Biome;)Z"));
+                        method.instructions.insertBefore(insn, new InsnNode(POP));
+                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/common/compat/natura/NaturaHandler", "isValidMinableBiome", "(Lnet/minecraft/world/biome/Biome;)Z", false));
                         method.instructions.remove(insn);
                         return BreakType.METHODS;
                     }
@@ -196,15 +196,14 @@ public final class Transformer_NetherHeight_Natura implements ITransformer
                      *
                      * New code:
                      * // Only generate features in vanilla hell biome by default, as they do not fit in many modded ones
-                     * if (Hooks.canGenerate(Hooks.VALID_TREE_BIOMES, biome))
+                     * if (NaturaHandler.isValidTreeBiome(biome))
                      * {
                      *     ...
                      * }
                      */
                     if (insn.getOpcode() == INVOKESTATIC && ((MethodInsnNode)insn).name.equals("hasType")) {
-                        method.instructions.remove(insn.getPrevious());
-                        method.instructions.insertBefore(insn.getPrevious(), genHookField("VALID_TREE_BIOMES", "Ljava/util/Set;"));
-                        method.instructions.insert(insn, genHookMethod("canGenerate", "(Ljava/util/Set;Lnet/minecraft/world/biome/Biome;)Z"));
+                        method.instructions.insertBefore(insn, new InsnNode(POP));
+                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/common/compat/natura/NaturaHandler", "isValidTreeBiome", "(Lnet/minecraft/world/biome/Biome;)Z", false));
                         method.instructions.remove(insn);
                     }
                     /*
@@ -271,15 +270,14 @@ public final class Transformer_NetherHeight_Natura implements ITransformer
                      *
                      * New code:
                      * // Only generate features in vanilla hell biome by default, as they do not fit in many modded ones
-                     * if (Hooks.canGenerate(Hooks.VALID_VINE_BIOMES, biome))
+                     * if (NaturaHandler.isValidVineBiome(biome))
                      * {
                      *     ...
                      * }
                      */
                     if (insn.getOpcode() == INVOKESTATIC && ((MethodInsnNode)insn).name.equals("hasType")) {
-                        method.instructions.remove(insn.getPrevious());
-                        method.instructions.insertBefore(insn.getPrevious(), genHookField("VALID_VINE_BIOMES", "Ljava/util/Set;"));
-                        method.instructions.insert(insn, genHookMethod("canGenerate", "(Ljava/util/Set;Lnet/minecraft/world/biome/Biome;)Z"));
+                        method.instructions.insertBefore(insn, new InsnNode(POP));
+                        method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/common/compat/natura/NaturaHandler", "isValidVineBiome", "(Lnet/minecraft/world/biome/Biome;)Z", false));
                         method.instructions.remove(insn);
                     }
                     /*
@@ -344,17 +342,17 @@ public final class Transformer_NetherHeight_Natura implements ITransformer
                 VALID_VINE_BIOMES = Sets.newHashSet(Biomes.HELL);
 
         public static int canBerryGenerate(@Nonnull final BlockPos pos, @Nonnull final World world) {
-            return pos.getY() >= 0 && canGenerate(VALID_BERRY_BIOMES, world.getBiome(pos)) ? pos.getY() : -1;
+            return pos.getY() >= 0 && NaturaHandler.isValidBerryBiome(world.getBiome(pos)) ? pos.getY() : -1;
         }
 
         public static boolean canGenerate(@Nonnull final Set<Biome> validBiomes, @Nonnull final Biome biome) {
-            return validBiomes.isEmpty() || validBiomes.contains(biome);
+            return !NetherAPIConfig.Natura.limitNaturaNetherGenerators || validBiomes.isEmpty() || validBiomes.contains(biome);
         }
 
         @Nonnull
         private static final Lock LOCK = new ReentrantLock();
         public static void populate(@Nonnull final BiomeDataBasePopulatorJson populator, @Nonnull final BiomeDataBase data) {
-            if(VALID_TREE_BIOMES.isEmpty()) {
+            if(!NetherAPIConfig.Natura.limitNaturaNetherGenerators || VALID_TREE_BIOMES.isEmpty()) {
                 populator.populate(data);
                 return;
             }
