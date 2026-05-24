@@ -50,6 +50,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -78,6 +80,8 @@ public final class NetherAPI
             "after:perfectspawn@[2.1,);" +
             "after:stygian@[1.0.4,);" +
             "after:voidislandcontrol@[1.5.3,);";
+    @Nonnull
+    public static final Logger LOGGER = LogManager.getLogger(NAME);
 
     // Mod Compatibility
     public static final boolean isBetterNetherLoaded = Loader.isModLoaded("betternether");
