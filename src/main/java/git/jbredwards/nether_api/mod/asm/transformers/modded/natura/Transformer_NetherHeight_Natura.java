@@ -346,7 +346,8 @@ public final class Transformer_NetherHeight_Natura implements ITransformer
         }
 
         public static boolean canGenerate(@Nonnull final Set<Biome> validBiomes, @Nonnull final Biome biome) {
-            return !NetherAPIConfig.Natura.limitNaturaNetherGenerators || validBiomes.isEmpty() || validBiomes.contains(biome);
+            if(NetherAPIConfig.Natura.limitNaturaNetherGenerators) return validBiomes.isEmpty() || validBiomes.contains(biome);
+            else return BiomeDictionary.hasType(biome, BiomeDictionary.Type.NETHER) || validBiomes.contains(biome);
         }
 
         @Nonnull
