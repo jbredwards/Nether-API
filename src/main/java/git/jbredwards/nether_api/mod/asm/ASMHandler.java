@@ -21,6 +21,9 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Streams;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.betternether.*;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty.*;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.dsurround.TransformerBiomeFogColorCalculator;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.dsurround.TransformerFogHandler;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.dsurround.TransformerStormRenderer;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.dynamictrees.TransformerSpeciesHellbark;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.dynamictrees.Transformer_NetherHeight_DynamicTrees;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.hexed.TransformerNetherHexedKingdom;
@@ -162,6 +165,18 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Support modded "Netherrack"-like soil blocks.
                 register(new TransformerBlockBOPSapling(),
                         "biomesoplenty.common.block.BlockBOPSapling");
+            }
+            // Dynamic Surroundings:
+            {
+                // Support Nether API fog color events.
+                register(new TransformerBiomeFogColorCalculator(),
+                        "org.orecruncher.dsurround.client.handlers.fog.BiomeFogColorCalculator");
+                // Account for world.provider.doesXZShowFog().
+                register(new TransformerFogHandler(),
+                        "org.orecruncher.dsurround.client.handlers.FogHandler");
+                // Support Nether API fog color events.
+                register(new TransformerStormRenderer(),
+                        "org.orecruncher.dsurround.client.renderer.weather.StormRenderer");
             }
             // Dynamic Trees:
             {

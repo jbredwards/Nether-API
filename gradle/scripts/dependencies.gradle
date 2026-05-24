@@ -38,8 +38,10 @@ dependencies {
     compileOnly rfg.deobf('curse.maven:netherex-248039:3374256')
     compileOnly rfg.deobf('maven.modrinth:stygian-endunoffical:1.0.5')
 
+    compileOnly rfg.deobf('curse.maven:dynamic-surroundings-238891:3497269')
     compileOnly rfg.deobf('curse.maven:dynamictrees-252818:3812473')
     compileOnly rfg.deobf('curse.maven:just-enough-dimensions-254317:3840727')
+    compileOnly rfg.deobf('curse.maven:orelib-307806:2820815')
     compileOnly rfg.deobf('curse.maven:perfect-spawn-221418:2543507')
     compileOnly rfg.deobf('curse.maven:void-island-control-257655:2666967')
 

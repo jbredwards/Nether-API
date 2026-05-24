@@ -226,14 +226,28 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
     @SideOnly(Side.CLIENT)
     @Override
     public Vec3d getFogColor(final float celestialAngle, final float partialTicks) {
-        return getFogColor(world, celestialAngle, partialTicks, 0.09411766, 0.07529412, 0.09411766, NetherAPIFogColorEvent.End::new);
+        return getFogColor(world, celestialAngle, partialTicks);
     }
 
     @Nonnull
     @SideOnly(Side.CLIENT)
     @Override
-    public Vec3d getDefaultFogColor(@Nonnull final Biome biome, final float celestialAngle, final float partialTicks, final double defaultR, final double defaultG, final double defaultB) {
-        return biome instanceof IEndBiome ? ((IEndBiome)biome).getFogColor(celestialAngle, partialTicks) : new Vec3d(defaultR, defaultG, defaultB);
+    public Vec3d getBiomeFogColor(final float celestialAngle, final float partialTicks, @Nonnull final Biome biome) {
+        return biome instanceof IEndBiome ? ((IEndBiome)biome).getFogColor(celestialAngle, partialTicks) : getDefaultFogColor(celestialAngle, partialTicks);
+    }
+
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public Vec3d getDefaultFogColor(final float celestialAngle, final float partialTicks) {
+        return new Vec3d(0.09411766, 0.07529412, 0.09411766);
+    }
+
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public NetherAPIFogColorEvent createEvent(@Nonnull final Biome biomeIn, @Nonnull final World worldIn, final float celestialAngleIn, final float partialTicksIn) {
+        return new NetherAPIFogColorEvent.End(biomeIn, worldIn, celestialAngleIn, partialTicksIn);
     }
 
     @Nullable

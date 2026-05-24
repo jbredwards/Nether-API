@@ -24,7 +24,6 @@ import fi.dy.masa.justenoughdimensions.util.world.WorldUtils;
 import fi.dy.masa.justenoughdimensions.world.IWorldProviderJED;
 import fi.dy.masa.justenoughdimensions.world.JEDWorldProperties;
 import fi.dy.masa.justenoughdimensions.world.WorldProviderJED;
-import git.jbredwards.nether_api.api.event.NetherAPIFogColorEvent;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.entity.Entity;
@@ -36,6 +35,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenSpikes;
@@ -319,10 +319,23 @@ public final class JEDWorldProviderTheEnd extends WorldProviderTheEnd implements
     @SideOnly(Side.CLIENT)
     @Override
     public Vec3d getFogColor(final float celestialAngle, final float partialTicks) {
-        @Nullable final Vec3d fogColor = properties.getFogColor();
-        if(fogColor != null) return getFogColor(world, celestialAngle, partialTicks, fogColor.x, fogColor.y, fogColor.z, NetherAPIFogColorEvent.End::new)
-                .scale(MathHelper.clamp(Math.cos(celestialAngle * Math.PI * 2) * 2 + 0.5, 0, 1) * 0.94 + 0.06);
+        @Nonnull final Vec3d fogColor = properties.getFogColor() != null ? properties.getFogColor() : super.getFogColor(celestialAngle, partialTicks);
+        return isSurfaceWorld() ? fogColor.scale(MathHelper.clamp(Math.cos(celestialAngle * Math.PI * 2) * 2 + 0.5, 0, 1) * 0.94 + 0.06) : fogColor;
+    }
 
-        return super.getFogColor(celestialAngle, partialTicks);
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public Vec3d getFogColorFor(@Nonnull final World world, final float celestialAngle, final float partialTicks, @Nonnull final Biome biome) {
+        @Nullable final Vec3d fogColor = properties.getFogColor();
+        return fogColor != null ? fogColor : super.getFogColorFor(world, celestialAngle, partialTicks, biome);
+    }
+
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public Vec3d getDefaultFogColor(final float celestialAngle, final float partialTicks) {
+        @Nullable final Vec3d fogColor = properties.getFogColor();
+        return fogColor != null ? fogColor : super.getDefaultFogColor(celestialAngle, partialTicks);
     }
 }

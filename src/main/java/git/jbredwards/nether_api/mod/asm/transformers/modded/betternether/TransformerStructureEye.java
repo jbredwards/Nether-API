@@ -35,7 +35,7 @@ public final class TransformerStructureEye implements ITransformer
     @Nonnull
     @Override
     public byte[] transform(@Nonnull final String name, @Nonnull final String transformedName, @Nonnull final byte[] basicClass) {
-        return transform(basicClass, false, classNode -> {
+        return transform(basicClass, classNode -> {
             for(@Nonnull final MethodNode method : classNode.methods) {
                 if(method.name.equals("generate")) {
                     final int height = getLocalVar(method, "height", 4);

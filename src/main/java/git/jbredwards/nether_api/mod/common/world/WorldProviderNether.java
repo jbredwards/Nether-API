@@ -30,6 +30,7 @@ import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.IChunkGenerator;
@@ -85,14 +86,28 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @SideOnly(Side.CLIENT)
     @Override
     public Vec3d getFogColor(float celestialAngle, float partialTicks) {
-        return getFogColor(world, celestialAngle, partialTicks, 0.2, 0.03, 0.03, NetherAPIFogColorEvent.Nether::new);
+        return getFogColor(world, celestialAngle, partialTicks);
     }
 
     @Nonnull
     @SideOnly(Side.CLIENT)
     @Override
-    public Vec3d getDefaultFogColor(@Nonnull Biome biome, float celestialAngle, float partialTicks, double defaultR, double defaultG, double defaultB) {
-        return biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : new Vec3d(defaultR, defaultG, defaultB);
+    public Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome) {
+        return biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : getDefaultFogColor(celestialAngle, partialTicks);
+    }
+
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public Vec3d getDefaultFogColor(float celestialAngle, float partialTicks) {
+        return new Vec3d(0.2, 0.03, 0.03);
+    }
+
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public NetherAPIFogColorEvent createEvent(@Nonnull Biome biomeIn, @Nonnull World worldIn, float celestialAngleIn, float partialTicksIn) {
+        return new NetherAPIFogColorEvent.Nether(biomeIn, worldIn, celestialAngleIn, partialTicksIn);
     }
 
     @Nullable
