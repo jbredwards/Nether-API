@@ -40,13 +40,14 @@ public final class TransformerStormRenderer implements ITransformer
              *
              * New code:
              * // Support Nether API fog color events.
-             * color = Hooks.getColor(biome, worldClient, partialTicks, true);
+             * color = Hooks.getColor(biome, FMLClientHandler.instance().getWorldClient(), partialTicks, true);
              */
             if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals("getDustColor")) {
                 method.instructions.insert(insn, genHookMethod("getColor", "(Lorg/orecruncher/dsurround/registry/biome/BiomeInfo;Lnet/minecraft/world/World;FZ)Lorg/orecruncher/lib/Color;"));
                 method.instructions.insert(insn, new InsnNode(ICONST_1));
                 method.instructions.insert(insn, new VarInsnNode(FLOAD, 2));
-                method.instructions.insert(insn, new VarInsnNode(ALOAD, 5));
+                method.instructions.insert(insn, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/fml/client/FMLClientHandler", "getWorldClient", "()Lnet/minecraft/client/multiplayer/WorldClient;", false));
+                method.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, "net/minecraftforge/fml/client/FMLClientHandler", "instance", "()Lnet/minecraftforge/fml/client/FMLClientHandler;", false));
                 method.instructions.remove(insn);
                 return BreakType.METHODS;
             }

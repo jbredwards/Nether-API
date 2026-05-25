@@ -63,6 +63,7 @@ import java.util.Optional;
  *
  */
 @Mod(modid = NetherAPI.MODID, name = NetherAPI.NAME, version = NetherAPI.VERSION, dependencies = NetherAPI.DEPENDENCIES,
+updateJSON = "https://api.modrinth.com/updates/nether-api/forge_updates.json",
 guiFactory = "git.jbredwards.nether_api.mod.client.config.NetherAPIGuiFactory")
 public final class NetherAPI
 {
