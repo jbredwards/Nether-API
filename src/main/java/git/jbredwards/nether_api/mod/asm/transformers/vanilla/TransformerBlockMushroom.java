@@ -69,7 +69,7 @@ public final class TransformerBlockMushroom implements ITransformer
         @Nonnull
         @SideOnly(Side.CLIENT)
         public static BlockStateContainer createBlockState(@Nonnull final Block block) {
-            return NetherAPI.isBetterNetherLoaded ? new BlockStateContainer.Builder(block).add(IS_BIOME_3D).build() : new BlockStateContainer(block);
+            return new BlockStateContainer.Builder(block).add(IS_BIOME_3D).build();
         }
 
         @Nonnull

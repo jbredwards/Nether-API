@@ -96,6 +96,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
         public Transformer() {
             // BetterNether:
             {
+                // Run world load event before generation.
+                register(new TransformerEventsHandler(),
+                        "paulevs.betternether.events.EventsHandler");
                 // Change nether generators to not use hardcoded height values.
                 register(new Transformer_NetherHeight_BetterNether(),
                         "paulevs.betternether.structures.plants.StructureEye",
