@@ -24,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.EnumPlantType;
 import net.minecraftforge.common.IPlantable;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -113,6 +114,7 @@ public final class PlantUtils
     /**
      * Internal. Initializes the new {@code EnumPlantType} instances.
      */
+    @ApiStatus.Internal
     public static void init() {
         /* NO-OP */
     }
