@@ -108,6 +108,7 @@ public final class NetherAPI
         PlantUtils.init();
         NetherAPIRegistry.init();
         if(isBetterNetherLoaded) MinecraftForge.EVENT_BUS.register(BetterNetherHandler.class);
+        if(isBiomesOPlentyLoaded) MinecraftForge.EVENT_BUS.register(BiomesOPlentyHandler.class);
         if(isDynamicTreesLoaded) MinecraftForge.EVENT_BUS.register(DynamicTreesHandler.class);
         if(isJourneyIntoTheLightLoaded) MinecraftForge.EVENT_BUS.register(JITLHandler.class);
         if(isNethercraftLoaded) MinecraftForge.EVENT_BUS.register(NethercraftHandler.class);
