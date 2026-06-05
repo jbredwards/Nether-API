@@ -133,6 +133,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 register(new TransformerBlockNetherMycelium(),
                         "paulevs.betternether.blocks.BlockNetherMycelium",
                         "paulevs.betternether.blocks.BlockNetherrackMoss");
+                // Don't let BetterNether forks place black apple plants in the air.
+                register(new TransformerStructureBlackApple(),
+                        "paulevs.betternether.structures.plants.StructureBlackApple");
                 // Don't let eye vines carve through terrain.
                 register(new TransformerStructureEye(),
                         "paulevs.betternether.structures.plants.StructureEye");
