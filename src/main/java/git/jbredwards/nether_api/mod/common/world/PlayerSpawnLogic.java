@@ -24,6 +24,8 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import it.unimi.dsi.fastutil.ints.Int2BooleanMap;
 import it.unimi.dsi.fastutil.ints.Int2BooleanOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import lumien.perfectspawn.handler.AsmHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -34,6 +36,7 @@ import net.minecraft.world.WorldProvider;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,27 +50,31 @@ import java.util.stream.Collectors;
  * @author jbred
  *
  */
+@ApiStatus.Internal
 public final class PlayerSpawnLogic
 {
     /**
      * Allows mods to define a global initial spawn dimension.
      */
-    @Nullable
-    public static Integer INITIAL_SPAWN_DIMENSION = null;
+    @Nullable public static Integer INITIAL_SPAWN_DIMENSION = null;
 
     /**
      * Allows mods to define initial spawn dimension logic on a per-player basis.
      */
-    @Nonnull
-    public static Function<GameProfile, Integer> INITIAL_SPAWN_PER_PLAYER = profile -> null;
+    @Nonnull public static Function<GameProfile, Integer> INITIAL_SPAWN_PER_PLAYER = profile -> null;
+    // Collection of all possible nonnull values that can be returned by the INITIAL_SPAWN_PER_PLAYER function.
+    @Nonnull public static IntList INITIAL_SPAWN_PER_PLAYER_POSSIBILITIES = new IntArrayList();
 
     /**
      * Allows mods to override any dimension's "canRespawnHere", aside from the Overworld.
      */
-    @Nonnull
-    public static final Int2BooleanMap RESPAWN_DIMENSIONS = new Int2BooleanOpenHashMap();
+    @Nonnull public static final Int2BooleanMap RESPAWN_DIMENSIONS = new Int2BooleanOpenHashMap();
 
     public static boolean canSpawnInDimension(@Nonnull final WorldProvider provider, @Nullable final EntityPlayer player) {
+        return canSpawnInDimension(provider, player, true);
+    }
+
+    private static boolean canSpawnInDimension(@Nonnull final WorldProvider provider, @Nullable final EntityPlayer player, final boolean checkBuiltinRespawn) {
         final int dimension = provider.getDimension();
         if(dimension == 0) return true;
 
@@ -87,7 +94,7 @@ public final class PlayerSpawnLogic
         else if(configData.respawn.containsKey(dimension)) return configData.respawn.get(dimension);
 
         // Default "respawn-ability".
-        return provider.canRespawnHere();
+        return checkBuiltinRespawn && provider.canRespawnHere();
     }
 
     public static int getInitialSpawnDimension(@Nullable final GameProfile profile) {
@@ -100,6 +107,10 @@ public final class PlayerSpawnLogic
         // Global initial spawn dimension override.
         if(INITIAL_SPAWN_DIMENSION != null) return INITIAL_SPAWN_DIMENSION;
         else return WorldRespawnData.load().initial;
+    }
+
+    public static boolean isInitialSpawnDimension(@Nonnull final WorldProvider provider) {
+        return canSpawnInDimension(provider, null, false) || INITIAL_SPAWN_PER_PLAYER_POSSIBILITIES.contains(provider.getDimension());
     }
 
     public static final class WorldRespawnData extends WorldSavedData
@@ -152,8 +163,7 @@ public final class PlayerSpawnLogic
 
                             // Handle malformed entries by outputting error info to the logger (instead of crashing).
                             catch(@Nonnull final JsonParseException e) {
-                                System.err.println("An error occurred while parsing \"" + config + "\", skipping...");
-                                e.printStackTrace();
+                                NetherAPI.LOGGER.error("An error occurred while parsing \"{}\", skipping...", config, e);
                                 return null;
                             }
                         })

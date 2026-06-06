@@ -178,7 +178,7 @@ public final class TransformerPlayerChunkMap implements ITransformer
     public static final class Hooks
     {
         public static boolean canDropChunk(@Nonnull final WorldProvider provider, final int x, final int z, @Nonnull final ChunkProviderServer manager) {
-            return provider.canDropChunk(x, z) && (!manager.world.isSpawnChunk(x, z) || !PlayerSpawnLogic.canSpawnInDimension(provider, null));
+            return provider.canDropChunk(x, z) && (!manager.world.isSpawnChunk(x, z) || !PlayerSpawnLogic.isInitialSpawnDimension(provider));
         }
 
         // Helper.
