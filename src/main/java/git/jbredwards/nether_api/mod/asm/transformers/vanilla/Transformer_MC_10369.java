@@ -209,7 +209,7 @@ public final class Transformer_MC_10369 implements ITransformer
                      *     ...
                      * }
                      */
-                    if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 7) {
+                    if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 7 && insn.getNext().getOpcode() == IF_ICMPGE) {
                         method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
                         method.instructions.insertBefore(insn, new FieldInsnNode(GETFIELD, "net/minecraft/entity/ai/EntityAIMate", DEOBFUSCATED ? "world" : "field_75394_a", "Lnet/minecraft/world/World;"));
                         method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
