@@ -16,21 +16,22 @@
 
 package git.jbredwards.nether_api.api.audio;
 
+import git.jbredwards.nether_api.api.audio.impl.VanillaMusicType;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
 /**
- * Allows End and Nether biomes to have their own music, used by
- * {@link git.jbredwards.nether_api.api.biome.IEndBiome IEndBiome} and
- * {@link git.jbredwards.nether_api.api.biome.INetherBiome INetherBiome}.
+ * Allows biomes to have their own music, used by
+ * {@link git.jbredwards.nether_api.api.audio.IMusicBiome IMusicBiome}.
  *
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public interface IMusicType
 {
     /**
@@ -40,6 +41,7 @@ public interface IMusicType
      *
      * @return The MusicType that gets played.
      */
+    @ApiStatus.AvailableSince("1.0.0")
     @Nonnull
     @SideOnly(Side.CLIENT)
     MusicTicker.MusicType getMusicType();
@@ -47,12 +49,38 @@ public interface IMusicType
     /**
      * @return Whether this should replace the currently playing music.
      */
+    @ApiStatus.AvailableSince("1.0.0")
     @SideOnly(Side.CLIENT)
     boolean replacesCurrentMusic(@Nonnull final MusicTicker.MusicType currentlyPlaying);
 
     /**
      * @return Whether this should only play while the player remains within the same biome.
-     * @since 1.4.0
      */
-    default boolean isBiomeLocal() { return false; }
+    @ApiStatus.AvailableSince("1.4.0")
+    default boolean isBiomeLocal() {
+        return false;
+    }
+
+    /**
+     * @return A new {@code IMusicType} instance with Vanilla music properties
+     * (cannot replace current music, and is not local to the current biome).
+     * @throws NullPointerException If type is null.
+     */
+    @ApiStatus.AvailableSince("1.5.0")
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    static VanillaMusicType vanilla(@Nonnull final MusicTicker.MusicType type) {
+        return new VanillaMusicType(type);
+    }
+
+    /**
+     * @return A new {@code IMusicType} instance with custom music properties.
+     * @throws NullPointerException If type is null.
+     */
+    @ApiStatus.AvailableSince("1.5.0")
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    static VanillaMusicType modded(@Nonnull final MusicTicker.MusicType type, final boolean replacesCurrentMusic, final boolean isBiomeLocal) {
+        return new VanillaMusicType(type, replacesCurrentMusic, isBiomeLocal);
+    }
 }

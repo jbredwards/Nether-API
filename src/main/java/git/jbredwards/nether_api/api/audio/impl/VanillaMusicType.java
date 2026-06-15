@@ -20,6 +20,7 @@ import git.jbredwards.nether_api.api.audio.IMusicType;
 import net.minecraft.client.audio.MusicTicker.MusicType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,10 +29,10 @@ import java.util.Objects;
 /**
  * The default implementation of {@link IMusicType}.
  *
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public class VanillaMusicType implements IMusicType
 {
     @Nonnull
@@ -39,12 +40,13 @@ public class VanillaMusicType implements IMusicType
     public final MusicType musicType;
     private final boolean replacesCurrent, isLocal;
 
+    @ApiStatus.AvailableSince("1.0.0")
     @SideOnly(Side.CLIENT)
     public VanillaMusicType(@Nullable MusicType musicTypeIn) {
         this(musicTypeIn, false, false);
     }
 
-    // Since 1.4.0
+    @ApiStatus.AvailableSince("1.4.0")
     @SideOnly(Side.CLIENT)
     public VanillaMusicType(@Nullable MusicType musicTypeIn, boolean replacesCurrentIn, boolean isLocalIn) {
         musicType = Objects.requireNonNull(musicTypeIn, "MusicType cannot be null!");

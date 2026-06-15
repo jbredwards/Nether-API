@@ -16,6 +16,7 @@
 
 package git.jbredwards.nether_api.api.biome;
 
+import git.jbredwards.nether_api.api.audio.IMusicBiome;
 import git.jbredwards.nether_api.api.audio.IMusicType;
 import git.jbredwards.nether_api.api.audio.impl.VanillaMusicType;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
@@ -26,6 +27,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -33,20 +35,22 @@ import java.util.Random;
 /**
  * Having your nether biome class implement this is heavily recommended, but not required.
  *
- * @since 1.0.0
  * @author jbred
  *
  */
-public interface INetherBiome
+@ApiStatus.AvailableSince("1.0.0")
+public interface INetherBiome extends IMusicBiome
 {
     /**
      * At the given x and z positions, build the biome surface by replacing the template blocks.
      */
+    @ApiStatus.AvailableSince("1.0.0")
     void buildSurface(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, double terrainNoise);
 
     /**
      * Called instead of vanilla's {@link net.minecraft.world.biome.Biome#decorate(World, Random, BlockPos) Biome::decorate} method.
      */
+    @ApiStatus.AvailableSince("1.0.0")
     default void populate(@Nonnull INetherAPIChunkGenerator chunkGenerator, int chunkX, int chunkZ) {
         chunkGenerator.populateWithVanilla(chunkX, chunkZ);
     }
@@ -54,22 +58,43 @@ public interface INetherBiome
     /**
      * @return this biome's background fog color.
      */
+    @ApiStatus.AvailableSince("1.0.0")
     @Nonnull
     @SideOnly(Side.CLIENT)
-    default Vec3d getFogColor(float celestialAngle, float partialTicks) { return new Vec3d(0.2, 0.03, 0.03); }
+    default Vec3d getFogColor(float celestialAngle, float partialTicks) {
+        return new Vec3d(0.2, 0.03, 0.03);
+    }
 
     /**
      * @return the ambient music that plays while players are in this biome.
      */
+    @ApiStatus.AvailableSince("1.0.0")
     @Nonnull
+    @Override
     @SideOnly(Side.CLIENT)
-    default IMusicType getMusicType() { return new VanillaMusicType(MusicTicker.MusicType.NETHER); }
+    default IMusicType getMusicType() {
+        return new VanillaMusicType(MusicTicker.MusicType.NETHER);
+    }
 
     /**
      * @return the boss music that plays while players are in this biome.
-     * @since 1.4.0
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull
+    @Override
     @SideOnly(Side.CLIENT)
-    default IMusicType getBossMusicType() { return getMusicType(); }
+    default IMusicType getBossMusicType() {
+        return getMusicType();
+    }
+
+    /**
+     * @return the creative mode music that plays while players are in this biome.
+     */
+    @ApiStatus.AvailableSince("1.5.0")
+    @Nonnull
+    @Override
+    @SideOnly(Side.CLIENT)
+    default IMusicType getCreativeMusicType() {
+        return getMusicType();
+    }
 }
