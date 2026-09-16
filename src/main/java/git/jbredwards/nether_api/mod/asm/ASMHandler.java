@@ -360,6 +360,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Support modded "End Stone"-like soil blocks.
                 register(new TransformerBlockChorusPlant(),
                         "net.minecraft.block.BlockChorusPlant");
+                // Fix dragon egg teleport particle desync and teleporting into the air
+                register(new TransformerBlockDragonEgg(),
+                        "net.minecraft.block.BlockDragonEgg");
                 // Allow BetterNether's 3d mushroom feature to have more render options.
                 register(new TransformerBlockMushroom(),
                         "net.minecraft.block.BlockMushroom");

@@ -20,6 +20,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -41,16 +42,24 @@ public class MessageTeleportFX implements IMessage
     public boolean valid;
 
     public MessageTeleportFX() {}
-    public MessageTeleportFX(@Nonnull final Entity entityIn, final double prevXIn, final double prevYIn, final double prevZIn) {
+    public MessageTeleportFX(final float widthIn, final float heightIn, final double xIn, final double yIn, final double zIn, final double prevXIn, final double prevYIn, final double prevZIn) {
         valid = true;
-        x = entityIn.posX;
-        y = entityIn.posY;
-        z = entityIn.posZ;
+        x = xIn;
+        y = yIn;
+        z = zIn;
         prevX = prevXIn;
         prevY = prevYIn;
         prevZ = prevZIn;
-        width = entityIn.width;
-        height = entityIn.height;
+        width = widthIn;
+        height = heightIn;
+    }
+
+    public MessageTeleportFX(@Nonnull final Entity entityIn, final double prevXIn, final double prevYIn, final double prevZIn) {
+        this(entityIn.width, entityIn.height, entityIn.posX, entityIn.posY, entityIn.posZ, prevXIn, prevYIn, prevZIn);
+    }
+
+    public MessageTeleportFX(@Nonnull final Vec3i posIn, @Nonnull final Vec3i prevPosIn) {
+        this(1, 1, posIn.getX() + 0.5, posIn.getY() - 0.5, posIn.getZ() + 0.5, prevPosIn.getX() + 0.5, prevPosIn.getY() - 0.5, prevPosIn.getZ() + 0.5);
     }
 
     @Override
@@ -90,12 +99,12 @@ public class MessageTeleportFX implements IMessage
         @SideOnly(Side.CLIENT)
         static void onMessageClient(@Nonnull final MessageTeleportFX msg) {
             Minecraft.getMinecraft().addScheduledTask(() -> {
-                final double scale = (double)1 / 127;
-                for(double slide = 0; slide <= 1; slide += scale) Minecraft.getMinecraft().renderGlobal.spawnParticle(
+                final double scale = 1 / Math.min(512, 128 * msg.width * msg.height);
+                for(double slide = 0; slide < 1; slide += scale) Minecraft.getMinecraft().renderGlobal.spawnParticle(
                         EnumParticleTypes.PORTAL,
-                        msg.prevX + (msg.x - msg.prevX) * slide + (Math.random() - 0.5) * msg.width * 2,
+                        msg.prevX + (msg.x - msg.prevX) * slide + (Math.random() - 0.5) * msg.width,
                         msg.prevY + (msg.y - msg.prevY) * slide + Math.random() * msg.height,
-                        msg.prevZ + (msg.z - msg.prevZ) * slide + (Math.random() - 0.5) * msg.width * 2,
+                        msg.prevZ + (msg.z - msg.prevZ) * slide + (Math.random() - 0.5) * msg.width,
                         (Math.random() - 0.5) * 0.2,
                         (Math.random() - 0.5) * 0.2,
                         (Math.random() - 0.5) * 0.2
