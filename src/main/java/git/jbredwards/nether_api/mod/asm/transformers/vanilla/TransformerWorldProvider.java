@@ -18,6 +18,8 @@ package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -25,8 +27,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.*;
+import net.minecraft.world.GameType;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import org.objectweb.asm.commons.GeneratorAdapter;
 
@@ -91,7 +96,8 @@ public final class TransformerWorldProvider implements ITransformer
     public static final class Hooks
     {
         public static boolean canCoordinateBeSpawn(@Nonnull final World world, final int x, final int z) {
-            if(world.getChunk(x >> 4, z >> 4).getHeightValue(x & 15, z & 15) == 0) return false; // Never spawn players into the void.
+            @Nonnull final Chunk chunk = world.getChunk(x >> 4, z >> 4);
+            if(chunk.getHeightValue(x & 15, z & 15) == 0) return false; // Never spawn players into the void.
 
             @Nonnull final Biome biome = world.getBiome(new BlockPos(x, 0, z));
             if(biome.ignorePlayerSpawnSuitability()) return true;
@@ -101,11 +107,10 @@ public final class TransformerWorldProvider implements ITransformer
 
             // Instead of using world.getGroundAboveSeaLevel(pos), also check for fluids and block "spawn-ability".
             @Nullable final BlockPos spawnCoord = world.provider.getSpawnCoordinate();
-            @Nonnull final ChunkCache cache = createCache(world, new BlockPos(x, 0, z), 0);
             @Nonnull final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, spawnCoord != null ? spawnCoord.getY() : world.getSeaLevel(), z);
 
-            while(pos.getY() < world.getActualHeight() - 1 && !isBlockGround(world.getMinecraftServer(), cache, pos.move(EnumFacing.UP)));
-            return pos.getY() < world.getActualHeight() - 1 && isBlockGround(world.getMinecraftServer(), cache, pos);
+            while(pos.getY() < world.getActualHeight() - 1 && !isBlockGround(world.getMinecraftServer(), chunk, pos.move(EnumFacing.UP)));
+            return pos.getY() < world.getActualHeight() - 1 && isBlockGround(world.getMinecraftServer(), chunk, pos);
         }
 
         @Nonnull
@@ -130,23 +135,22 @@ public final class TransformerWorldProvider implements ITransformer
                             .add(spawnFuzzHalf - world.rand.nextInt(spawnFuzz), 0, spawnFuzzHalf - world.rand.nextInt(spawnFuzz)));
                 }
 
-                @Nonnull final ChunkCache cache = createCache(world, spawnPoint, spawnFuzzHalf);
-                @Nonnull final boolean[] checkedPositions = new boolean[spawnFuzz * spawnFuzz];
-
                 final int y = spawnCoord != null ? spawnCoord.getY() : world.provider.isNether() ? 32 : world.getSeaLevel();
                 final int spawnAttempts = 1000; // Same # of spawn attempts as initial spawn point set.
+                @Nonnull final IntSet checkedPositions = new IntOpenHashSet(MathHelper.clamp(spawnFuzz * spawnFuzz, 1, spawnAttempts));
                 for(int i = 0; i < spawnAttempts; i++) {
                     int x = world.rand.nextInt(spawnFuzz);
                     int z = world.rand.nextInt(spawnFuzz);
 
-                    if(checkedPositions[x * spawnFuzz + z]) continue;
-                    else checkedPositions[x * spawnFuzz + z] = true;
+                    if(checkedPositions.contains(x * spawnFuzz + z)) continue;
+                    else checkedPositions.add(x * spawnFuzz + z);
                     x += spawnPoint.getX() - spawnFuzzHalf;
                     z += spawnPoint.getZ() - spawnFuzzHalf;
 
                     if(world.provider.canCoordinateBeSpawn(x, z)) {
                         @Nonnull final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(x, y, z);
-                        while(pos.getY() < world.getActualHeight() && !isBlockGround(world.getMinecraftServer(), cache, pos.move(EnumFacing.UP)));
+                        @Nonnull final Chunk chunk = world.getChunk(pos);
+                        while(pos.getY() < world.getActualHeight() && !isBlockGround(world.getMinecraftServer(), chunk, pos.move(EnumFacing.UP)));
                         return pos.move(EnumFacing.DOWN, 2).toImmutable();
                     }
                 }
@@ -156,21 +160,12 @@ public final class TransformerWorldProvider implements ITransformer
         }
 
         // Helper.
-        @Nonnull
-        private static ChunkCache createCache(@Nonnull final World world, @Nonnull final BlockPos origin, final int radius) {
-            @Nonnull final BlockPos min = new BlockPos(origin.getX(), 0, origin.getZ());
-            @Nonnull final BlockPos max = new BlockPos(origin.getX(), world.getActualHeight(), origin.getZ());
-
-            return new ChunkCache(world, min, max, radius);
-        }
-
-        // Helper.
-        private static boolean isBlockGround(@Nullable final MinecraftServer server, @Nonnull final IBlockAccess access, @Nonnull final BlockPos.MutableBlockPos pos) {
-            @Nonnull final IBlockState state = access.getBlockState(pos);
-            if(!state.getMaterial().blocksMovement() || state.getMaterial().isLiquid() || state.getBlock().isAir(state, access, pos)
+        private static boolean isBlockGround(@Nullable final MinecraftServer server, @Nonnull final Chunk chunk, @Nonnull final BlockPos.MutableBlockPos pos) {
+            @Nonnull final IBlockState state = chunk.getBlockState(pos);
+            if(!state.getMaterial().blocksMovement() || state.getMaterial().isLiquid() || state.getBlock().isAir(state, chunk.getWorld(), pos)
             || server != null && !state.canEntitySpawn(FakePlayerFactory.getMinecraft(server.getWorld(0)))) return false;
 
-            @Nonnull final IBlockState above = access.getBlockState(pos.move(EnumFacing.UP));
+            @Nonnull final IBlockState above = chunk.getBlockState(pos.move(EnumFacing.UP));
             pos.move(EnumFacing.DOWN);
             return !above.causesSuffocation() && !state.getMaterial().isLiquid() && state.getMaterial() != Material.FIRE;
         }
