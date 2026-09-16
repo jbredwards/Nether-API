@@ -182,7 +182,7 @@ public final class Transformer_MC_10369 implements ITransformer
                      *     ...
                      * }
                      */
-                    else if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 128) {
+                    else if(insn.getOpcode() == BIPUSH && ((IntInsnNode)insn).operand == 120) {
                         ((IntInsnNode)insn).operand = 0;
                         return BreakType.METHODS;
                     }
