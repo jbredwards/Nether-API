@@ -34,6 +34,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import org.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.tree.MethodInsnNode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -88,6 +89,24 @@ public final class TransformerWorldProvider implements ITransformer
                 generator.visitMethodInsn(INVOKESTATIC, genHookClass(), "getRandomizedSpawnPoint", "(Lnet/minecraft/world/World;)Lnet/minecraft/util/math/BlockPos;", false);
                 generator.visitInsn(ARETURN);
                 return BreakType.METHODS;
+            });
+
+            /*
+             * getMusicType: (changes are around line 455)
+             * Old code:
+             * return null;
+             * 
+             * New code:
+             * // Allow biomes to have custom music.
+             * return git.jbredwards.nether_api.mod.client.audio.BiomeMusicHandler.get(null);
+             */
+            transformMethod(classNode, method -> method.name.equals("getMusicType"), (method, insn) -> {
+                if(insn.getOpcode() == ARETURN) {
+                    method.instructions.insertBefore(insn, new MethodInsnNode(INVOKESTATIC, "git/jbredwards/nether_api/mod/client/audio/BiomeMusicHandler", "get", "(Lnet/minecraft/client/audio/MusicTicker$MusicType;)Lnet/minecraft/client/audio/MusicTicker$MusicType;", false));
+                    return BreakType.METHODS;
+                }
+
+                return BreakType.CONTINUE;
             });
         });
     }

@@ -34,15 +34,18 @@ public final class BiomeMusicHandler
 
     @Nullable
     public static MusicTicker.MusicType get(@Nullable final MusicTicker.MusicType defaultMusic) {
-        if(prevType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) prevType = null;
+        if(defaultMusic != null) {
+            resetCurrentMusicType();
+            return defaultMusic;
+        }
 
+        if(prevType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) resetCurrentMusicType();
         @Nonnull final Biome biome = mc.world.getBiome(new BlockPos(mc.player.getPositionEyes(mc.getRenderPartialTicks())));
         @Nullable final IMusicType type = biome instanceof IMusicBiome ? getActiveType((IMusicBiome)biome) : null;
 
         if(prevType == null || type.replacesCurrentMusic(prevType.getMusicType()) || prevBiome != biome && prevType.isBiomeLocal()) prevType = type;
         prevBiome = biome;
-
-        return prevType != null ? prevType.getMusicType() : defaultMusic;
+        return prevType != null ? prevType.getMusicType() : null;
     }
 
     @Nonnull
@@ -52,17 +55,20 @@ public final class BiomeMusicHandler
         else return biome.getMusicType();
     }
 
-    private static void tick() {
-        if(prevType != null && mc.player == null) prevType = null;
+    private static void resetCurrentMusicType() {
+        prevType = null;
+        prevBiome = null;
     }
 
     @SubscribeEvent
     static void resetCurrentMusicType(@Nonnull final TickEvent.ClientTickEvent event) {
-        if(event.phase == TickEvent.Phase.START) tick();
+        if(event.phase == TickEvent.Phase.START && prevType != null && mc.player == null) resetCurrentMusicType();
     }
 
     @Deprecated
+    @Nonnull
     static MusicTicker.MusicType get(@Nonnull final IMusicBiome music) {
-        return get(getActiveType(music).getMusicType());
+        @Nullable final MusicTicker.MusicType type = get((MusicTicker.MusicType)null);
+        return type != null ? type : getActiveType(music).getMusicType();
     }
 }

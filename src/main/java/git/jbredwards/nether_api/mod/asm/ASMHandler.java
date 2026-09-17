@@ -384,9 +384,6 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Allow IEndBiome instances to specify whether they're an applicable biome.
                 register(new TransformerMapGenEndCity(),
                         "net.minecraft.world.gen.structure.MapGenEndCity");
-                // Allow biomes to have custom music.
-                register(new TransformerMinecraft(),
-                        "net.minecraft.client.Minecraft");
                 // Allow more than just the Overworld to be set as an initial spawn dimension.
                 register(new TransformerNetHandlerPlayClient(),
                         "net.minecraft.client.network.NetHandlerPlayClient",
