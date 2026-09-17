@@ -44,7 +44,7 @@ public interface IMusicBiome
 
     /**
      * @return A {@code IMusicBiome} instance that uses the provided music types.
-     * @throws NullPointerException If ambientType or bossType are null.
+     * @throws NullPointerException If any music types are null.
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
@@ -78,7 +78,7 @@ public interface IMusicBiome
 
     /**
      * @return A {@code IMusicBiome} instance that uses one music type.
-     * @throws NullPointerException If type is null.
+     * @throws NullPointerException If the music type is null.
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
@@ -88,7 +88,7 @@ public interface IMusicBiome
 
     /**
      * @return A {@code IMusicBiome} instance that shares its creative and survival music.
-     * @throws NullPointerException If type is null.
+     * @throws NullPointerException If any music types are null.
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull

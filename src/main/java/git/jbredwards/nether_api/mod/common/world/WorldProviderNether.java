@@ -22,13 +22,11 @@ import git.jbredwards.nether_api.api.biome.INetherBiome;
 import git.jbredwards.nether_api.api.event.NetherAPIFogColorEvent;
 import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
-import git.jbredwards.nether_api.mod.client.audio.NetherMusicHandler;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
-import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
@@ -108,13 +106,6 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @Override
     public NetherAPIFogColorEvent createEvent(@Nonnull Biome biomeIn, @Nonnull World worldIn, float celestialAngleIn, float partialTicksIn) {
         return new NetherAPIFogColorEvent.Nether(biomeIn, worldIn, celestialAngleIn, partialTicksIn);
-    }
-
-    @Nullable
-    @SideOnly(Side.CLIENT)
-    @Override
-    public MusicTicker.MusicType getMusicType() {
-        return NetherMusicHandler.getMusicType();
     }
 
     @SideOnly(Side.CLIENT)

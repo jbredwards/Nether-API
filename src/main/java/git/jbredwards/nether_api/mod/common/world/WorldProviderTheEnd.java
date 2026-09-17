@@ -23,12 +23,10 @@ import git.jbredwards.nether_api.api.event.NetherAPIFogColorEvent;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
-import git.jbredwards.nether_api.mod.client.audio.TheEndMusicHandler;
 import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderTheEnd;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorTheEnd;
-import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -248,13 +246,6 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
     @Override
     public NetherAPIFogColorEvent createEvent(@Nonnull final Biome biomeIn, @Nonnull final World worldIn, final float celestialAngleIn, final float partialTicksIn) {
         return new NetherAPIFogColorEvent.End(biomeIn, worldIn, celestialAngleIn, partialTicksIn);
-    }
-
-    @Nullable
-    @SideOnly(Side.CLIENT)
-    @Override
-    public MusicTicker.MusicType getMusicType() {
-        return TheEndMusicHandler.getMusicType();
     }
 
     @SideOnly(Side.CLIENT)

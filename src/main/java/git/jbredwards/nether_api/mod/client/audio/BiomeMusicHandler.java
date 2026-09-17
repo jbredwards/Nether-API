@@ -6,7 +6,6 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -19,8 +18,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * Currently only supports the Nether and End.<br>
- * TODO: Support all dimensions.
+ *
  * @author jbred
  *
  */
@@ -33,22 +31,18 @@ public final class BiomeMusicHandler
 
     @Nullable private static Biome prevBiome;
     @Nullable private static IMusicType prevType;
-    @Nullable private static Integer prevDimension;
 
-    @Nonnull
-    public static MusicTicker.MusicType get(@Nonnull final DimensionType dimension, @Nonnull final IMusicBiome defaultMusic) {
-        if(mc.player == null || mc.player.dimension != dimension.getId()) return getActiveType(defaultMusic).getMusicType();
-
+    @Nullable
+    public static MusicTicker.MusicType get(@Nullable final MusicTicker.MusicType defaultMusic) {
         if(prevType != null && !mc.getSoundHandler().isSoundPlaying(mc.getMusicTicker().currentMusic)) prevType = null;
-        prevDimension = dimension.getId();
 
         @Nonnull final Biome biome = mc.world.getBiome(new BlockPos(mc.player.getPositionEyes(mc.getRenderPartialTicks())));
-        @Nonnull final IMusicType type = getActiveType(biome instanceof IMusicBiome ? (IMusicBiome)biome : defaultMusic);
+        @Nullable final IMusicType type = biome instanceof IMusicBiome ? getActiveType((IMusicBiome)biome) : null;
 
         if(prevType == null || type.replacesCurrentMusic(prevType.getMusicType()) || prevBiome != biome && prevType.isBiomeLocal()) prevType = type;
         prevBiome = biome;
 
-        return prevType.getMusicType();
+        return prevType != null ? prevType.getMusicType() : defaultMusic;
     }
 
     @Nonnull
@@ -59,14 +53,16 @@ public final class BiomeMusicHandler
     }
 
     private static void tick() {
-        if(prevType != null && (mc.player == null || prevDimension != null && mc.player.dimension != prevDimension)) {
-            prevType = null;
-            prevDimension = null;
-        }
+        if(prevType != null && mc.player == null) prevType = null;
     }
 
     @SubscribeEvent
     static void resetCurrentMusicType(@Nonnull final TickEvent.ClientTickEvent event) {
         if(event.phase == TickEvent.Phase.START) tick();
+    }
+
+    @Deprecated
+    static MusicTicker.MusicType get(@Nonnull final IMusicBiome music) {
+        return get(getActiveType(music).getMusicType());
     }
 }

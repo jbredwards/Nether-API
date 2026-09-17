@@ -19,7 +19,6 @@ package git.jbredwards.nether_api.mod.client.audio;
 import git.jbredwards.nether_api.api.audio.IMusicBiome;
 import git.jbredwards.nether_api.api.audio.IMusicType;
 import net.minecraft.client.audio.MusicTicker;
-import net.minecraft.world.DimensionType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -42,6 +41,6 @@ public final class TheEndMusicHandler
 
     @Nonnull
     public static MusicTicker.MusicType getMusicType() {
-        return BiomeMusicHandler.get(DimensionType.THE_END, DEFAULT_MUSIC);
+        return BiomeMusicHandler.get(DEFAULT_MUSIC);
     }
 }
