@@ -43,7 +43,7 @@ public final class BiomeMusicHandler
         @Nonnull final Biome biome = mc.world.getBiome(new BlockPos(mc.player.getPositionEyes(mc.getRenderPartialTicks())));
         @Nullable final IMusicType type = biome instanceof IMusicBiome ? getActiveType((IMusicBiome)biome) : null;
 
-        if(prevType == null || type.replacesCurrentMusic(prevType.getMusicType()) || prevBiome != biome && prevType.isBiomeLocal()) prevType = type;
+        if(prevType == null || type != null && type.replacesCurrentMusic(prevType.getMusicType()) || prevBiome != biome && prevType.isBiomeLocal()) prevType = type;
         prevBiome = biome;
         return prevType != null ? prevType.getMusicType() : null;
     }
