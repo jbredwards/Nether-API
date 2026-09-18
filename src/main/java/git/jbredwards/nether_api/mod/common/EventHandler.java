@@ -54,7 +54,8 @@ final class EventHandler
         //built-in supported mods, other mods must use the event themselves
         if(NetherAPI.isStygianEndLoaded) StygianEndHandler.registerBiomes(event.registry);
         //vanilla
-        event.registry.registerBiome(Biomes.SKY, NetherAPIConfig.endWeight);
+        if(NetherAPIConfig.endWeight == 0) event.registry.removeBiome(Biomes.SKY);
+        else event.registry.registerBiome(Biomes.SKY, NetherAPIConfig.endWeight);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -66,7 +67,8 @@ final class EventHandler
         if(NetherAPI.isNethercraftLoaded) NethercraftHandler.registerBiomes(event.registry);
         if(NetherAPI.isNetherExLoaded) NetherExHandler.registerBiomes(event.registry, event.world);
         //vanilla
-        event.registry.registerBiome(Biomes.HELL, NetherAPIConfig.hellWeight);
+        if(NetherAPIConfig.hellWeight == 0) event.registry.removeBiome(Biomes.HELL);
+        else event.registry.registerBiome(Biomes.HELL, NetherAPIConfig.hellWeight);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
