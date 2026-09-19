@@ -16,16 +16,15 @@
 
 package git.jbredwards.nether_api.mod.asm.transformers.modded.netherex;
 
-import biomesoplenty.common.block.BlockBOPGrass;
-import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
-import net.journey.init.blocks.JourneyBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.tree.*;
-import paulevs.betternether.blocks.BlocksRegister;
 
 import javax.annotation.Nonnull;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Support the conversion of certain modded netherrack blocks
@@ -87,24 +86,11 @@ public final class TransformerInputHandler implements ITransformer
     @SuppressWarnings("unused")
     public static final class Hooks
     {
-        @Nonnull
-        public static Block getNetherrackCandidate(@Nonnull final IBlockState state, @Nonnull final Block fallback) {
-            if(state.getBlock() != fallback) {
-                if(NetherAPI.isBetterNetherLoaded) {
-                    if(state.getBlock() == BlocksRegister.BLOCK_NETHER_MYCELIUM || state.getBlock() == BlocksRegister.BLOCK_NETHERRACK_MOSS) return state.getBlock();
-                }
-                if(NetherAPI.isBiomesOPlentyLoaded) {
-                    if(state.getBlock() instanceof BlockBOPGrass) {
-                        @Nonnull final BlockBOPGrass.BOPGrassType type = (BlockBOPGrass.BOPGrassType)state.getValue(BlockBOPGrass.VARIANT);
-                        if(type == BlockBOPGrass.BOPGrassType.MYCELIAL_NETHERRACK || type == BlockBOPGrass.BOPGrassType.OVERGROWN_NETHERRACK) return state.getBlock();
-                    }
-                }
-                if(NetherAPI.isJourneyIntoTheLightLoaded) {
-                    if(state.getBlock() == JourneyBlocks.earthenNetherrack || state.getBlock() == JourneyBlocks.nethicGrass) return state.getBlock();
-                }
-            }
-
-            return fallback;
+        // Helper.
+        @ApiStatus.Internal
+        @Nonnull public static final Set<IBlockState> NETHERRACK_CANDIDATES = new HashSet<>();
+        @Nonnull public static Block getNetherrackCandidate(@Nonnull final IBlockState state, @Nonnull final Block fallback) {
+            return state.getBlock() != fallback && NETHERRACK_CANDIDATES.contains(state) ? state.getBlock() : fallback;
         }
     }
 }

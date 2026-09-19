@@ -171,6 +171,10 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Support modded "Netherrack"-like soil blocks.
                 register(new TransformerBlockBOPSapling(),
                         "biomesoplenty.common.block.BlockBOPSapling");
+                // Fix BOP grass block break particles.
+                register(new TransformerBlockParticleColorFix(),
+                        "biomesoplenty.common.block.BlockBOPDoublePlant",
+                        "biomesoplenty.common.block.BlockBOPGrass");
             }
             // Dynamic Surroundings:
             {
@@ -372,6 +376,11 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Allow shrubs to be used in Nether world generation.
                 register(new TransformerBlockTallGrass(),
                         "net.minecraft.block.BlockTallGrass");
+                // Use "Blocks.GRASS" if the block shouldn't have its particles colored.
+                register(new TransformerParticleDigging(),
+                        "com.TominoCZ.FBP.particle.FBPParticleDigging", // Fancy Block Particles compat.
+                        "dev.redstudio.fbp.particles.FBPParticleDigging", // Fancier Block Particles compat.
+                        "net.minecraft.client.particle.ParticleDigging");
                 // Add registered structures to the /locate tab completion list.
                 register(new TransformerCommandLocate(),
                         "net.minecraft.command.CommandLocate");

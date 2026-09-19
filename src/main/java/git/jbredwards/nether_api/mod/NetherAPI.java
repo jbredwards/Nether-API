@@ -137,7 +137,6 @@ public final class NetherAPI
     @SideOnly(Side.CLIENT)
     @Mod.EventHandler
     static void initClient(@Nonnull final FMLInitializationEvent event) {
-        if(isBiomesOPlentyLoaded) BiomesOPlentyHandler.initClient();
         if(isStygianEndLoaded) StygianEndHandler.initClient();
         Optional.ofNullable(Loader.instance().getIndexedModList().get(MODID)).ifPresent(mod -> {
             // Remove "disable" button in mod gui.

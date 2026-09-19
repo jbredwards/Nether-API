@@ -17,6 +17,7 @@
 package git.jbredwards.nether_api.mod.common.compat.betternether;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
+import git.jbredwards.nether_api.api.util.NetherAPIProperties;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -39,6 +40,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import paulevs.betternether.biomes.BiomeRegister;
 import paulevs.betternether.biomes.NetherBiome;
+import paulevs.betternether.blocks.BlocksRegister;
 import paulevs.betternether.config.ConfigLoader;
 import paulevs.betternether.entities.EntityFirefly;
 
@@ -143,11 +145,18 @@ public final class BetterNetherHandler
         catch(@Nonnull final Exception ignored) {}
     }
 
-    // exists because this mod adds BetterNether biomes as real biomes
     public static void init() {
+        initBiomes();
+
+        // add support for NetherEx path creation
+        NetherAPIProperties.registerNetherExPathable(BlocksRegister.BLOCK_NETHER_MYCELIUM.getDefaultState(), BlocksRegister.BLOCK_NETHERRACK_MOSS.getDefaultState());
+
         // ensure netherrack is set as a valid terrain block (needed for TransformerBetterNetherPlants)
         if(isModern()) ObfuscationReflectionHelper.<Set<Block>, ConfigLoader>getPrivateValue(ConfigLoader.class, null, "NETHER_TERRAIN").add(Blocks.NETHERRACK);
+    }
 
+    // exists because this mod adds BetterNether biomes as real biomes
+    private static void initBiomes() {
         // fix fireflies
         Biomes.HELL.getSpawnableList(EnumCreatureType.AMBIENT).removeIf(entry -> entry.entityClass == EntityFirefly.class);
         if(BiomeRegister.BIOME_GRASSLANDS != null) EntityRegistry.addSpawn(EntityFirefly.class, 100, 5, 10, EnumCreatureType.AMBIENT, getBiomeFromLookup(BiomeRegister.BIOME_GRASSLANDS));

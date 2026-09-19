@@ -17,6 +17,7 @@
 package git.jbredwards.nether_api.mod.common.compat.journey_into_the_light;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
+import git.jbredwards.nether_api.api.util.NetherAPIProperties;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.journey.dimension.nether.JNWorldGenerator;
 import net.journey.dimension.nether.biomes.*;
@@ -114,6 +115,9 @@ public final class JITLHandler
         // fix certain leaves not dropping their saplings
         ObfuscationReflectionHelper.setPrivateValue(BlockModLeaves.class, (BlockModLeaves)JourneyBlocks.sizzlerWoodLeaves, JourneyBlocks.netherSapling, "sapling");
         ObfuscationReflectionHelper.setPrivateValue(BlockModLeaves.class, (BlockModLeaves)JourneyBlocks.earthenNetherLeaves, JourneyBlocks.EARTHEN_SAPLING, "sapling");
+
+        // add support for NetherEx path creation
+        NetherAPIProperties.registerNetherExPathable(JourneyBlocks.earthenNetherrack.getDefaultState(), JourneyBlocks.nethicGrass.getDefaultState());
     }
 
     @Nonnull
