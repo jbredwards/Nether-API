@@ -31,6 +31,7 @@ import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EntitySelectors;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -48,6 +49,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -61,11 +63,11 @@ import java.util.Random;
  */
 public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWorldProvider, IFogWorldProvider
 {
-    // Non-hardcoded so mod devs can customize these!
-    @Nonnull public static ExitPortal EXIT_PORTAL = WorldGenEndPodium::new;
-    @Nonnull public static WorldGenerator END_GATEWAY = new WorldGenEndGateway();
-    @Nonnull public static WorldGenSpikes END_PILLAR = new WorldGenSpikes(); // used via asm
-    @Nonnull public static WorldGenerator OBSIDIAN_PLATFORM = new WorldGenerator() {
+    // Non-hardcoded so mod devs can customize these via NetherAPIProperties!
+    @ApiStatus.Internal @Nonnull public static ExitPortal EXIT_PORTAL = WorldGenEndPodium::new;
+    @ApiStatus.Internal @Nonnull public static WorldGenerator END_GATEWAY = new WorldGenEndGateway();
+    @ApiStatus.Internal @Nonnull public static WorldGenSpikes END_PILLAR = new WorldGenSpikes(); // used via asm
+    @ApiStatus.Internal @Nonnull public static WorldGenerator OBSIDIAN_PLATFORM = new WorldGenerator() {
         @Override
         public boolean generate(@Nonnull final World worldIn, @Nonnull final Random rand, @Nonnull final BlockPos position) {
             for(int x = -2; x <= 2; x++) for(int z = -2; z <= 2; z++) {
@@ -190,16 +192,17 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
         }
 
         protected boolean spawnPortalLit(final boolean active) {
-            if(!active) return false;
-            else if(initialDragonKilled) return true;
-            else if(initialPortalLit != null) return initialPortalLit;
-            else return PlayerSpawnLogic.getInitialSpawnDimension(null) != getDimension();
+            return active && (initialDragonKilled || initialPortalLit == EnumActionResult.SUCCESS
+                    || initialPortalLit == EnumActionResult.PASS && PlayerSpawnLogic.getInitialSpawnDimension(null) != getDimension());
         }
     }
 
-    @Nullable
-    protected static Boolean initialPortalLit = null;
-    public static void overrideInitialPortalLit(final boolean value) { initialPortalLit = value; }
+    @ApiStatus.Internal // Use NetherAPIProperties to set this value.
+    @Nonnull public static EnumActionResult initialPortalLit = EnumActionResult.PASS;
+    @Deprecated // Use NetherAPIProperties instead.
+    public static void overrideInitialPortalLit(final boolean value) {
+        initialPortalLit = value ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+    }
 
     @Nonnull
     @Override
@@ -212,6 +215,7 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
     // biome ambience
     // --------------
 
+    @ApiStatus.Internal // Use NetherAPIProperties to set this value.
     public static boolean forceExtraEndFog = false;
 
     @Nullable

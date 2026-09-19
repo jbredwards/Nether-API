@@ -35,6 +35,7 @@ import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -72,6 +73,7 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     // biome ambience
     // --------------
 
+    @ApiStatus.Internal // Use NetherAPIProperties to set this value.
     public static boolean FORCE_NETHER_FOG = false;
 
     @Nullable
