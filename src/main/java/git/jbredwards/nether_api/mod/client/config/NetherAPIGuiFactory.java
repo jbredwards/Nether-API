@@ -55,6 +55,7 @@ public final class NetherAPIGuiFactory implements IModGuiFactory
         if(NetherAPI.isJourneyIntoTheLightLoaded) activeModCategories.add(NetherAPIConfig.JITL.class);
         if(NetherAPI.isNaturaLoaded) activeModCategories.add(NetherAPIConfig.Natura.class);
         if(NetherAPI.isNethercraftLoaded) activeModCategories.add(NetherAPIConfig.Nethercraft.class);
+        if(NetherAPI.isNetherExLoaded) activeModCategories.add(NetherAPIConfig.NetherEx.class);
         if(NetherAPI.isNetherHexedKingdomLoaded) activeModCategories.add(NetherAPIConfig.NHK.class);
         if(NetherAPI.isStygianEndLoaded) activeModCategories.add(NetherAPIConfig.StygianEnd.class);
     }

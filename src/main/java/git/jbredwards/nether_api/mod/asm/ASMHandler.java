@@ -345,6 +345,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "net.minecraft.entity.boss.EntityDragon",
                         "net.minecraft.entity.EntityLivingBase",
                         "net.minecraft.item.ItemEnderEye");
+                // Save BiomeStructureHandler caches to biome
+                register(new TransformerBiome(),
+                        "net.minecraft.world.biome.Biome");
                 // Use seed-coord-based random and un-hardcode obsidian spike generation.
                 register(new TransformerBiomeEndDecorator(),
                         "net.minecraft.world.biome.BiomeEndDecorator");
@@ -384,6 +387,10 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Allow IEndBiome instances to specify whether they're an applicable biome.
                 register(new TransformerMapGenEndCity(),
                         "net.minecraft.world.gen.structure.MapGenEndCity");
+                // Allow height to be configured and cache starting biome.
+                register(new TransformerMapGenNetherBridge(),
+                        "net.minecraft.world.gen.structure.MapGenNetherBridge",
+                        "net.minecraft.world.gen.structure.MapGenNetherBridge$Start");
                 // Allow more than just the Overworld to be set as an initial spawn dimension.
                 register(new TransformerNetHandlerPlayClient(),
                         "net.minecraft.client.network.NetHandlerPlayClient",
@@ -397,6 +404,23 @@ public final class ASMHandler implements IFMLLoadingPlugin
                         "net.minecraft.server.management.PlayerList",
                         "net.minecraft.world.gen.ChunkProviderServer",
                         "net.minecraft.world.WorldServer");
+                // Use event to get structure block IDs.
+                register(new TransformerStructureNetherBridgePieces(),
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Piece",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Crossing3",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$End",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Straight",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Corridor3",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Corridor4",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Entrance",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Crossing2",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Corridor",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Corridor5",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Corridor2",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$NetherStalkRoom",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Throne",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Crossing",
+                        "net.minecraft.world.gen.structure.StructureNetherBridgePieces$Stairs");
                 // Allow for custom obsidian platform generation.
                 register(new TransformerTeleporter(),
                         "net.minecraft.world.Teleporter");

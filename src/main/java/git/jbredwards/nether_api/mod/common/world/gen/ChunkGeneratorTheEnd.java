@@ -203,11 +203,19 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
     @Nonnull
     @Override
     public List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull EnumCreatureType creatureType, @Nonnull BlockPos pos) {
-        // modded
         if(areStructuresEnabled()) {
+            @Nonnull List<Biome.SpawnListEntry> possibleCreatures;
+
+            // vanilla (won't pass unless another mod replaces "endCityGen" with one that spawns entities)
+            if(endCityGen instanceof ISpawningStructure) {
+                possibleCreatures = ((ISpawningStructure)endCityGen).getPossibleCreatures(creatureType, world, pos);
+                if(!possibleCreatures.isEmpty()) return possibleCreatures;
+            }
+
+            // modded
             for(@Nonnull final MapGenStructure structure : moddedStructures) {
                 if(structure instanceof ISpawningStructure) {
-                    final List<Biome.SpawnListEntry> possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
+                    possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
                     if(!possibleCreatures.isEmpty()) return possibleCreatures;
                 }
             }

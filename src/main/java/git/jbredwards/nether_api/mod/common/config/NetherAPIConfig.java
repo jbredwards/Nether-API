@@ -65,6 +65,27 @@ public final class NetherAPIConfig
     @Config.LangKey("config.nether_api.hellWeight")
     public static int hellWeight = 8;
 
+    @Config.LangKey("config.nether_api.vanilla.advanced")
+    public static Advanced advanced = new Advanced();
+    public static final class Advanced
+    {
+        @Config.RangeInt(min = -1, max = 255)
+        @Config.LangKey("config.nether_api.vanilla.advanced.fortressMinY")
+        public int fortressMinY = -1;
+
+        @Config.RangeInt(min = -1, max = 255)
+        @Config.LangKey("config.nether_api.vanilla.advanced.fortressMaxY")
+        public int fortressMaxY = -1;
+
+        @Config.RangeInt(min = -1, max = 255)
+        @Config.LangKey("config.nether_api.vanilla.advanced.fortressPillarMinLen")
+        public int fortressPillarMinLen = -1;
+
+        @Config.RangeInt(min = -1, max = 255)
+        @Config.LangKey("config.nether_api.vanilla.advanced.fortressPillarMaxLen")
+        public int fortressPillarMaxLen = -1;
+    }
+
     @Config(modid = NetherAPI.MODID, name = "nether_api/betternether")
     public static final class BetterNether
     {
@@ -159,6 +180,18 @@ public final class NetherAPIConfig
         @Config.RequiresWorldRestart
         @Config.LangKey("config.nether_api.compat.nethercraft.glowingGroveWeight")
         public static int glowingGroveWeight = 4;
+    }
+
+    @Config(modid = NetherAPI.MODID, name = "nether_api/netherex")
+    public static final class NetherEx
+    {
+        @Config.RequiresMcRestart
+        @Config.LangKey("config.nether_api.compat.netherex.fortressBiomeVariants")
+        public static boolean fortressBiomeVariants = false;
+
+        @Config.RequiresMcRestart
+        @Config.LangKey("config.nether_api.compat.netherex.fortressSpawnsFrost")
+        public static boolean fortressSpawnsFrost = false;
     }
 
     @Config(modid = NetherAPI.MODID, name = "nether_api/stygian_end")

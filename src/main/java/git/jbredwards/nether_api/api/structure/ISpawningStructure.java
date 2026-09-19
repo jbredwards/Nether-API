@@ -20,6 +20,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -27,15 +28,17 @@ import java.util.List;
 /**
  * Having your MapGenStructure implement this will allow it go passively spawn mods (similar to how nether fortresses do).
  *
- * @since 1.0.0
+ * @see git.jbredwards.nether_api.api.event.BiomeStructureEvent.PrepareSpawnList
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public interface ISpawningStructure
 {
     /**
      * @return all possible spawn entries for the provided creature type. This should also check whether the provided position is within the structure.
      */
+    @ApiStatus.AvailableSince("1.0.0")
     @Nonnull
-    List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull EnumCreatureType type, @Nonnull World world, @Nonnull BlockPos pos);
+    List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull final EnumCreatureType type, @Nonnull final World world, @Nonnull final BlockPos pos);
 }

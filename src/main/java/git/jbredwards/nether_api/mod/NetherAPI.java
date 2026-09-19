@@ -32,6 +32,7 @@ import git.jbredwards.nether_api.mod.common.network.MessageTeleportFX;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderNether;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd;
+import git.jbredwards.nether_api.mod.common.world.gen.BiomeStructureHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.IReloadableResourceManager;
@@ -167,7 +168,8 @@ public final class NetherAPI
 
     // Ensure all registries are cleared before another world is loaded
     @Mod.EventHandler
-    static void serverStopping(@Nonnull final FMLServerStoppingEvent event) {
+    static void serverStopping(@Nonnull final FMLServerStoppedEvent event) {
         INetherAPIRegistry.REGISTRIES.forEach(INetherAPIRegistry::clear);
+        BiomeStructureHandler.clear();
     }
 }

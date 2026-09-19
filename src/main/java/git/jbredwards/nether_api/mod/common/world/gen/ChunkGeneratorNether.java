@@ -276,15 +276,18 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     @Override
     public List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull EnumCreatureType creatureType, @Nonnull BlockPos pos) {
         if(areStructuresEnabled()) {
+            @Nonnull List<Biome.SpawnListEntry> possibleCreatures;
+
             //vanilla
-            if(creatureType == EnumCreatureType.MONSTER && genNetherBridge != null
-            && (genNetherBridge.isInsideStructure(pos) || genNetherBridge.isPositionInStructure(world, pos) && world.getBlockState(pos.down()).getBlock() == Blocks.NETHER_BRICK))
-                return genNetherBridge.getSpawnList();
+            if(genNetherBridge != null) {
+                possibleCreatures = ((ISpawningStructure)genNetherBridge).getPossibleCreatures(creatureType, world, pos);
+                if(!possibleCreatures.isEmpty()) return possibleCreatures;
+            }
 
             //modded
             else for(@Nonnull final MapGenStructure structure : moddedStructures) {
                 if(structure instanceof ISpawningStructure) {
-                    final List<Biome.SpawnListEntry> possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
+                    possibleCreatures = ((ISpawningStructure)structure).getPossibleCreatures(creatureType, world, pos);
                     if(!possibleCreatures.isEmpty()) return possibleCreatures;
                 }
             }
@@ -326,7 +329,7 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
     @Override
     public void recreateStructures(@Nonnull Chunk chunkIn, int x, int z) {
         if(areStructuresEnabled()) {
-            genNetherBridge.generate(world, x, z, null);
+            if(genNetherBridge != null) genNetherBridge.generate(world, x, z, null);
             for(@Nonnull final MapGenStructure structure : moddedStructures) structure.generate(world, x, z, null);
         }
     }
