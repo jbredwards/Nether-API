@@ -16,6 +16,7 @@
 
 package git.jbredwards.nether_api.mod.common.world.gen;
 
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -30,37 +31,45 @@ import javax.annotation.Nonnull;
  */
 public class MapGenCavesEnd extends MapGenCavesHell
 {
-    public static boolean generateOnStartIsland = false;
-    public static int chance = 3, roomChance = 4, maxY = 80;
-
     @Override
-    public void generate(@Nonnull World worldIn, int x, int z, @Nonnull ChunkPrimer primer) {
-        if(generateOnStartIsland || (long)x * (long)x + (long)z * (long)z > 2048L) super.generate(worldIn, x, z, primer);
+    public void generate(@Nonnull final World worldIn, final int x, final int z, @Nonnull final ChunkPrimer primer) {
+        if(NetherAPIConfig.endCavesOnStartIsland || (long)x * (long)x + (long)z * (long)z > 2048L) super.generate(worldIn, x, z, primer);
     }
 
     @Override
-    protected void recursiveGenerate(@Nonnull World worldIn, int chunkX, int chunkZ, int originalX, int originalZ, @Nonnull ChunkPrimer chunkPrimerIn) {
-        if(rand.nextInt(chance) == 0) {
-            final int max = rand.nextInt(rand.nextInt(rand.nextInt(10) + 1) + 1);
+    protected void recursiveGenerate(@Nonnull final World worldIn, final int chunkX, final int chunkZ, final int originalX, final int originalZ, @Nonnull final ChunkPrimer chunkPrimerIn) {
+        if(rand.nextInt(NetherAPIConfig.advanced.endCaveChance) == 0) {
+            final int maxCfg = MathHelper.getInt(rand, NetherAPIConfig.advanced.endCaveMin, NetherAPIConfig.advanced.endCaveMax);
+            final int max = rand.nextInt(rand.nextInt(maxCfg + 1) + 1);
             for(int i = 0; i < max; i++) {
                 final double x = (chunkX << 4) + rand.nextInt(16);
-                final double y = MathHelper.getInt(rand, 10, maxY);
+                final double y = MathHelper.getInt(rand, NetherAPIConfig.advanced.endCaveMinY, NetherAPIConfig.advanced.endCaveMaxY);
                 final double z = (chunkZ << 4) + rand.nextInt(16);
                 int tunnels = 1;
                 
-                if(rand.nextInt(roomChance) == 0) {
+                if(rand.nextInt(NetherAPIConfig.advanced.endCaveRoomChance) == 0) {
                     addRoom(rand.nextLong(), originalX, originalZ, chunkPrimerIn, x, y, z);
-                    tunnels += rand.nextInt(4);
+                    tunnels += MathHelper.getInt(rand, NetherAPIConfig.advanced.endCaveRoomTunnelsMin, NetherAPIConfig.advanced.endCaveRoomTunnelsMax);
                 }
                 
                 for(int j = 0; j < tunnels; j++) {
-                    final float radius = rand.nextFloat() * 6;
-                    final float direction = rand.nextFloat() * (float)Math.PI * 2;
-                    final float length = (rand.nextFloat() - 0.5f) / 4;
+                    final float radius = MathHelper.nextFloat(rand, NetherAPIConfig.advanced.endCaveTunnelMinRadius, NetherAPIConfig.advanced.endCaveTunnelMaxRadius);
+                    final float heightMul = MathHelper.nextFloat(rand, NetherAPIConfig.advanced.endCaveTunnelMinHeightMul, NetherAPIConfig.advanced.endCaveTunnelMaxHeightMul);
 
-                    addTunnel(rand.nextLong(), originalX, originalZ, chunkPrimerIn, x, y, z, radius, direction, length, 0, 0, 0.5);
+                    final float rotXZ = rand.nextFloat() * (float)Math.PI * 2;
+                    final float rotY = MathHelper.nextFloat(rand, -NetherAPIConfig.advanced.endCaveRotYMul, NetherAPIConfig.advanced.endCaveRotYMul);
+
+                    addTunnel(rand.nextLong(), originalX, originalZ, chunkPrimerIn, x, y, z, radius, rotXZ, rotY, 0, 0, heightMul);
                 }
             }
         }
+    }
+
+    @Override
+    protected void addRoom(final long seed, final int originalX, final int originalZ, @Nonnull final ChunkPrimer primer, final double x, final double y, final double z) {
+        addTunnel(seed, originalX, originalZ, primer, x, y, z,
+                MathHelper.nextFloat(rand, NetherAPIConfig.advanced.endCaveRoomMinRadius, NetherAPIConfig.advanced.endCaveRoomMaxRadius),
+                0, 0, -1, -1,
+                MathHelper.nextFloat(rand, NetherAPIConfig.advanced.endCaveRoomMinHeightMul, NetherAPIConfig.advanced.endCaveRoomMaxHeightMul));
     }
 }

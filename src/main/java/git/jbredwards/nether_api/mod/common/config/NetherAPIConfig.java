@@ -37,6 +37,9 @@ public final class NetherAPIConfig
     @Config.LangKey("config.nether_api.endCaves")
     public static boolean endCaves = true;
 
+    @Config.LangKey("config.nether_api.vanilla.endCavesOnStartIsland")
+    public static boolean endCavesOnStartIsland = false;
+
     @Config.LangKey("config.nether_api.hellCaves")
     public static boolean hellCaves = true;
 
@@ -69,6 +72,74 @@ public final class NetherAPIConfig
     public static Advanced advanced = new Advanced();
     public static final class Advanced
     {
+        @Config.RangeInt(min = 1)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveChance")
+        public int endCaveChance = 3;
+
+        @Config.RangeInt(min = 1)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveChance")
+        public int endCaveRoomChance = 4;
+
+        @Config.RangeInt(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveRoomTunnelsMin")
+        public int endCaveRoomTunnelsMin = 0;
+
+        @Config.RangeInt(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveRoomTunnelsMax")
+        public int endCaveRoomTunnelsMax = 3;
+
+        @Config.RangeInt(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveMin")
+        public int endCaveMin = 0;
+
+        @Config.RangeInt(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveMax")
+        public int endCaveMax = 9;
+
+        @Config.RangeDouble(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveRoomMinRadius")
+        public float endCaveRoomMinRadius = 1;
+
+        @Config.RangeDouble(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveRoomMaxRadius")
+        public float endCaveRoomMaxRadius = 7;
+
+        @Config.RangeDouble(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveRoomMinHeightMul")
+        public float endCaveRoomMinHeightMul = 0.5f;
+
+        @Config.RangeDouble(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveRoomMaxHeightMul")
+        public float endCaveRoomMaxHeightMul = 0.5f;
+
+        @Config.RangeDouble(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveTunnelMinRadius")
+        public float endCaveTunnelMinRadius = 0;
+
+        @Config.RangeDouble(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveTunnelMaxRadius")
+        public float endCaveTunnelMaxRadius = 6;
+
+        @Config.RangeDouble(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveTunnelMinHeightMul")
+        public float endCaveTunnelMinHeightMul = 0.5f;
+
+        @Config.RangeDouble(min = 0)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveTunnelMaxHeightMul")
+        public float endCaveTunnelMaxHeightMul = 0.5f;
+
+        @Config.RangeDouble(min = 0, max = 1)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveRotYMul")
+        public float endCaveRotYMul = 0.125f;
+
+        @Config.RangeInt(min = 1, max = 255)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveMinY")
+        public int endCaveMinY = 10;
+
+        @Config.RangeInt(min = 1, max = 255)
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveMaxY")
+        public int endCaveMaxY = 80;
+
         @Config.RangeInt(min = -1, max = 255)
         @Config.LangKey("config.nether_api.vanilla.advanced.fortressMinY")
         public int fortressMinY = -1;
