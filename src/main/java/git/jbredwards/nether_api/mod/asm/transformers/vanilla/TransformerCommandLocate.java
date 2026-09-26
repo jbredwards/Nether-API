@@ -18,7 +18,9 @@ package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.api.structure.INetherAPIStructureEntry;
+import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
+import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
@@ -62,6 +64,7 @@ public final class TransformerCommandLocate implements ITransformer
         public static String[] getStructures(@Nonnull String[] vanillaStructures) {
             @Nonnull final Set<String> structures = new HashSet<>(Arrays.asList(vanillaStructures));
             INetherAPIRegistry.REGISTRIES.forEach(registry -> registry.getStructures().stream().map(INetherAPIStructureEntry::getCommandName).forEach(structures::add));
+            if(NetherAPI.isBetterNetherLoaded && BetterNetherHandler.isCityEnabled()) structures.add("betternether:city"); // Special case for BetterNether's city structure, which uses its own structure system.
             return structures.toArray(new String[0]);
         }
     }

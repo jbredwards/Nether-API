@@ -21,6 +21,7 @@ import git.jbredwards.nether_api.api.structure.ISpawningStructure;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import git.jbredwards.nether_api.mod.NetherAPI;
+import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
@@ -309,7 +310,8 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
                 if(structure.getStructureName().equals(structureName)) return structure.getNearestStructurePos(worldIn, position, findUnexplored);
         }
 
-        return null;
+        // Special case for BetterNether's city structure, which uses its own structure system.
+        return NetherAPI.isBetterNetherLoaded && "betternether:city".equals(structureName) ? BetterNetherHandler.findNearestCity(worldIn, position) : null;
     }
 
     @Override

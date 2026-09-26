@@ -27,6 +27,9 @@ import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.WeightedRandom;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -43,8 +46,10 @@ import paulevs.betternether.biomes.NetherBiome;
 import paulevs.betternether.blocks.BlocksRegister;
 import paulevs.betternether.config.ConfigLoader;
 import paulevs.betternether.entities.EntityFirefly;
+import paulevs.betternether.world.BNWorldGenerator;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -165,5 +170,19 @@ public final class BetterNetherHandler
         // remove ghasts from biomes that have cacti, as to prevent lots of really annoying damage sounds from playing
         if(BiomeRegister.BIOME_GRAVEL_DESERT != null)
             getBiomeFromLookup(BiomeRegister.BIOME_GRAVEL_DESERT).getSpawnableList(EnumCreatureType.MONSTER).removeIf(entry -> EntityGhast.class.isAssignableFrom(entry.entityClass));
+    }
+
+    public static boolean isCityEnabled() {
+        return ConfigLoader.hasCities();
+    }
+
+    @Nullable
+    public static BlockPos findNearestCity(@Nonnull final World world, @Nonnull final BlockPos pos) {
+        if(isCityEnabled() && world.provider.getDimensionType() == DimensionType.NETHER) {
+            @Nullable final BlockPos cityChunkPos = BNWorldGenerator.getNearestCity(world, pos.getX() >> 4, pos.getZ() >> 4);
+            if(cityChunkPos != null) return new BlockPos(cityChunkPos.getX() << 4 | 8, cityChunkPos.getY(), cityChunkPos.getZ() << 4 | 8);
+        }
+
+        return null;
     }
 }
