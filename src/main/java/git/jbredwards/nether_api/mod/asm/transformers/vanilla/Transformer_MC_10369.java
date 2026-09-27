@@ -18,6 +18,7 @@ package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.network.MessageTeleportFX;
 import io.netty.util.internal.IntegerHolder;
 import net.minecraft.block.Block;
@@ -314,35 +315,32 @@ public final class Transformer_MC_10369 implements ITransformer
     @SuppressWarnings("unused")
     public static final class Hooks
     {
-        // mutable in case someone wants to disable any of these fixes
-        public static boolean BABY_FIX = true, DRAGON_FIX = true, EYE_FIX = true, FLUID_FIX = true, GOLEM_FIX = true, TELEPORT_FIX = true, TORCH_FIX = true;
-
         public static boolean destroyBlockWithFlags(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState replaceState, int flags) {
-            if(GOLEM_FIX) world.playEvent(Constants.WorldEvents.BREAK_BLOCK_EFFECTS, pos, Block.getStateId(world.getBlockState(pos)));
+            if(NetherAPIConfig.advanced.particleFixGolemSpawn) world.playEvent(Constants.WorldEvents.BREAK_BLOCK_EFFECTS, pos, Block.getStateId(world.getBlockState(pos)));
             return world.setBlockState(pos, replaceState, flags);
         }
 
         public static int spawnBabyParticles(@Nonnull World world, @Nonnull Entity animal) {
-            if(BABY_FIX) world.setEntityState(animal, (byte)18);
+            if(NetherAPIConfig.advanced.particleFixBabyAnimalSpawn) world.setEntityState(animal, (byte)18);
             return 0;
         }
 
         public static void spawnDragonParticle(@Nonnull World world, @Nonnull EnumParticleTypes particle, double x, double y, double z, double motionX, double motionY, double motionZ, int[] args) {
-            if(DRAGON_FIX && world instanceof WorldServer) ((WorldServer)world).spawnParticle(particle, true, x, y, z, 0, motionX, motionY, motionZ, 1, args);
+            if(NetherAPIConfig.advanced.particleFixDragonDestruction && world instanceof WorldServer) ((WorldServer)world).spawnParticle(particle, true, x, y, z, 0, motionX, motionY, motionZ, 1, args);
         }
 
         public static int spawnEyeParticles(@Nonnull World world, @Nonnull BlockPos pos) {
-            if(EYE_FIX && world instanceof WorldServer) ((WorldServer)world).spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX() + 0.5, pos.getY() + 0.8125, pos.getZ() + 0.5, 16, 0.1875, 0, 0.1875, 0);
+            if(NetherAPIConfig.advanced.particleFixPortalFrameFill && world instanceof WorldServer) ((WorldServer)world).spawnParticle(EnumParticleTypes.SMOKE_NORMAL, pos.getX() + 0.5, pos.getY() + 0.8125, pos.getZ() + 0.5, 16, 0.1875, 0, 0.1875, 0);
             return 0; // 16
         }
 
         public static int spawnFluidParticles(@Nonnull World world, double x, double y, double z) {
-            if(FLUID_FIX && world instanceof WorldServer) ((WorldServer)world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, x + 0.5, y + 1.2, z + 0.5, 8, 0.25, 0, 0.25, 0);
+            if(NetherAPIConfig.advanced.particleFixFluidMix && world instanceof WorldServer) ((WorldServer)world).spawnParticle(EnumParticleTypes.SMOKE_LARGE, x + 0.5, y + 1.2, z + 0.5, 8, 0.25, 0, 0.25, 0);
             return 0; // 8
         }
 
         public static int spawnTeleportParticles(@Nonnull Entity entity, double prevX, double prevY, double prevZ) {
-            if(TELEPORT_FIX && entity.world instanceof WorldServer) {
+            if(NetherAPIConfig.advanced.particleFixEntityTeleport && entity.world instanceof WorldServer) {
                 final MessageTeleportFX message = new MessageTeleportFX(entity, prevX, prevY, prevZ);
                 if(entity instanceof EntityPlayerMP) NetherAPI.WRAPPER.sendTo(message, (EntityPlayerMP)entity);
 
@@ -353,7 +351,7 @@ public final class Transformer_MC_10369 implements ITransformer
         }
 
         public static int spawnTorchParticles(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
-            if(TORCH_FIX && world instanceof WorldServer) {
+            if(NetherAPIConfig.advanced.particleFixTorchExtinguish && world instanceof WorldServer) {
                 final EnumFacing facing = state.getValue(BlockTorch.FACING);
                 double offsetX = 0.5, offsetY = 0.5625, offsetZ = 0.5;
                 if(facing.getAxis().isHorizontal()) {

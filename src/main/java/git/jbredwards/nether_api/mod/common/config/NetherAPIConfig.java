@@ -155,6 +155,30 @@ public final class NetherAPIConfig
         @Config.RangeInt(min = -1, max = 255)
         @Config.LangKey("config.nether_api.vanilla.advanced.fortressPillarMaxLen")
         public int fortressPillarMaxLen = -1;
+
+        @Config.LangKey("config.nether_api.vanilla.advanced.particleFixBabyAnimalSpawn")
+        public boolean particleFixBabyAnimalSpawn = true;
+
+        @Config.LangKey("config.nether_api.vanilla.advanced.particleFixDragonDestruction")
+        public boolean particleFixDragonDestruction = true;
+
+        @Config.LangKey("config.nether_api.vanilla.advanced.particleFixDragonEggTeleport")
+        public boolean particleFixDragonEggTeleport = true;
+
+        @Config.LangKey("config.nether_api.vanilla.advanced.particleFixEntityTeleport")
+        public boolean particleFixEntityTeleport = true;
+
+        @Config.LangKey("config.nether_api.vanilla.advanced.particleFixFluidMix")
+        public boolean particleFixFluidMix = true;
+
+        @Config.LangKey("config.nether_api.vanilla.advanced.particleFixGolemSpawn")
+        public boolean particleFixGolemSpawn = true;
+
+        @Config.LangKey("config.nether_api.vanilla.advanced.particleFixPortalFrameFill")
+        public boolean particleFixPortalFrameFill = true;
+
+        @Config.LangKey("config.nether_api.vanilla.advanced.particleFixTorchExtinguish")
+        public boolean particleFixTorchExtinguish = true;
     }
 
     @Config(modid = NetherAPI.MODID, name = "nether_api/betternether")

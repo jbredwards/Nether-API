@@ -108,6 +108,7 @@ public final class NetherAPIProperties
 
     /**
      * A function to help create generic {@code Mutable} instances.
+     * @author jbred
      */
     @ApiStatus.Internal
     @Nonnull

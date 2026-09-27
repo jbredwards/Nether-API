@@ -2,6 +2,7 @@ package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.network.MessageTeleportFX;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -87,11 +88,11 @@ public final class TransformerBlockDragonEgg implements ITransformer
     public static final class Hooks
     {
         public static boolean isPositionValid(@Nonnull final World world, @Nonnull final BlockPos pos) {
-            return world.isValid(pos) && world.isAirBlock(pos) && world.isSideSolid(pos.down(), EnumFacing.UP);
+            return !world.isOutsideBuildHeight(pos) && world.isAirBlock(pos) && world.isSideSolid(pos.down(), EnumFacing.UP);
         }
 
         public static int oldParticles(final int amount) {
-            return Transformer_MC_10369.Hooks.TELEPORT_FIX ? 0 : amount;
+            return NetherAPIConfig.advanced.particleFixDragonEggTeleport ? 0 : amount;
         }
 
         public static void sendParticles(@Nonnull final World world, @Nonnull final BlockPos oldPos, @Nonnull final BlockPos newPos) {

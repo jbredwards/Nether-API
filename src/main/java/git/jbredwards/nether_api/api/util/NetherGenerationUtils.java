@@ -23,31 +23,37 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.gen.ChunkGeneratorEnd;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
 
 /**
- * Provides some utility functions for generating nether features.
+ * Provides some utility functions for generating world features.
  *
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public final class NetherGenerationUtils
 {
     /**
-     * At the given x and z positions, replaces "stateToFill" with the provided top and filler blocks. Also generates the random gravel and soul sand for the biome.
-     * @since 1.0.0
+     * Nether generation utility that, at the given x and z positions, replaces "stateToFill" with the provided top and filler blocks. Also generates the random gravel and soul sand for the biome.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.0.0")
     public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn, @Nonnull IBlockState liquidBlockIn) {
         buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, stateToFill, topBlockIn, fillerBlockIn, liquidBlockIn, Blocks.GRAVEL.getDefaultState(), Blocks.SOUL_SAND.getDefaultState());
     }
 
     /**
-     * At the given x and z positions, replaces "stateToFill" with the provided top and filler blocks. Also generates the random gravel and soul sand for the biome.
-     * @since 1.3.0
+     * Nether generation utility that, at the given x and z positions, replaces "stateToFill" with the provided top and filler blocks. Also generates the random gravel and soul sand for the biome.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn, @Nonnull IBlockState liquidBlockIn, @Nonnull IBlockState gravelIn, @Nonnull IBlockState sandIn) {
         final boolean soulSand = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesSoulSandGenerate() || sandIn.getBlock() != Blocks.SOUL_SAND) && soulSandNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
         final boolean gravel = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesGravelGenerate() || gravelIn.getBlock() != Blocks.GRAVEL) && gravelNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
@@ -113,12 +119,24 @@ public final class NetherGenerationUtils
 
     /**
      * @return A new Random whose seed is based on a combination of the world seed + chunk pos.
-     * @since 1.4.0
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull
     public static Random createSeedRandom(final long seed, final int chunkX, final int chunkZ) {
         @Nonnull final Random rand = new Random(seed);
         rand.setSeed(((rand.nextLong() >> 2 + 1) * chunkX + (rand.nextLong() >> 2 + 1) * chunkZ) ^ seed);
         return rand;
+    }
+
+    /**
+     * Exposes {@link ChunkGeneratorEnd#getIslandHeightValue} for other mods to use.
+     * @return Noise height of the end island at the provided chunk position.
+     * @throws NullPointerException If generator is null.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.5.0")
+    public static float getEndIslandHeightValue(@Nonnull final ChunkGeneratorEnd generator, final int chunkX, final int chunkZ) {
+        return generator.getIslandHeightValue(chunkX, chunkZ, 1, 1);
     }
 }
