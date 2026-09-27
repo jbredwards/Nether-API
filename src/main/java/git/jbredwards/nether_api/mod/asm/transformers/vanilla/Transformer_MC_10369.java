@@ -341,10 +341,16 @@ public final class Transformer_MC_10369 implements ITransformer
 
         public static int spawnTeleportParticles(@Nonnull Entity entity, double prevX, double prevY, double prevZ) {
             if(NetherAPIConfig.advanced.particleFixEntityTeleport && entity.world instanceof WorldServer) {
-                final MessageTeleportFX message = new MessageTeleportFX(entity, prevX, prevY, prevZ);
-                if(entity instanceof EntityPlayerMP) NetherAPI.WRAPPER.sendTo(message, (EntityPlayerMP)entity);
-
-                NetherAPI.WRAPPER.sendToAllTracking(message, entity);
+                if(entity.getDistance(prevX, prevY, prevZ) > Math.max(512, entity.getServer().getPlayerList().getEntityViewDistance())) {
+                    final double offsetXZ = entity.width / 4, offsetY = entity.height / 4;
+                    ((WorldServer)entity.world).spawnParticle(EnumParticleTypes.PORTAL, prevX, prevY + entity.height / 2, prevZ, 64, offsetXZ, offsetY, offsetXZ, 0.1);
+                    ((WorldServer)entity.world).spawnParticle(EnumParticleTypes.PORTAL, entity.posX, entity.posY + entity.height / 2, entity.posZ, 64, offsetXZ, offsetY, offsetXZ, 0.1);
+                }
+                else {
+                    @Nonnull final MessageTeleportFX message = new MessageTeleportFX(entity, prevX, prevY, prevZ);
+                    if(entity instanceof EntityPlayerMP) NetherAPI.WRAPPER.sendTo(message, (EntityPlayerMP)entity);
+                    NetherAPI.WRAPPER.sendToAllTracking(message, entity);
+                }
             }
 
             return 0; // 128
