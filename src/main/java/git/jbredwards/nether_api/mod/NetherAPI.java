@@ -16,7 +16,6 @@
 
 package git.jbredwards.nether_api.mod;
 
-import git.jbredwards.nether_api.Tags;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.api.util.PlantUtils;
 import git.jbredwards.nether_api.mod.common.command.CommandNetherAPI;
