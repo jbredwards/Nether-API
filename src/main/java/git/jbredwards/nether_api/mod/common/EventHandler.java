@@ -88,9 +88,14 @@ final class EventHandler
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     static void handleRespawnWorldData(@Nonnull final WorldEvent.Load event) {
-        if(!event.getWorld().isRemote && PlayerSpawnLogic.isInitialSpawnDimension(event.getWorld().provider)) {
-            NetherAPI.LOGGER.info("Initializing level {}...", event.getWorld().provider.getDimension());
-            event.getWorld().initialize(new WorldSettings(event.getWorld().getWorldInfo()));
+        @Nonnull final World world = event.getWorld();
+        if(!world.isRemote) {
+            if(PlayerSpawnLogic.isInitialSpawnDimension(world.provider)) {
+                NetherAPI.LOGGER.info("Initializing level {}...", world.provider.getDimension());
+                world.initialize(new WorldSettings(world.getWorldInfo()));
+            }
+
+            world.getWorldInfo().setServerInitialized(true);
         }
     }
 }

@@ -71,8 +71,10 @@ public class DerivedWorldInfoMulti extends DerivedWorldInfo
         if(dimension == 0) super.setServerInitialized(initializedIn);
         else {
             @Nonnull final Data data = Data.load(delegate, dimension);
-            data.initialized = initializedIn;
-            data.markDirty();
+            if(data.initialized != initializedIn) {
+                data.initialized = initializedIn;
+                data.markDirty();
+            }
         }
     }
 
@@ -99,10 +101,12 @@ public class DerivedWorldInfoMulti extends DerivedWorldInfo
         if(dimension == 0) super.setSpawn(spawnPoint);
         else {
             @Nonnull final Data data = Data.load(delegate, dimension);
-            data.x = spawnPoint.getX();
-            data.y = spawnPoint.getY();
-            data.z = spawnPoint.getZ();
-            data.markDirty();
+            if(data.x != spawnPoint.getX() || data.y != spawnPoint.getY() || data.z != spawnPoint.getZ()) {
+                data.x = spawnPoint.getX();
+                data.y = spawnPoint.getY();
+                data.z = spawnPoint.getZ();
+                data.markDirty();
+            }
         }
     }
 
