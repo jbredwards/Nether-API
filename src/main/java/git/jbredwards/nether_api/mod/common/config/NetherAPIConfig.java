@@ -72,6 +72,9 @@ public final class NetherAPIConfig
     public static Advanced advanced = new Advanced();
     public static final class Advanced
     {
+        @Config.LangKey("config.nether_api.vanilla.advanced.betterDragonDestruction")
+        public boolean betterDragonDestruction = true;
+
         @Config.RangeInt(min = 1)
         @Config.LangKey("config.nether_api.vanilla.advanced.endCaveChance")
         public int endCaveChance = 3;

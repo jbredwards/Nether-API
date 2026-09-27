@@ -77,7 +77,7 @@ final class EventHandler
             // prevent the ender dragon from breaking parts of the exit portal
             if(event.getState().getBlock() instanceof BlockTorch) event.setCanceled(true);
             // all blocks with the blast resistance of at least obsidian should be dragon-resistant
-            else {
+            else if(NetherAPIConfig.advanced.betterDragonDestruction) {
                 final World world = event.getEntity().getEntityWorld();
                 final BlockPos pos = event.getPos();
                 final Explosion explosion = new Explosion(world, event.getEntity(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.5f, false, true);
@@ -95,7 +95,9 @@ final class EventHandler
                 world.initialize(new WorldSettings(world.getWorldInfo()));
             }
 
-            world.getWorldInfo().setServerInitialized(true);
+            // Ensures all loaded worlds have "initialized" set to true, rather than only the initial spawn dimension world.
+            // This is the Vanilla behavior.
+            else world.getWorldInfo().setServerInitialized(true);
         }
     }
 }
