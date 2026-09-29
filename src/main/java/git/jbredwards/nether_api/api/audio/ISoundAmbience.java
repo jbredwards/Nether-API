@@ -16,27 +16,61 @@
 
 package git.jbredwards.nether_api.api.audio;
 
+import git.jbredwards.nether_api.api.audio.impl.SoundAmbience;
 import net.minecraft.util.SoundEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
 /**
  * Allows biomes to have their own ambient sounds.
  *
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public interface ISoundAmbience
 {
     /**
-     * @return the SoundEvent that gets played.
+     * The chance that's used by Vanilla in modern versions.
      */
+    @ApiStatus.AvailableSince("1.5.0")
+    double DEFAULT_CHANCE_PER_TICK = 1 / (4.5 * 20);
+
+    /**
+     * @return The SoundEvent that gets played.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.0.0")
     @Nonnull
     SoundEvent getSoundEvent();
 
     /**
-     * @return the chance per tick that this randomly plays.
+     * @return The chance per tick that this randomly plays.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.0.0")
     double getChancePerTick();
+
+    /**
+     * @return A new
+     * @throws NullPointerException If soundEvent is null.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.5.0")
+    @Nonnull
+    static SoundAmbience of(@Nonnull final SoundEvent soundEvent) {
+        return ISoundAmbience.of(soundEvent, ISoundAmbience.DEFAULT_CHANCE_PER_TICK);
+    }
+
+    /**
+     * @return
+     * @throws NullPointerException If soundEvent is null.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.5.0")
+    @Nonnull
+    static SoundAmbience of(@Nonnull final SoundEvent soundEvent, final double chancePerTick) {
+        return new SoundAmbience(soundEvent, chancePerTick);
+    }
 }

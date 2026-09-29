@@ -9,6 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +72,34 @@ public final class TransformerBiome implements ITransformer
                 generator.loadThis();
                 generator.visitFieldInsn(GETFIELD, "net/minecraft/world/biome/Biome", "nether_api$entities", "Ljava/util/Map;");
             });
+            /*
+             * New code:
+             * // Allow biome ambience to be configurable.
+             * @ASMGenerated
+             * public Object nether_api$ambience()
+             * {
+             *     return this.nether_api$ambience;
+             * }
+             */
+            classNode.fields.add(new FieldNode(ACC_PUBLIC, "nether_api$ambience", "Ljava/lang/Object;", null, null));
+            transformOverwrite(classNode, new MethodNode(ACC_PUBLIC, "nether_api$ambience", "()Ljava/lang/Object;", null, null), generator -> {
+                generator.loadThis();
+                generator.visitFieldInsn(GETFIELD, "net/minecraft/world/biome/Biome", "nether_api$ambience", "Ljava/lang/Object;");
+            });
+            /*
+             * New code:
+             * // Allow biome ambience to be configurable.
+             * @ASMGenerated
+             * public void nether_api$ambience(ambience)
+             * {
+             *     this.nether_api$ambience = ambience;
+             * }
+             */
+            transformOverwrite(classNode, new MethodNode(ACC_PUBLIC, "nether_api$ambience", "(Ljava/lang/Object;)V", null, null), generator -> {
+                generator.loadThis();
+                generator.loadArg(0);
+                generator.visitFieldInsn(PUTFIELD, "net/minecraft/world/biome/Biome", "nether_api$ambience", "Ljava/lang/Object;");
+            });
         });
     }
 
@@ -82,5 +111,9 @@ public final class TransformerBiome implements ITransformer
 
         @Nonnull
         Map<Pair<String, EnumCreatureType>, List<Biome.SpawnListEntry>> nether_api$entities();
+
+        @Nullable
+        Object nether_api$ambience();
+        void nether_api$ambience(@Nullable final Object ambience);
     }
 }

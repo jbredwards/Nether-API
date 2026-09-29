@@ -18,6 +18,7 @@ package git.jbredwards.nether_api.mod;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.api.util.PlantUtils;
+import git.jbredwards.nether_api.mod.common.config.ambience.AmbienceConfig;
 import git.jbredwards.nether_api.mod.common.command.CommandNetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import git.jbredwards.nether_api.mod.common.compat.biomesoplenty.BiomesOPlentyHandler;
@@ -149,6 +150,12 @@ public final class NetherAPI
                 }
             });
         });
+    }
+
+    // Read biome ambience config
+    @Mod.EventHandler
+    static void loadComplete(@Nonnull final FMLLoadCompleteEvent event) {
+        AmbienceConfig.load();
     }
 
     // Register dimension overrides

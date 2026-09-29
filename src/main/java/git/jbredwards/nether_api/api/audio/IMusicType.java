@@ -65,22 +65,24 @@ public interface IMusicType
      * @return A new {@code IMusicType} instance with Vanilla music properties
      * (cannot replace current music, and is not local to the current biome).
      * @throws NullPointerException If type is null.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
     @SideOnly(Side.CLIENT)
-    static VanillaMusicType vanilla(@Nonnull final MusicTicker.MusicType type) {
+    static IMusicType vanilla(@Nonnull final MusicTicker.MusicType type) {
         return new VanillaMusicType(type);
     }
 
     /**
      * @return A new {@code IMusicType} instance with custom music properties.
      * @throws NullPointerException If type is null.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
     @SideOnly(Side.CLIENT)
-    static VanillaMusicType modded(@Nonnull final MusicTicker.MusicType type, final boolean replacesCurrentMusic, final boolean isBiomeLocal) {
+    static IMusicType modded(@Nonnull final MusicTicker.MusicType type, final boolean replacesCurrentMusic, final boolean isBiomeLocal) {
         return new VanillaMusicType(type, replacesCurrentMusic, isBiomeLocal);
     }
 }

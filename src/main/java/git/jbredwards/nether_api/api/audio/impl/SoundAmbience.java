@@ -20,6 +20,7 @@ import git.jbredwards.nether_api.api.audio.ISoundAmbience;
 import net.minecraft.util.SoundEvent;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * The default implementation of {@link ISoundAmbience}.
@@ -35,7 +36,7 @@ public class SoundAmbience implements ISoundAmbience
     protected final double chancePerTick;
 
     public SoundAmbience(@Nonnull SoundEvent soundEventIn, double chancePerTickIn) {
-        soundEvent = soundEventIn;
+        soundEvent = Objects.requireNonNull(soundEventIn);
         chancePerTick = chancePerTickIn;
     }
 
