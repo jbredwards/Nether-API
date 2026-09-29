@@ -46,6 +46,8 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -63,6 +65,7 @@ import java.util.Optional;
  * @author jbred
  *
  */
+@Mod.EventBusSubscriber(Side.CLIENT)
 @Mod(modid = NetherAPI.MODID, name = NetherAPI.NAME, version = NetherAPI.VERSION, dependencies = NetherAPI.DEPENDENCIES,
 updateJSON = "https://api.modrinth.com/updates/nether-api/forge_updates.json",
 guiFactory = "git.jbredwards.nether_api.mod.client.config.NetherAPIGuiFactory")
@@ -158,22 +161,24 @@ public final class NetherAPI
         AmbienceConfig.load();
     }
 
-    // Register dimension overrides
-    @Mod.EventHandler
-    static void serverAboutToStart(@Nonnull final FMLServerAboutToStartEvent event) {
-        if(DimensionManager.isDimensionRegistered(DimensionType.NETHER.getId())) DimensionManager.getProviderType(DimensionType.NETHER.getId()).clazz = WorldProviderNether.class;
-        if(DimensionManager.isDimensionRegistered(DimensionType.THE_END.getId())) DimensionManager.getProviderType(DimensionType.THE_END.getId()).clazz = WorldProviderTheEnd.class;
-    }
-
     // Register commands
     @Mod.EventHandler
     static void serverStarting(@Nonnull final FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandNetherAPI());
     }
 
+    // Register dimension overrides
+    @Mod.EventHandler static void initDimensions(@Nonnull final FMLServerAboutToStartEvent event) { initDimensions(); }
+    @SubscribeEvent static void initDimensions(@Nonnull final FMLNetworkEvent.ClientConnectedToServerEvent event) { initDimensions(); }
+    static void initDimensions() {
+        if(DimensionManager.isDimensionRegistered(DimensionType.NETHER.getId())) DimensionManager.getProviderType(DimensionType.NETHER.getId()).clazz = WorldProviderNether.class;
+        if(DimensionManager.isDimensionRegistered(DimensionType.THE_END.getId())) DimensionManager.getProviderType(DimensionType.THE_END.getId()).clazz = WorldProviderTheEnd.class;
+    }
+
     // Ensure all registries are cleared before another world is loaded
-    @Mod.EventHandler
-    static void serverStopping(@Nonnull final FMLServerStoppedEvent event) {
+    @Mod.EventHandler static void freeDimensions(@Nonnull final FMLServerStoppedEvent event) { freeDimensions(); }
+    @SubscribeEvent static void freeDimensions(@Nonnull final FMLNetworkEvent.ClientDisconnectionFromServerEvent event) { freeDimensions(); }
+    static void freeDimensions() {
         INetherAPIRegistry.REGISTRIES.forEach(INetherAPIRegistry::clear);
         BiomeStructureHandler.clear();
     }
