@@ -293,6 +293,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Support the conversion of certain modded netherrack blocks.
                 register(new TransformerInputHandler(),
                         "logictechcorp.netherex.handler.InputHandler");
+                // Fix Coolmar Spider rendering.
+                register(new TransformerLayerCoolmarSpider(),
+                        "logictechcorp.netherex.client.render.entity.layers.LayerCoolmarSpider");
                 // Change NetherEx's nether biome super classes.
                 register(new TransformerNetherEXBiomes());
                 // Disable NetherEx's nether override.
