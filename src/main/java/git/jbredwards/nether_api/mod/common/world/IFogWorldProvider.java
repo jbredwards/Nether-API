@@ -27,6 +27,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -35,31 +36,30 @@ import javax.annotation.Nonnull;
  * @author jbred
  *
  */
+@ApiStatus.Internal
 public interface IFogWorldProvider
 {
     @Nonnull
     @SideOnly(Side.CLIENT)
     default Vec3d getFogColor(@Nonnull World world, float celestialAngle, float partialTicks) {
         final Vec3d entityPos = ActiveRenderInfo.projectViewFromEntity(Minecraft.getMinecraft().player, partialTicks);
-
         final int originX = MathHelper.fastFloor(entityPos.x), originZ = MathHelper.fastFloor(entityPos.z);
-        final double originDiffX = entityPos.x - originX, originDiffZ = entityPos.z - originZ;
-        final int[] weights = {0, 1, 4, 6, 4, 1, 0};
+
+        final double[] weightsX = FogHelper.getWeights(entityPos.x - originX);
+        final double[] weightsZ = FogHelper.getWeights(entityPos.z - originZ);
 
         Vec3d color = Vec3d.ZERO;
         double totalWeight = 0;
 
-        for(int offsetX = 0; offsetX < 6; offsetX++) {
-            final double weightX = originDiffX * (weights[offsetX] - weights[offsetX + 1]) + weights[offsetX];
-            final int posX = originX + offsetX - 3;
+        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for(int offsetX = 0; offsetX < FogHelper.DIAMETER; offsetX++) {
+            pos.setPos(originX + offsetX - 3, pos.getY(), pos.getZ());
+            for(int offsetZ = 0; offsetZ < FogHelper.DIAMETER; offsetZ++) {
+                final double weight = weightsX[offsetX] * weightsZ[offsetZ];
+                pos.setPos(pos.getX(), pos.getY(), originZ + offsetZ - FogHelper.RADIUS);
 
-            for(int offsetZ = 0; offsetZ < 6; offsetZ++) {
-                final double weightZ = originDiffZ * (weights[offsetZ] - weights[offsetZ + 1]) + weights[offsetZ];
-                final int posZ = originZ + offsetZ - 3;
-
-                final double weight = weightX * weightZ;
                 totalWeight += weight;
-                color = color.add(getFogColorFor(world, celestialAngle, partialTicks, world.getBiome(new BlockPos(posX, 0, posZ))).scale(weight));
+                color = color.add(getFogColorFor(world, celestialAngle, partialTicks, world.getBiome(pos)).scale(weight));
             }
         }
 
