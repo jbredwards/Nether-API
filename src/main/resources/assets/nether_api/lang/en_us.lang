@@ -87,6 +87,10 @@ config.nether_api.tallNether=Tall Nether §lHOVER OVER ME!
 config.nether_api.tallNether.tooltip=Generate the Nether with a height of 256. §4WARNING: Only enable this feature for new worlds (or old worlds if you reset the Nether first)! This feature can cause additional world generation lag, so if you experience any performance issues, it's recommended to install the following mods: §oAlfheim Lighting Engine, CensoredASM, Nothirium, and VintageFix. §r§cNote: For many mods that generate their own nether features, you'll have to adjust their configs to account for the new height. Currently all mods with builtin support (and do not require manual config editing) are as follows: §oBetterNether, Biomes O' Plenty, Journey Into The Light, Natura, Nethercraft Classic, and NetherEx. It's also assumed that any mods using Nether API as a dependency have automatic support for this feature.§r
 
 # Config Categories
+configgui.nether_api.ambience=Ambience
+configgui.nether_api.ambience.toast=Reloaded From Disk!
+configgui.nether_api.ambience.tooltip=Must be edited externally (via "ambience.json" file).
+configgui.nether_api.ambience.tooltip.btn=Reload From Disk
 configgui.nether_api.compat=Mod Compatibility
 configgui.nether_api.compat.tooltip=Compatibility settings for other mods.
 configgui.nether_api.title=Nether API Configuration

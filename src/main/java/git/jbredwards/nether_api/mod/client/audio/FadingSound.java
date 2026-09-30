@@ -34,6 +34,9 @@ import javax.annotation.Nonnull;
 @SideOnly(Side.CLIENT)
 public class FadingSound extends MovingSound
 {
+    protected static final int FADE_DURATION = 40;
+    protected static final int FADE_SPEED = 1;
+
     @Nonnull
     protected final EntityPlayerSP player;
     protected int fadeSpeed;
@@ -56,16 +59,16 @@ public class FadingSound extends MovingSound
         yPosF = (float)player.posY;
         zPosF = (float)player.posZ;
         fadeInTicks += fadeSpeed;
-        volume = MathHelper.clamp(fadeInTicks / 40f, 0, 1);
+        volume = MathHelper.clamp(fadeInTicks / (float)FADE_DURATION, 0, 1);
     }
 
     public void fadeOut() {
-        fadeInTicks = Math.min(fadeInTicks, 40);
-        fadeSpeed = -1;
+        fadeInTicks = Math.min(fadeInTicks, FADE_DURATION);
+        fadeSpeed = -FADE_SPEED;
     }
 
     public void fadeIn() {
         fadeInTicks = Math.max(0, fadeInTicks);
-        fadeSpeed = 1;
+        fadeSpeed = FADE_SPEED;
     }
 }

@@ -38,6 +38,8 @@ public final class AmbienceConfig
     }
 
     public static void load() {
+        NetherAPI.LOGGER.info("Reading \"ambience.json\"...");
+        final long start = System.currentTimeMillis();
         reset();
 
         if(PARENT.mkdirs() || !FILE.exists()) {
@@ -71,6 +73,8 @@ public final class AmbienceConfig
 
             ((TransformerBiome.Accessor)biome).nether_api$ambience(value);
         }
+
+        NetherAPI.LOGGER.info("Reading \"ambience.json\" took {} ms", System.currentTimeMillis() - start);
     }
 
     private static void reset() {

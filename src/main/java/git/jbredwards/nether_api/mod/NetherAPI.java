@@ -28,6 +28,7 @@ import git.jbredwards.nether_api.mod.common.compat.nethercraft.NethercraftHandle
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.compat.stygian_end.StygianEndHandler;
 import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
+import git.jbredwards.nether_api.mod.common.network.MessageAmbienceConfig;
 import git.jbredwards.nether_api.mod.common.network.MessageTeleportFX;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderNether;
@@ -123,6 +124,7 @@ public final class NetherAPI
     @Mod.EventHandler
     static void preInit(@Nonnull final FMLPreInitializationEvent event) {
         WRAPPER.registerMessage(MessageTeleportFX.Handler.INSTANCE, MessageTeleportFX.class, messageId++, Side.CLIENT);
+        WRAPPER.registerMessage(MessageAmbienceConfig.class, MessageAmbienceConfig.class, messageId++, Side.CLIENT);
     }
 
     // Fix some misc mod issues (like the BetterNether firefly spawn biomes)

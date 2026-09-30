@@ -52,7 +52,7 @@ public class GuiConfigTranslucent extends GuiConfig
         }
 
         super.initGui();
-        if(loadComponentEntries) entryList.listEntries.replaceAll(entry -> entry instanceof GuiConfigEntries.CategoryEntry
+        if(loadComponentEntries) entryList.listEntries.replaceAll(entry -> entry.getClass() == GuiConfigEntries.CategoryEntry.class
         ? new GuiConfigEntries.CategoryEntry(this, entryList, entry.getConfigElement()) {
             @Nonnull
             @Override
@@ -69,13 +69,13 @@ public class GuiConfigTranslucent extends GuiConfig
         return new GuiConfigEntries(this, mc) {
             @Override
             protected void overlayBackground(final int startY, final int endY, final int startAlpha, final int endAlpha) {
-                if(mc.world != null) drawGradientRect(left, endY, left + width, startY, -1072689136, -804253680);
+                if(isWorldRunning) drawGradientRect(left, endY, left + width, startY, -1072689136, -804253680);
                 else super.overlayBackground(startY, endY, startAlpha, endAlpha);
             }
 
             @Override
             protected void drawContainerBackground(@Nonnull final Tessellator tessellator) {
-                if(mc.world != null) drawGradientRect(right, bottom, left, top, -1072689136, -804253680);
+                if(isWorldRunning) drawGradientRect(right, bottom, left, top, -1072689136, -804253680);
                 else super.drawContainerBackground(tessellator);
             }
 

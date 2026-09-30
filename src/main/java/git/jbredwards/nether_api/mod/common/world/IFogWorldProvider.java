@@ -53,7 +53,7 @@ public interface IFogWorldProvider
 
         final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         for(int offsetX = 0; offsetX < FogHelper.DIAMETER; offsetX++) {
-            pos.setPos(originX + offsetX - 3, pos.getY(), pos.getZ());
+            pos.setPos(originX + offsetX - FogHelper.RADIUS, pos.getY(), pos.getZ());
             for(int offsetZ = 0; offsetZ < FogHelper.DIAMETER; offsetZ++) {
                 final double weight = weightsX[offsetX] * weightsZ[offsetZ];
                 pos.setPos(pos.getX(), pos.getY(), originZ + offsetZ - FogHelper.RADIUS);

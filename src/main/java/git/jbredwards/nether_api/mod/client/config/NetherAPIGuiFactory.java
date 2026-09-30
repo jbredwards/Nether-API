@@ -63,26 +63,21 @@ public final class NetherAPIGuiFactory implements IModGuiFactory
     @Nonnull
     @Override
     public GuiScreen createConfigGui(@Nonnull final GuiScreen parentScreen) {
-        @Nonnull final List<IConfigElement> elements = sorted(Lists.newArrayList(
-                // Creates a dummy config category filled with all the mod compatibility settings.
-                new DummyConfigElement.DummyCategoryElement("nether_api/compat (dummy category)", "configgui.nether_api.compat",
-                sorted(activeModCategories.stream()
-                .map(ConfigElement::from)
-                .collect(Collectors.toList()))),
+        @Nonnull final List<IConfigElement> elements = Lists.newArrayList(
                 // Creates a dummy config category filled with all the vanilla settings (sorted).
-                new DummyConfigElement.DummyCategoryElement("nether_api/vanilla", "nether_api/vanilla",
-                sorted(ConfigElement.from(NetherAPIConfig.class).getChildElements()))
-        ));
+                new DummyConfigElement.DummyCategoryElement("nether_api/vanilla", "nether_api/vanilla", sorted(ConfigElement.from(NetherAPIConfig.class).getChildElements())),
+                // Creates a dummy config entry to reload "ambience.json" in-game.
+                new DummyConfigElement.DummyCategoryElement("nether_api/ambience (dummy category)", "configgui.nether_api.ambience", GuiButtonAmbienceReload.class)
+        );
 
-        if(activeModCategories.isEmpty()) {
-            // No mods with special compatibility settings are present. Bring all Vanilla entries to the front.
-            elements.addAll(elements.get(1).getChildElements());
-            // Remove categories.
-            elements.remove(0);
-            elements.remove(0);
+        if(!activeModCategories.isEmpty()) {
+            // Creates a dummy config category filled with all the mod compatibility settings.
+            elements.add(new DummyConfigElement.DummyCategoryElement(
+                    "nether_api/compat (dummy category)", "configgui.nether_api.compat",
+                    sorted(activeModCategories.stream().map(ConfigElement::from).collect(Collectors.toList()))));
         }
 
-        return new GuiConfigTranslucent(parentScreen, elements, NetherAPI.MODID, false, false, I18n.format("configgui.nether_api.title"), null);
+        return new GuiConfigTranslucent(parentScreen, sorted(elements), NetherAPI.MODID, false, false, I18n.format("configgui.nether_api.title"), null);
     }
 
     @Nonnull

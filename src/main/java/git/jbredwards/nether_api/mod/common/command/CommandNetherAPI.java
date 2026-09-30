@@ -32,17 +32,22 @@ import javax.annotation.Nonnull;
 public final class CommandNetherAPI extends CommandTreeBase
 {
     public CommandNetherAPI() {
+        super.addSubcommand(new CommandAmbienceReload());
         super.addSubcommand(new CommandListInfo());
         super.addSubcommand(new CommandTreeHelp(this));
     }
 
     @Nonnull
     @Override
-    public String getName() { return NetherAPI.MODID; }
+    public String getName() {
+        return NetherAPI.MODID;
+    }
 
     @Nonnull
     @Override
-    public String getUsage(@Nonnull final ICommandSender sender) { return "commands." + NetherAPI.MODID + '.' + getName() + ".usage"; }
+    public String getUsage(@Nonnull final ICommandSender sender) {
+        return "commands." + NetherAPI.MODID + '.' + getName() + ".usage";
+    }
 
     @Override
     public void addSubcommand(@Nonnull final ICommand command) {
