@@ -86,7 +86,8 @@ final class AmbienceDeserializer
                     else if(!json.isJsonObject()) return ParticleFactoryUtils.getParticleFactorySafe(particle);
 
                     final float chance = JsonUtils.getFloat(json.getAsJsonObject(), "chance", 1);
-                    return ParticleFactoryUtils.particleFactoryWithChance(particle, () -> chance);
+                    @Nullable final int[] params = json.isJsonObject() ? JsonUtils.deserializeClass(json.getAsJsonObject(), "params", null, ctx, int[].class) : null;
+                    return ParticleFactoryUtils.particleFactoryWithChance(particle, () -> chance, params);
                 })
                 // Color deserializer.
                 .registerTypeAdapter(Color.class, (JsonDeserializer<Color>)(json, type, ctx) -> Color.decode(JsonUtils.getString(json, "color")));

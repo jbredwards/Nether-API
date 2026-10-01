@@ -56,9 +56,9 @@ public final class ParticleFactoryUtils
     @ApiStatus.AvailableSince("1.5.0")
     @Nullable
     @SideOnly(Side.CLIENT)
-    public static IParticleFactory particleFactoryWithChance(@Nonnull final EnumParticleTypes particleType, @Nonnull final DoubleSupplier chance) {
+    public static IParticleFactory particleFactoryWithChance(@Nonnull final EnumParticleTypes particleType, @Nonnull final DoubleSupplier chance, @Nullable final int[] params) {
         @Nullable final IParticleFactory factory = ParticleFactoryUtils.getParticleFactory(particleType);
         return factory == null ? null : (id, world, x, y, z, xSpeed, ySpeed, zSpeed, args) -> world.rand.nextFloat() < chance.getAsDouble() ?
-                factory.createParticle(particleType.getParticleID(), world, x, y, z, xSpeed, ySpeed, zSpeed, args) : null;
+                factory.createParticle(particleType.getParticleID(), world, x, y, z, xSpeed, ySpeed, zSpeed, params == null ? args : params) : null;
     }
 }
