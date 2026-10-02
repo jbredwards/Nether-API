@@ -2,6 +2,7 @@ package git.jbredwards.nether_api.mod.client.config;
 
 import com.google.common.collect.Lists;
 import git.jbredwards.nether_api.mod.NetherAPI;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.config.ambience.AmbienceConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.toasts.SystemToast;
@@ -25,11 +26,8 @@ public class GuiButtonAmbienceReload extends GuiConfigEntries.CategoryEntry
 {
     @Nonnull private static final SystemToast.Type TOAST_TYPE = Objects.requireNonNull(EnumHelper.addEnum(SystemToast.Type.class, NetherAPI.MODID, new Class[0]));
     @Nonnull private static final ITextComponent TOAST_TEXT = new TextComponentTranslation("configgui." + NetherAPI.MODID + ".ambience.toast");
+    @Nonnull private static final ITextComponent TOAST_TEXT_ERROR = new TextComponentTranslation("configgui." + NetherAPI.MODID + ".ambience.toastError");
     @Nonnull private static final ITextComponent TOAST_SUB = new TextComponentString(NetherAPI.MODID + "/ambience.json");
-    public static void run() {
-        AmbienceConfig.load();
-        SystemToast.addOrUpdate(Minecraft.getMinecraft().getToastGui(), TOAST_TYPE, TOAST_TEXT, TOAST_SUB);
-    }
 
     @Nonnull protected final GuiButtonExt btnReload;
     @Nonnull protected final HoverChecker reloadHoverChecker;
@@ -46,6 +44,7 @@ public class GuiButtonAmbienceReload extends GuiConfigEntries.CategoryEntry
 
     @Override
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
+        btnReload.enabled = !NetherAPIConfig.ambienceJsonSync || !owningScreen.isWorldRunning || mc.isGamePaused();
         btnReload.x = owningEntryList.scrollBarX - 44;
         btnReload.y = y;
         btnReload.drawButton(mc, mouseX, mouseY, partial);
@@ -65,7 +64,7 @@ public class GuiButtonAmbienceReload extends GuiConfigEntries.CategoryEntry
     public boolean mousePressed(final int index, final int x, final int y, final int mouseEvent, final int relativeX, final int relativeY) {
         if(btnReload.mousePressed(mc, x, y)) {
             btnReload.playPressSound(mc.getSoundHandler());
-            synchronized(NetherAPI.MODID) { run(); }
+            SystemToast.addOrUpdate(Minecraft.getMinecraft().getToastGui(), TOAST_TYPE, AmbienceConfig.load() ? TOAST_TEXT : TOAST_TEXT_ERROR, TOAST_SUB);
             return true;
         }
 

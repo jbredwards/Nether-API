@@ -1,15 +1,13 @@
 package git.jbredwards.nether_api.mod.common.command;
 
+import com.google.gson.JsonElement;
 import git.jbredwards.nether_api.mod.NetherAPI;
-import git.jbredwards.nether_api.mod.client.config.GuiButtonAmbienceReload;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.config.ambience.AmbienceConfig;
 import git.jbredwards.nether_api.mod.common.network.MessageAmbienceConfig;
 import net.minecraft.command.*;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.rcon.RConConsoleSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -44,24 +42,17 @@ public class CommandAmbienceReload extends CommandBase
     @Override
     public void execute(@Nonnull final MinecraftServer server, @Nonnull final ICommandSender sender, @Nonnull final String[] args) throws CommandException {
         if(args.length != 1 || !args[0].equals("reload")) throw new WrongUsageException(getUsage(sender));
-        boolean reloadOnServer = true;
-        if(sender instanceof EntityPlayerMP) {
-            // Reload on server & client (if it's integrated server).
-            if(FMLLaunchHandler.side().isClient() && ((EntityPlayerMP)sender).connection.netManager.isLocalChannel()) {
-                reloadOnServer = false;
-                synchronized(NetherAPI.MODID) { GuiButtonAmbienceReload.run(); }
-            }
-            // Schedule client to reload.
-            else NetherAPI.WRAPPER.sendTo(new MessageAmbienceConfig(), (EntityPlayerMP)sender);
+
+        @Nullable final JsonElement file = AmbienceConfig.read();
+        if(!NetherAPIConfig.ambienceJsonSync && !server.isDedicatedServer()) {
+            synchronized(NetherAPI.MODID) { AmbienceConfig.load(file); }
+        }
+        else {
+            if(server.isDedicatedServer()) AmbienceConfig.load(file);
+            if(NetherAPIConfig.ambienceJsonSync) NetherAPI.WRAPPER.sendToAll(new MessageAmbienceConfig(file));
         }
 
-        // Not a console or server invoking the command, no-op.
-        else if(!(sender instanceof RConConsoleSource) && !(sender instanceof MinecraftServer)) {
-            throw new PlayerNotFoundException("commands." + NetherAPI.MODID + '.' + getName() + ".fail");
-        }
-
-        // Reload on server.
-        if(reloadOnServer) AmbienceConfig.load();
+        if(file == null) throw new CommandException("commands." + NetherAPI.MODID + '.' + getName() + ".fail");
         notifyCommandListener(sender, this, "commands." + NetherAPI.MODID + '.' + getName() + ".success");
     }
 

@@ -26,8 +26,8 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.util.TextTable;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -72,10 +72,10 @@ public class CommandListInfo extends CommandBase
                 .toArray(INetherAPIRegistry[]::new);
 
         if(registries.length == 0) throw new CommandException("commands." + NetherAPI.MODID + '.' + getName() + ".fail", String.valueOf(registry));
-        else printInfo(sender, type, registries);
+        else printInfo(sender, type, registries, args);
     }
 
-    protected static void printInfo(@Nonnull final ICommandSender sender, @Nullable final String type, @Nonnull final INetherAPIRegistry[] registries) {
+    protected void printInfo(@Nonnull final ICommandSender sender, @Nullable final String type, @Nonnull final INetherAPIRegistry[] registries, @Nonnull final String[] args) {
         if(type == null || type.equals("biomes")) {
             @Nonnull final TextTable table = new TextTable(Arrays.asList(TextTable.column("Registry"), TextTable.column("Biome"), TextTable.column("Weight")));
             for(@Nonnull final INetherAPIRegistry registry : registries) registry.getBiomeEntries().stream()
@@ -83,7 +83,7 @@ public class CommandListInfo extends CommandBase
                     .sorted(Comparator.comparing(entry -> entry.biome.getRegistryName()))
                     .forEach(entry -> table.add(registry.getRegistryName(), entry.biome.getRegistryName(), entry.itemWeight));
 
-            for(@Nonnull final String row : table.build("\n").split("\n")) if(!row.isEmpty()) sender.sendMessage(new TextComponentString(row));
+            NetherAPI.LOGGER.info("{} ->\n{}", getOutPrefix(type, "biomes", args), table.build("\n"));
         }
 
         if(type == null || type.equals("structures")) {
@@ -92,7 +92,16 @@ public class CommandListInfo extends CommandBase
                     .sorted(Comparator.comparing(INetherAPIStructureEntry::getCommandName))
                     .forEach(entry -> table.add(registry.getRegistryName(), entry.getCommandName()));
 
-            for(@Nonnull final String row : table.build("\n").split("\n")) if(!row.isEmpty()) sender.sendMessage(new TextComponentString(row));
+            NetherAPI.LOGGER.info("{} ->\n{}", getOutPrefix(type, "structures", args), table.build("\n"));
         }
+
+        notifyCommandListener(sender, this, "commands." + NetherAPI.MODID + '.' + getName() + ".success");
+    }
+
+    @Nonnull
+    protected String getOutPrefix(@Nullable final String type, @Nonnull final String active, @Nonnull final String[] args) {
+        @Nonnull final String start = '/' + NetherAPI.MODID + ' ' + getName() + ' ';
+        if(type != null) return (start + StringUtils.join(args, " ")).trim();
+        else return start + active;
     }
 }

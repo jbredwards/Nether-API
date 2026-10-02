@@ -34,6 +34,10 @@ import javax.annotation.Nonnull;
 @Mod.EventBusSubscriber(modid = NetherAPI.MODID)
 public final class NetherAPIConfig
 {
+    @Config.RequiresWorldRestart
+    @Config.LangKey("config.nether_api.vanilla.ambienceJsonSync")
+    public static boolean ambienceJsonSync = true;
+
     @Config.LangKey("config.nether_api.endCaves")
     public static boolean endCaves = true;
 

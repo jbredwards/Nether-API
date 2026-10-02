@@ -18,6 +18,7 @@ package git.jbredwards.nether_api.mod;
 
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.api.util.PlantUtils;
+import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.config.ambience.AmbienceConfig;
 import git.jbredwards.nether_api.mod.common.command.CommandNetherAPI;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
@@ -37,6 +38,7 @@ import git.jbredwards.nether_api.mod.common.world.gen.BiomeStructureHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.client.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.client.resource.VanillaResourceType;
@@ -156,13 +158,6 @@ public final class NetherAPI
             });
         });
     }
-
-    // Read biome ambience config
-    @Mod.EventHandler
-    static void loadComplete(@Nonnull final FMLLoadCompleteEvent event) {
-        AmbienceConfig.load();
-    }
-
     // Register commands
     @Mod.EventHandler
     static void serverStarting(@Nonnull final FMLServerStartingEvent event) {
@@ -183,5 +178,19 @@ public final class NetherAPI
     static void freeDimensions() {
         INetherAPIRegistry.REGISTRIES.forEach(INetherAPIRegistry::clear);
         BiomeStructureHandler.clear();
+    }
+
+    // Read biome ambience config
+    @Mod.EventHandler
+    static void initAmbienceConfig(@Nonnull final FMLServerAboutToStartEvent event) {
+        AmbienceConfig.load();
+    }
+
+    // Sync biome ambience config from server
+    @SubscribeEvent
+    static void syncAmbienceConfig(@Nonnull final FMLNetworkEvent.ServerConnectionFromClientEvent event) {
+        if(NetherAPIConfig.ambienceJsonSync && !event.isLocal()) {
+            WRAPPER.sendTo(new MessageAmbienceConfig(AmbienceConfig.read()), ((NetHandlerPlayServer)event.getHandler()).player);
+        }
     }
 }

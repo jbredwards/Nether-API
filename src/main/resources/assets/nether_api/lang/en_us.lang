@@ -88,9 +88,10 @@ config.nether_api.tallNether.tooltip=Generate the Nether with a height of 256. �
 
 # Config Categories
 configgui.nether_api.ambience=Ambience
-configgui.nether_api.ambience.toast=Reloaded From Disk!
+configgui.nether_api.ambience.toast=Reloaded from Disk!
+configgui.nether_api.ambience.toastError=Error Reloading from Disk!
 configgui.nether_api.ambience.tooltip=Must be edited externally (via "ambience.json" file).
-configgui.nether_api.ambience.tooltip.btn=Reload From Disk
+configgui.nether_api.ambience.tooltip.btn=Reload from Disk
 configgui.nether_api.compat=Mod Compatibility
 configgui.nether_api.compat.tooltip=Compatibility settings for other mods.
 configgui.nether_api.title=Nether API Configuration
@@ -112,7 +113,11 @@ nether_api/vanilla=Vanilla
 nether_api/vanilla.tooltip=Vanilla settings.
 
 # Misc
+commands.nether_api.ambience.fail=Failed to read "ambience.json", check log for more info
+commands.nether_api.ambience.success=Reloaded ambience.json from disk
+commands.nether_api.ambience.usage=/nether_api ambience reload
 commands.nether_api.list.fail=There is no such registry with name %s
+commands.nether_api.list.success=§e§l[Debug]:§r Logged all Nether API registries
 commands.nether_api.list.usage=/nether_api list [biomes|structures] [registryId]
 commands.nether_api.nether_api.usage=/nether_api <subcommand>
 info.nether_api.loadStartRegion=Preparing start region for level %s

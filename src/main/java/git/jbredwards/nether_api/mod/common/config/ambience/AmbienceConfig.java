@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerBiome;
+import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.Loader;
@@ -37,30 +38,41 @@ public final class AmbienceConfig
         @Nullable public float[] endFogColor;
     }
 
-    public static void load() {
-        NetherAPI.LOGGER.info("Reading \"ambience.json\"...");
-        final long start = System.currentTimeMillis();
-        reset();
-
+    @Nullable
+    public static JsonElement read() {
         if(PARENT.mkdirs() || !FILE.exists()) {
             try(@Nonnull final Writer writer = Files.newWriter(FILE, StandardCharsets.UTF_8)) { writer.write("{\n\n}"); }
             catch(@Nonnull final IOException e) {
                 NetherAPI.LOGGER.error("An error occurred while creating the default \"ambience.json\" config file.", e);
-                return;
+                return null;
             }
         }
 
-        @Nonnull final JsonElement file;
-        try(@Nonnull final Reader reader = Files.newReader(FILE, StandardCharsets.UTF_8)) { file = new JsonParser().parse(reader); }
-        catch(@Nonnull final IOException e) {
+        try(@Nonnull final Reader reader = Files.newReader(FILE, StandardCharsets.UTF_8)) { return new JsonParser().parse(reader); }
+        catch(@Nonnull final Exception e) {
             NetherAPI.LOGGER.error("An error occurred while reading the \"ambience.json\" config file.", e);
-            return;
+            return null;
+        }
+    }
+
+    public static boolean load() { return load(read()); }
+    public static boolean load(@Nullable final JsonElement file) {
+        NetherAPI.LOGGER.info("Reading \"ambience.json\"...");
+        final long start = System.currentTimeMillis();
+        reset();
+
+        if(file == null) return false;
+        else if(!file.isJsonObject()) {
+            NetherAPI.LOGGER.error("Expected \"ambience.json\" to be a JsonObject, was {}", JsonUtils.toString(file));
+            return false;
         }
 
-        if(file.isJsonObject()) for(@Nonnull final Map.Entry<String, JsonElement> entry : file.getAsJsonObject().entrySet()) {
+        boolean foundError = false;
+        for(@Nonnull final Map.Entry<String, JsonElement> entry : file.getAsJsonObject().entrySet()) {
             @Nullable final Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(entry.getKey()));
             if(biome == null) {
                 NetherAPI.LOGGER.error("Could not get biome from \"{}\", skipping...", entry.getKey());
+                foundError = true;
                 continue;
             }
 
@@ -68,6 +80,7 @@ public final class AmbienceConfig
             try { value = AmbienceDeserializer.INSTANCE.fromJson(entry.getValue(), Value.class); }
             catch(@Nonnull final Exception e) {
                 NetherAPI.LOGGER.error("Could not parse custom biome ambience for \"{}\", skipping...", biome.getRegistryName(), e);
+                foundError = true;
                 continue;
             }
 
@@ -75,6 +88,7 @@ public final class AmbienceConfig
         }
 
         NetherAPI.LOGGER.info("Reading \"ambience.json\" took {} ms", System.currentTimeMillis() - start);
+        return !foundError;
     }
 
     private static void reset() {
