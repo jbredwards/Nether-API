@@ -16,31 +16,46 @@
 
 package git.jbredwards.nether_api.mod.common.compat.betternether;
 
+import com.google.common.collect.ImmutableMap;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import git.jbredwards.nether_api.api.util.NetherAPIProperties;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.block.statemap.StateMapperBase;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.monster.EntityGhast;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.model.ForgeBlockStateV1;
+import net.minecraftforge.client.model.ItemLayerModel;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.model.IModelState;
+import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.oredict.OreDictionary;
 import paulevs.betternether.biomes.BiomeRegister;
 import paulevs.betternether.biomes.NetherBiome;
 import paulevs.betternether.blocks.BlocksRegister;
@@ -133,7 +148,27 @@ public final class BetterNetherHandler
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
+    static void registerMappers(@Nonnull final ModelRegistryEvent event) {
+        // Fix BetterNether's Quartz Stained Glass Pane block models.
+        if(isModern() && ConfigLoader.mustInitBlock("BLOCK_QUARTZ_STAINED_GLASS_PANE")) ModelLoader.setCustomStateMapper(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE, new StateMapperBase() {
+            @Nonnull
+            @Override
+            protected ModelResourceLocation getModelResourceLocation(@Nonnull final IBlockState state) {
+                return new ModelResourceLocation(new ResourceLocation(NetherAPI.MODID, "bn_glass_pane"), getPropertyString(state.getProperties()));
+            }
+        });
+    }
+
+    @SideOnly(Side.CLIENT)
+    @SubscribeEvent
     static void registerModels(@Nonnull final ModelBakeEvent event) {
+        // Fix BetterNether's Quartz Stained Glass Pane item models.
+        if(isModern() && ConfigLoader.mustInitBlock("BLOCK_QUARTZ_STAINED_GLASS_PANE")) for(@Nonnull final EnumDyeColor color : EnumDyeColor.values()) {
+            @Nonnull final IModelState transforms = ForgeBlockStateV1.Transforms.get("forge:default-item").orElseGet(TRSRTransformation::identity);
+            event.getModelRegistry().putObject(new ModelResourceLocation("betternether:quartz_stained_glass_pane", "color=" + color.getDyeColorName()), ItemLayerModel.INSTANCE
+                    .retexture(ImmutableMap.of("layer0", "betternether:blocks/quartz_stained_glass_" + color.getDyeColorName()))
+                    .bake(transforms, DefaultVertexFormats.ITEM, ModelLoader.defaultTextureGetter()));
+        }
         // Wrap BetterNether's mushroom models, allowing them to be easily toggled.
         event.getModelRegistry().putObject(new ModelResourceLocation("brown_mushroom"), new MushroomModelWrapper(event, new ModelResourceLocation("brown_mushroom"), new ModelResourceLocation(NetherAPI.MODID + ":brown_mushroom")));
         event.getModelRegistry().putObject(new ModelResourceLocation("red_mushroom"), new MushroomModelWrapper(event, new ModelResourceLocation("red_mushroom"), new ModelResourceLocation(NetherAPI.MODID + ":red_mushroom")));
@@ -157,7 +192,17 @@ public final class BetterNetherHandler
         NetherAPIProperties.registerNetherExPathable(BlocksRegister.BLOCK_NETHER_MYCELIUM.getDefaultState(), BlocksRegister.BLOCK_NETHERRACK_MOSS.getDefaultState());
 
         // ensure netherrack is set as a valid terrain block (needed for TransformerBetterNetherPlants)
-        if(isModern()) ObfuscationReflectionHelper.<Set<Block>, ConfigLoader>getPrivateValue(ConfigLoader.class, null, "NETHER_TERRAIN").add(Blocks.NETHERRACK);
+        if(isModern()) ReflectionHelper.<Set<Block>, ConfigLoader>getPrivateValue(ConfigLoader.class, null, "NETHER_TERRAIN").add(Blocks.NETHERRACK);
+
+        // add recipes for Quartz Stained Glass Panes
+        final boolean hasBlock = BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS != Blocks.AIR;
+        if(hasBlock) OreDictionary.registerOre("blockQuartzGlass", new ItemStack(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS, 1, OreDictionary.WILDCARD_VALUE));
+        if(isModern()) {
+            final boolean hasPane = BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE != Blocks.AIR;
+            if(hasPane) OreDictionary.registerOre("paneQuartzGlass", new ItemStack(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE, 1, OreDictionary.WILDCARD_VALUE));
+            if(hasPane && hasBlock) for(int i = 0; i < 16; i++) GameRegistry.addShapedRecipe(new ResourceLocation(NetherAPI.MODID, "betternether/quartz_stained_glass_pane/" + i),
+                    null, new ItemStack(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE, 16, i), "###", "###", '#', new ItemStack(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS, 1, i));
+        }
     }
 
     // exists because this mod adds BetterNether biomes as real biomes

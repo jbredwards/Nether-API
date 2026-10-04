@@ -1,0 +1,174 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "betternether:quartz_glass_pane_post"
+  },
+  "variants": {
+    "color": {
+      "black": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_black",
+          "edge": "#pane"
+        }
+      },
+      "blue": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_blue",
+          "edge": "#pane"
+        }
+      },
+      "brown": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_brown",
+          "edge": "#pane"
+        }
+      },
+      "cyan": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_cyan",
+          "edge": "#pane"
+        }
+      },
+      "gray": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_gray",
+          "edge": "#pane"
+        }
+      },
+      "green": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_green",
+          "edge": "#pane"
+        }
+      },
+      "light_blue": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_light_blue",
+          "edge": "#pane"
+        }
+      },
+      "lime": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_lime",
+          "edge": "#pane"
+        }
+      },
+      "magenta": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_magenta",
+          "edge": "#pane"
+        }
+      },
+      "orange": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_orange",
+          "edge": "#pane"
+        }
+      },
+      "pink": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_pink",
+          "edge": "#pane"
+        }
+      },
+      "purple": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_purple",
+          "edge": "#pane"
+        }
+      },
+      "red": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_red",
+          "edge": "#pane"
+        }
+      },
+      "silver": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_silver",
+          "edge": "#pane"
+        }
+      },
+      "white": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_white",
+          "edge": "#pane"
+        }
+      },
+      "yellow": {
+        "textures": {
+          "pane": "betternether:blocks/quartz_stained_glass_yellow",
+          "edge": "#pane"
+        }
+      }
+    },
+    "north": {
+      "false": {
+        "submodel": {
+          "0": {
+            "model": "betternether:quartz_glass_pane_noside"
+          }
+        }
+      },
+      "true": {
+        "submodel": {
+          "1": {
+            "model": "betternether:quartz_glass_pane_side"
+          }
+        }
+      }
+    },
+    "east": {
+      "false": {
+        "submodel": {
+          "2": {
+            "model": "betternether:quartz_glass_pane_noside_alt"
+          }
+        }
+      },
+      "true": {
+        "submodel": {
+          "3": {
+            "model": "betternether:quartz_glass_pane_side",
+            "y": 90
+          }
+        }
+      }
+    },
+    "south": {
+      "false": {
+        "submodel": {
+          "4": {
+            "model": "betternether:quartz_glass_pane_noside_alt",
+            "y": 90
+          }
+        }
+      },
+      "true": {
+        "submodel": {
+          "5": {
+            "model": "betternether:quartz_glass_pane_side_alt"
+          }
+        }
+      }
+    },
+    "west": {
+      "false": {
+        "submodel": {
+          "6": {
+            "model": "betternether:quartz_glass_pane_noside",
+            "y": 270
+          }
+        }
+      },
+      "true": {
+        "submodel": {
+          "7": {
+            "model": "betternether:quartz_glass_pane_side_alt",
+            "y": 90
+          }
+        }
+      }
+    }
+  }
+}
