@@ -124,3 +124,22 @@ info.nether_api.loadStartRegion=Preparing start region for level %s
 tile.nether_api:rooty_endstone.name=Rooty End Stone
 tile.nether_api:rooty_netherrack.name=Rooty Netherrack
 tile.nether_api:rooty_soulsand.name=Rooty Soul Sand
+
+# BetterNether
+# https://github.com/quentin452/BetterNether-Continuation/commit/d7058d01760bc3050022e33da85157dc02f921a4
+tile.quartz_stained_glass_pane.black.name=Quartz Stained Glass Pane Black
+tile.quartz_stained_glass_pane.blue.name=Quartz Stained Glass Pane Blue
+tile.quartz_stained_glass_pane.brown.name=Quartz Stained Glass Pane Brown
+tile.quartz_stained_glass_pane.cyan.name=Quartz Stained Glass Pane Cyan
+tile.quartz_stained_glass_pane.gray.name=Quartz Stained Glass Pane Gray
+tile.quartz_stained_glass_pane.green.name=Quartz Stained Glass Pane Green
+tile.quartz_stained_glass_pane.lightBlue.name=Quartz Stained Glass Pane Light Blue
+tile.quartz_stained_glass_pane.lime.name=Quartz Stained Glass Pane Lime
+tile.quartz_stained_glass_pane.magenta.name=Quartz Stained Glass Pane Magenta
+tile.quartz_stained_glass_pane.orange.name=Quartz Stained Glass Pane Orange
+tile.quartz_stained_glass_pane.pink.name=Quartz Stained Glass Pane Pink
+tile.quartz_stained_glass_pane.purple.name=Quartz Stained Glass Pane Purple
+tile.quartz_stained_glass_pane.red.name=Quartz Stained Glass Pane Red
+tile.quartz_stained_glass_pane.silver.name=Quartz Stained Glass Pane Silver
+tile.quartz_stained_glass_pane.white.name=Quartz Stained Glass Pane White
+tile.quartz_stained_glass_pane.yellow.name=Quartz Stained Glass Pane Yellow
