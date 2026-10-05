@@ -24,8 +24,8 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import it.unimi.dsi.fastutil.ints.Int2BooleanMap;
 import it.unimi.dsi.fastutil.ints.Int2BooleanOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntSets;
 import lumien.perfectspawn.handler.AsmHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -63,7 +63,7 @@ public final class PlayerSpawnLogic
      */
     @Nonnull public static Function<GameProfile, Integer> INITIAL_SPAWN_PER_PLAYER = profile -> null;
     // Collection of all possible nonnull values that can be returned by the INITIAL_SPAWN_PER_PLAYER function.
-    @Nonnull public static IntList INITIAL_SPAWN_PER_PLAYER_POSSIBILITIES = new IntArrayList();
+    @Nonnull public static IntSet INITIAL_SPAWN_PER_PLAYER_POSSIBILITIES = IntSets.EMPTY_SET;
 
     /**
      * Allows mods to override any dimension's "canRespawnHere", aside from the Overworld.
