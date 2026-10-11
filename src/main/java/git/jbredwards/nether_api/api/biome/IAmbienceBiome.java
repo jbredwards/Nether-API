@@ -21,6 +21,9 @@ import git.jbredwards.nether_api.api.audio.ISoundAmbience;
 import git.jbredwards.nether_api.api.audio.impl.DarkSoundAmbience;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.ArrayUtils;
@@ -43,10 +46,12 @@ public interface IAmbienceBiome
     /**
      * Air in this biome spawns these once per random block render tick (same as torch particles).
      * One gets picked from random to be played. If the factory returns null, a different factory is randomly chosen.
-     * @return The possible ambient particle factories
+     * @return The possible ambient particle factories.
+     * @see git.jbredwards.nether_api.api.world.IAmbienceWorldProvider#getAmbientParticles(World, BlockPos, Biome)
      * @author jbred
      */
     @ApiStatus.AvailableSince("1.0.0")
+    @ApiStatus.OverrideOnly
     @Nullable
     @SideOnly(Side.CLIENT)
     default IParticleFactory[] getAmbientParticles() {
@@ -55,9 +60,11 @@ public interface IAmbienceBiome
 
     /**
      * @return The ambient sound that continuously plays while in this biome.
+     * @see git.jbredwards.nether_api.api.world.IAmbienceWorldProvider#getAmbientSound(World, BlockPos, Biome)
      * @author jbred
      */
     @ApiStatus.AvailableSince("1.0.0")
+    @ApiStatus.OverrideOnly
     @Nullable
     default SoundEvent getAmbientSound() {
         return null;
@@ -65,9 +72,11 @@ public interface IAmbienceBiome
 
     /**
      * @return The ambient sound that randomly plays while in this biome.
+     * @see git.jbredwards.nether_api.api.world.IAmbienceWorldProvider#getRandomAmbientSound(World, BlockPos, Biome)
      * @author jbred
      */
     @ApiStatus.AvailableSince("1.0.0")
+    @ApiStatus.OverrideOnly
     @Nullable
     default ISoundAmbience getRandomAmbientSound() {
         return null;
@@ -75,9 +84,11 @@ public interface IAmbienceBiome
 
     /**
      * @return The ambient sound that randomly plays in dark areas (cave sounds).
+     * @see git.jbredwards.nether_api.api.world.IAmbienceWorldProvider#getDarkAmbienceSound(World, BlockPos, Biome)
      * @author jbred
      */
     @ApiStatus.AvailableSince("1.0.0")
+    @ApiStatus.OverrideOnly
     @Nullable
     default IDarkSoundAmbience getDarkAmbienceSound() {
         return DarkSoundAmbience.DEFAULT_CAVE;

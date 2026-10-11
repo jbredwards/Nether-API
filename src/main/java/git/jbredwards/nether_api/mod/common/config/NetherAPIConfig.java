@@ -34,14 +34,10 @@ import javax.annotation.Nonnull;
 @Mod.EventBusSubscriber(modid = NetherAPI.MODID)
 public final class NetherAPIConfig
 {
-    @Config.RequiresWorldRestart
-    @Config.LangKey("config.nether_api.vanilla.ambienceJsonSync")
-    public static boolean ambienceJsonSync = true;
-
     @Config.LangKey("config.nether_api.endCaves")
     public static boolean endCaves = true;
 
-    @Config.LangKey("config.nether_api.vanilla.endCavesOnStartIsland")
+    @Config.LangKey("config.nether_api.endCavesOnStartIsland")
     public static boolean endCavesOnStartIsland = false;
 
     @Config.LangKey("config.nether_api.hellCaves")
@@ -76,6 +72,10 @@ public final class NetherAPIConfig
     public static Advanced advanced = new Advanced();
     public static final class Advanced
     {
+        @Config.RequiresWorldRestart
+        @Config.LangKey("config.nether_api.vanilla.advanced.ambienceJsonSync")
+        public boolean ambienceJsonSync = true;
+
         @Config.LangKey("config.nether_api.vanilla.advanced.betterDragonDestruction")
         public boolean betterDragonDestruction = true;
 
@@ -84,7 +84,7 @@ public final class NetherAPIConfig
         public int endCaveChance = 3;
 
         @Config.RangeInt(min = 1)
-        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveChance")
+        @Config.LangKey("config.nether_api.vanilla.advanced.endCaveRoomChance")
         public int endCaveRoomChance = 4;
 
         @Config.RangeInt(min = 0)
@@ -163,6 +163,9 @@ public final class NetherAPIConfig
         @Config.LangKey("config.nether_api.vanilla.advanced.fortressPillarMaxLen")
         public int fortressPillarMaxLen = -1;
 
+        @Config.LangKey("config.nether_api.vanilla.advanced.fixEnderTeleportation")
+        public boolean fixEnderTeleportation = true;
+
         @Config.LangKey("config.nether_api.vanilla.advanced.particleFixBabyAnimalSpawn")
         public boolean particleFixBabyAnimalSpawn = true;
 
@@ -213,6 +216,10 @@ public final class NetherAPIConfig
     @Config(modid = NetherAPI.MODID, name = "nether_api/biomes_o_plenty")
     public static final class BOP
     {
+        @Config.RequiresWorldRestart
+        @Config.LangKey("config.nether_api.compat.bop.dependentEndBiomes")
+        public static boolean dependentBOPEndBiomes = true;
+
         @Config.RequiresWorldRestart
         @Config.LangKey("config.nether_api.compat.bop.dependentHellBiomes")
         public static boolean dependentBOPHellBiomes = true;
@@ -291,7 +298,9 @@ public final class NetherAPIConfig
         @Config.LangKey("config.nether_api.compat.netherex.fortressBiomeVariants")
         public static boolean fortressBiomeVariants = false;
 
-        @Config.RequiresMcRestart
+        @Config.LangKey("config.nether_api.compat.netherex.fortressGloomyForSoulSand")
+        public static boolean fortressGloomyForSoulSand = false;
+
         @Config.LangKey("config.nether_api.compat.netherex.fortressSpawnsFrost")
         public static boolean fortressSpawnsFrost = false;
     }

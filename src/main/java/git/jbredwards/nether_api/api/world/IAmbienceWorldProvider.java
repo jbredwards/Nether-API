@@ -29,6 +29,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,58 +39,119 @@ import java.util.function.Function;
 /**
  * Allows WorldProviders that implement this to call their own biome ambience code instead.
  *
- * @since 1.1.1
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.1.1")
 public interface IAmbienceWorldProvider
 {
     /**
      * Utility function that tries getting ambience from the provider, then the biome, then the fallback.
-     * @since 1.3.0
+     * @throws NullPointerException If any parameters (except fallback) are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
+    @ApiStatus.Obsolete(since = "1.5.0")
     @Nullable
-    static <T> T getAmbienceOrFallback(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull Biome biome, @Nonnull Class<T> ambienceType, @Nonnull BiFunction<IAmbienceWorldProvider, Biome, T> pFun, @Nonnull Function<IAmbienceBiome, T> bFun, @Nullable T fallback) {
-        final BiomeAmbienceEvent<T> event = new BiomeAmbienceEvent<>(ambienceType, biome, world, pos);
+    static <T> T getAmbienceOrFallback(@Nonnull final World world, @Nonnull final BlockPos pos, @Nonnull final Biome biome, @Nonnull final Class<T> ambienceType, @Nonnull final BiFunction<IAmbienceWorldProvider, Biome, T> pFun, @Nonnull final Function<IAmbienceBiome, T> bFun, @Nullable final T fallback) {
+        @Nonnull final BiomeAmbienceEvent<T> event = new BiomeAmbienceEvent<>(ambienceType, biome, world, pos);
         if(MinecraftForge.EVENT_BUS.post(event)) return event.ambience;
 
-        return world.provider instanceof IAmbienceWorldProvider
-                ? pFun.apply((IAmbienceWorldProvider)world.provider, biome)
-                : biome instanceof IAmbienceBiome ? bFun.apply((IAmbienceBiome)biome) : fallback;
+        else if(world.provider instanceof IAmbienceWorldProvider) return pFun.apply((IAmbienceWorldProvider)world.provider, biome);
+        else if(biome instanceof IAmbienceBiome) return bFun.apply((IAmbienceBiome)biome);
+
+        else return fallback;
     }
 
     /**
      * Air in the provided biome spawns these once per random block render tick (same as torch particles).
      * One gets picked from random to be played. If the factory returns null, a different factory is randomly chosen.
-     * @return the possible ambient particle factories
+     * @return The possible ambient particle factories.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.1.1")
+    @ApiStatus.OverrideOnly
     @Nullable
     @SideOnly(Side.CLIENT)
-    default IParticleFactory[] getAmbientParticles(@Nonnull Biome biome) {
+    default IParticleFactory[] getAmbientParticles(@Nonnull final Biome biome) {
         return biome instanceof IAmbienceBiome ? ((IAmbienceBiome)biome).getAmbientParticles() : null;
     }
 
     /**
-     * @return the ambient sound that continuously plays while in the provided biome.
+     * @return The possible ambient particle factories.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.5.0")
     @Nullable
-    default SoundEvent getAmbientSound(@Nonnull Biome biome) {
+    @SideOnly(Side.CLIENT)
+    static IParticleFactory[] getAmbientParticles(@Nonnull final World world, @Nonnull final BlockPos pos, @Nonnull final Biome biome) {
+        return IAmbienceWorldProvider.getAmbienceOrFallback(world, pos, biome, IParticleFactory[].class, IAmbienceWorldProvider::getAmbientParticles, IAmbienceBiome::getAmbientParticles, null);
+    }
+
+    /**
+     * @return The ambient sound that continuously plays while in the provided biome.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.1.1")
+    @ApiStatus.OverrideOnly
+    @Nullable
+    default SoundEvent getAmbientSound(@Nonnull final Biome biome) {
         return biome instanceof IAmbienceBiome ? ((IAmbienceBiome)biome).getAmbientSound() : null;
     }
 
     /**
-     * @return the ambient sound that randomly plays while in the provided biome.
+     * @return The ambient sound that continuously plays while in the provided biome.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.5.0")
     @Nullable
-    default ISoundAmbience getRandomAmbientSound(@Nonnull Biome biome) {
+    static SoundEvent getAmbientSound(@Nonnull final World world, @Nonnull final BlockPos pos, @Nonnull final Biome biome) {
+        return IAmbienceWorldProvider.getAmbienceOrFallback(world, pos, biome, SoundEvent.class, IAmbienceWorldProvider::getAmbientSound, IAmbienceBiome::getAmbientSound, null);
+    }
+
+    /**
+     * @return The ambient sound that randomly plays while in the provided biome.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.1.1")
+    @ApiStatus.OverrideOnly
+    @Nullable
+    default ISoundAmbience getRandomAmbientSound(@Nonnull final Biome biome) {
         return biome instanceof IAmbienceBiome ? ((IAmbienceBiome)biome).getRandomAmbientSound() : null;
     }
 
     /**
-     * @return the ambient sound that randomly plays in dark areas (cave sounds).
+     * @return The ambient sound that randomly plays while in the provided biome.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.5.0")
     @Nullable
-    default IDarkSoundAmbience getDarkAmbienceSound(@Nonnull Biome biome) {
+    static ISoundAmbience getRandomAmbientSound(@Nonnull final World world, @Nonnull final BlockPos pos, @Nonnull final Biome biome) {
+        return IAmbienceWorldProvider.getAmbienceOrFallback(world, pos, biome, ISoundAmbience.class, IAmbienceWorldProvider::getRandomAmbientSound, IAmbienceBiome::getRandomAmbientSound, null);
+    }
+
+    /**
+     * @return The ambient sound that randomly plays in dark areas (cave sounds).
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.1.1")
+    @ApiStatus.OverrideOnly
+    @Nullable
+    default IDarkSoundAmbience getDarkAmbienceSound(@Nonnull final Biome biome) {
         return biome instanceof IAmbienceBiome ? ((IAmbienceBiome)biome).getDarkAmbienceSound() : DarkSoundAmbience.DEFAULT_CAVE;
+    }
+
+    /**
+     * @return The ambient sound that randomly plays in dark areas (cave sounds).
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.5.0")
+    @Nullable
+    static IDarkSoundAmbience getDarkAmbienceSound(@Nonnull final World world, @Nonnull final BlockPos pos, @Nonnull final Biome biome) {
+        return IAmbienceWorldProvider.getAmbienceOrFallback(world, pos, biome, IDarkSoundAmbience.class, IAmbienceWorldProvider::getDarkAmbienceSound, IAmbienceBiome::getDarkAmbienceSound, DarkSoundAmbience.DEFAULT_CAVE);
     }
 }

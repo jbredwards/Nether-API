@@ -65,7 +65,7 @@ public final class NetherAPIGuiFactory implements IModGuiFactory
     public GuiScreen createConfigGui(@Nonnull final GuiScreen parentScreen) {
         @Nonnull final List<IConfigElement> elements = Lists.newArrayList(
                 // Creates a dummy config category filled with all the vanilla settings (sorted).
-                new DummyConfigElement.DummyCategoryElement("nether_api/vanilla", "nether_api/vanilla", sorted(ConfigElement.from(NetherAPIConfig.class).getChildElements())),
+                new DummyConfigElement.DummyCategoryElement("nether_api/vanilla", "nether_api/vanilla", ConfigElement.from(NetherAPIConfig.class).getChildElements()),
                 // Creates a dummy config entry to reload "ambience.json" in-game.
                 new DummyConfigElement.DummyCategoryElement("nether_api/ambience (dummy category)", "configgui.nether_api.ambience", GuiButtonAmbienceReload.class)
         );
@@ -74,7 +74,7 @@ public final class NetherAPIGuiFactory implements IModGuiFactory
             // Creates a dummy config category filled with all the mod compatibility settings.
             elements.add(new DummyConfigElement.DummyCategoryElement(
                     "nether_api/compat (dummy category)", "configgui.nether_api.compat",
-                    sorted(activeModCategories.stream().map(ConfigElement::from).collect(Collectors.toList()))));
+                    activeModCategories.stream().map(ConfigElement::from).collect(Collectors.toList())));
         }
 
         return new GuiConfigTranslucent(parentScreen, sorted(elements), NetherAPI.MODID, false, false, I18n.format("configgui.nether_api.title"), null);
@@ -83,6 +83,12 @@ public final class NetherAPIGuiFactory implements IModGuiFactory
     @Nonnull
     private static List<IConfigElement> sorted(@Nonnull final List<IConfigElement> elements) {
         elements.sort(Comparator.comparing(element -> I18n.format(element.getLanguageKey())));
+        elements.replaceAll(element -> {
+            @Nullable final List<IConfigElement> children = element.getChildElements();
+            if(children == null || children.isEmpty()) return element;
+            // Sort sub-categories.
+            else return new DummyConfigElement.DummyCategoryElement(element.getName(), element.getLanguageKey(), sorted(children), element.getConfigEntryClass());
+        });
         return elements;
     }
 

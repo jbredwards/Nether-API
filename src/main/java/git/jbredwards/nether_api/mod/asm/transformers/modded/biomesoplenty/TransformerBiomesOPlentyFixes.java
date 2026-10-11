@@ -17,9 +17,17 @@
 package git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty;
 
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
+import net.minecraftforge.fluids.BlockFluidBase;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
@@ -53,22 +61,50 @@ public final class TransformerBiomesOPlentyFixes implements ITransformer
                  * }
                  */
                 return transformMethod(basicClass, method -> method.name.equals("onGetFogColor") || method.name.equals("onRenderFog") || method.name.equals("fogColor"), (method, insn) -> {
-                    @Nonnull final InsnList list = new InsnList();
-                    list.add(new VarInsnNode(ALOAD, 1));
-                    list.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/client/event/EntityViewRenderEvent", "getEntity", "()Lnet/minecraft/entity/Entity;", false));
-                    list.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/Entity", DEOBFUSCATED ? "world" : "field_70170_p", "Lnet/minecraft/world/World;"));
-                    list.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/World", DEOBFUSCATED ? "provider" : "field_73011_w", "Lnet/minecraft/world/WorldProvider;"));
-                    list.add(new TypeInsnNode(INSTANCEOF, "git/jbredwards/nether_api/mod/common/world/IFogWorldProvider"));
+                    if(insn == method.instructions.getFirst()) {
+                        @Nonnull final InsnList list = new InsnList();
+                        list.add(new VarInsnNode(ALOAD, 1));
+                        list.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/client/event/EntityViewRenderEvent", "getEntity", "()Lnet/minecraft/entity/Entity;", false));
+                        list.add(new FieldInsnNode(GETFIELD, "net/minecraft/entity/Entity", DEOBFUSCATED ? "world" : "field_70170_p", "Lnet/minecraft/world/World;"));
+                        list.add(new FieldInsnNode(GETFIELD, "net/minecraft/world/World", DEOBFUSCATED ? "provider" : "field_73011_w", "Lnet/minecraft/world/WorldProvider;"));
+                        if(!method.name.equals("onRenderFog")) list.add(new TypeInsnNode(INSTANCEOF, "git/jbredwards/nether_api/mod/common/world/IFogWorldProvider"));
+                        else { // if (Hooks.applyXZFog(event.getEntity().world.provider, event.getEntity())) return;
+                            list.add(new VarInsnNode(ALOAD, 1));
+                            list.add(new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/client/event/EntityViewRenderEvent", "getEntity", "()Lnet/minecraft/entity/Entity;", false));
+                            list.add(genHookMethod("applyXZFog", "(Lnet/minecraft/world/WorldProvider;Lnet/minecraft/entity/Entity;)Z"));
+                        }
 
-                    @Nonnull final LabelNode label = new LabelNode();
-                    list.add(new JumpInsnNode(IFEQ, label));
-                    list.add(new InsnNode(RETURN));
+                        @Nonnull final LabelNode label = new LabelNode();
+                        list.add(new JumpInsnNode(IFEQ, label));
+                        list.add(new InsnNode(RETURN));
 
-                    list.add(label);
-                    list.add(new FrameNode(F_SAME, 0, null, 0, null));
-                    method.instructions.insert(method.instructions.getFirst(), list);
+                        list.add(label);
+                        list.add(new FrameNode(F_SAME, 0, null, 0, null));
+                        method.instructions.insert(method.instructions.getFirst(), list);
+                    }
+                    /*
+                     * onGetFogColor:
+                     * Old code:
+                     * if (stateAtEyes.getMaterial() == Material.LAVA)
+                     * {
+                     *     return;
+                     * }
+                     *
+                     * New code:
+                     * // Cancel event if the block is a fluid
+                     * if (Hooks.getFogMaterial(stateAtEyes) == Material.LAVA)
+                     * {
+                     *     return;
+                     * }
+                     */
+                    if(!method.name.equals("onGetFogColor")) return BreakType.INSTRUCTIONS;
+                    else if(insn instanceof MethodInsnNode && ((MethodInsnNode)insn).name.equals(DEOBFUSCATED ? "getMaterial" : "func_185904_a")) {
+                        method.instructions.insert(insn, genHookMethod("getFogMaterial", "(Lnet/minecraft/block/state/IBlockState;)Lnet/minecraft/block/material/Material;"));
+                        method.instructions.remove(insn);
+                        return BreakType.INSTRUCTIONS;
+                    }
 
-                    return BreakType.INSTRUCTIONS;
+                    return BreakType.CONTINUE;
                 });
 
             // GeneratorBramble
@@ -180,6 +216,11 @@ public final class TransformerBiomesOPlentyFixes implements ITransformer
     @SuppressWarnings("unused")
     public static final class Hooks
     {
+        @SideOnly(Side.CLIENT)
+        public static boolean applyXZFog(@Nonnull final WorldProvider provider, @Nonnull final Entity entity) {
+            return provider.doesXZShowFog((int)entity.posX, (int)entity.posZ) || Minecraft.getMinecraft().ingameGUI.getBossOverlay().shouldCreateFog();
+        }
+
         public static boolean canPlaceLeaves(@Nonnull final World world, @Nonnull final BlockPos genPos, @Nonnull final BlockPos origin) {
             final int minX = (origin.getX() - 8) &~ 15;
             if(genPos.getX() < minX || genPos.getX() > minX + 31) return false;
@@ -197,6 +238,11 @@ public final class TransformerBiomesOPlentyFixes implements ITransformer
             final int z = genPos.getZ() + offset.getZOffset();
             final int minZ = (origin.getZ() - 8) &~ 15;
             return z < minZ || z > minZ + 31 ? genPos : genPos.offset(offset);
+        }
+
+        @Nonnull
+        public static Material getFogMaterial(@Nonnull final IBlockState state) {
+            return state.getBlock() instanceof BlockFluidBase ? Material.LAVA : state.getMaterial();
         }
     }
 }

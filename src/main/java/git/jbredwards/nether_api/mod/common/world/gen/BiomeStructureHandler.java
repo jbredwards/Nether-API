@@ -19,6 +19,9 @@ package git.jbredwards.nether_api.mod.common.world.gen;
 import git.jbredwards.nether_api.api.event.BiomeStructureEvent;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.vanilla.TransformerBiome;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockStairs;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
@@ -67,7 +70,8 @@ public final class BiomeStructureHandler
         catch(@Nonnull final Throwable e) { NetherAPI.LOGGER.error("Error while finding replacement block for \"{}\" for \"{}\"", original.getBlock().getRegistryName(), structureName, e); }
 
         // Cache block ID value.
-        if(state == null) state = original;
+        if(state != null) state = carryRotation(state, original);
+        else state = original;
         blocks.put(key, state);
         return state;
     }
@@ -95,5 +99,40 @@ public final class BiomeStructureHandler
         // Cache entity list.
         entities.put(key, ret);
         return ret;
+    }
+
+    @Nonnull
+    private static IBlockState carryRotation(@Nonnull final IBlockState baseState, @Nonnull final IBlockState original) {
+        // Carry slab properties.
+        if(original.getBlock() instanceof BlockSlab) return baseState.getBlock() instanceof BlockSlab
+                ? baseState.withProperty(BlockSlab.HALF, original.getValue(BlockSlab.HALF))
+                : baseState;
+
+        // Carry stair properties.
+        else if(original.getBlock() instanceof BlockStairs) return baseState.getBlock() instanceof BlockStairs
+                ? baseState
+                .withProperty(BlockStairs.FACING, original.getValue(BlockStairs.FACING))
+                .withProperty(BlockStairs.HALF, original.getValue(BlockStairs.HALF))
+                .withProperty(BlockStairs.SHAPE, original.getValue(BlockStairs.SHAPE))
+                : baseState;
+
+        // Attempt to carry generic rotation properties.
+        return original.getProperties()
+                .entrySet()
+                .stream()
+                .filter(entry -> {
+                    @Nonnull final String propertyName = entry.getKey().getName();
+                    return propertyName.equals("facing") || propertyName.equals("rotation") || propertyName.equals("direction") || propertyName.equals("axis");
+                })
+                .reduce(baseState, (state, entry) -> {
+                    @Nonnull final IProperty property = entry.getKey();
+                    for(@Nonnull final IProperty<?> candidate : state.getPropertyKeys()) {
+                        if(candidate.getValueClass() == property.getValueClass() && candidate.getName().equals(property.getName())) {
+                            return state.withProperty(property, (Comparable)entry.getValue());
+                        }
+                    }
+
+                    return state;
+                }, (s1, s2) -> s2);
     }
 }

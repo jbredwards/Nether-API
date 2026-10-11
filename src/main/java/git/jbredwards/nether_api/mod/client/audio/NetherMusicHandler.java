@@ -16,11 +16,14 @@
 
 package git.jbredwards.nether_api.mod.client.audio;
 
-import git.jbredwards.nether_api.api.audio.IMusicBiome;
 import git.jbredwards.nether_api.api.audio.IMusicType;
+import git.jbredwards.nether_api.api.biome.IMusicBiome;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;
+import net.minecraft.world.DimensionType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -30,16 +33,21 @@ import javax.annotation.Nonnull;
  *
  */
 @Deprecated
+@ApiStatus.Internal
 @SideOnly(Side.CLIENT)
 public final class NetherMusicHandler
 {
     @Nonnull
-    private static final IMusicBiome DEFAULT_MUSIC = IMusicBiome.of(
+    public static final IMusicBiome DEFAULT_MUSIC = IMusicBiome.of(
             IMusicType.vanilla(MusicTicker.MusicType.NETHER)
     );
 
+    /**
+     * Use {@link BiomeMusicHandler} instead.
+     */
     @Nonnull
     public static MusicTicker.MusicType getMusicType() {
+        assert Minecraft.getMinecraft().world.provider.getDimensionType() == DimensionType.NETHER;
         return BiomeMusicHandler.get(DEFAULT_MUSIC);
     }
 }

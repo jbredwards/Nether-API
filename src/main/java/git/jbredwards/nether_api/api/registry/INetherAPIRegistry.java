@@ -22,6 +22,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraftforge.common.BiomeManager;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import java.util.LinkedList;
@@ -31,72 +32,83 @@ import java.util.function.Function;
 /**
  * Handles the registration of biomes and structures for dimensional generation.
  *
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public interface INetherAPIRegistry
 {
     /**
      * Contains all {@link INetherAPIRegistry} instances. This is used by the /locate command to auto-complete structure names.
-     * @since 1.3.0
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Nonnull
     List<INetherAPIRegistry> REGISTRIES = new LinkedList<>();
 
     /**
      * @return The unique name for this registry instance.
-     * @since 1.4.0
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull
     ResourceLocation getRegistryName();
 
     /**
      * Removes all the biomes and structures from the generation list.
-     * @since 1.0.0
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.0.0")
     void clear();
 
     /**
-     * @return true if this registry currently has no biomes or structures.
-     * @since 1.3.0
+     * @return Whether this registry currently has no biomes or structures.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     default boolean isEmpty() {
         return getBiomeEntries().isEmpty() && getStructures().isEmpty();
     }
 
     /**
-     * @return an immutable list containing all the Biomes in the generation list.
-     * @since 1.3.0
+     * @return An immutable list containing all the Biomes in the generation list.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Nonnull
     List<BiomeManager.BiomeEntry> getBiomeEntries();
 
     /**
      * Adds the BiomeEntry to the generation list.
-     * @since 1.4.0
+     * @throws NullPointerException If biomeEntry is null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.4.0")
     default void registerBiome(@Nonnull final BiomeManager.BiomeEntry biomeEntry) {
         registerBiome(biomeEntry.biome, biomeEntry.itemWeight);
     }
 
     /**
      * Adds the Biome to the generation list, with the provided weight.
-     * @since 1.0.0
+     * @throws NullPointerException If biome is null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.0.0")
     void registerBiome(@Nonnull final Biome biome, final int weight);
 
     /**
      * Removes the Biome from the generation list if present.
-     * @return true if the biome was removed from the generation list.
-     * @since 1.0.0
+     * @return Whether the biome was removed from the generation list.
+     * @throws NullPointerException If biome is null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.0.0")
     boolean removeBiome(@Nonnull final Biome biome);
 
     /**
-     * @return an immutable list containing all the structure handlers in the generation list.
-     * @since 1.3.0
+     * @return An immutable list containing all the structure handlers in the generation list.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Nonnull
     List<INetherAPIStructureEntry> getStructures();
 
@@ -104,9 +116,10 @@ public interface INetherAPIRegistry
      * Adds the structure handler to the generation list. Structures do not have to be registered in order to generate,
      * but do if you want them to be able to spawn mobs within its area (like nether fortresses do), and if you want /locate to work with it.
      * <p> All structures have to also be registered in {@link net.minecraft.world.gen.structure.MapGenStructureIO MapGenStructureIO}. </p>
-     *
-     * @since 1.3.0
+     * @throws NullPointerException If structureEntry is null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     void registerStructure(@Nonnull final INetherAPIStructureEntry structureEntry);
 
     /**
@@ -116,16 +129,18 @@ public interface INetherAPIRegistry
      *
      * @param commandName the name of the structure used by the /locate command (should match the result of calling the structure's {@link MapGenStructure#getStructureName()} method).
      * @param structureFactory responsible for initializing the structure during the construction of the registry's respective {@link INetherAPIChunkGenerator}.
-     *
-     * @since 1.3.0
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     void registerStructure(@Nonnull final String commandName, @Nonnull final Function<INetherAPIChunkGenerator, MapGenStructure> structureFactory);
 
     /**
      * Removes the structure handler from the generation list if present.
      * @return true if the structure handler was removed from the generation list.
-     *
-     * @since 1.3.0
+     * @throws NullPointerException If commandName is null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     boolean removeStructure(@Nonnull final String commandName);
 }

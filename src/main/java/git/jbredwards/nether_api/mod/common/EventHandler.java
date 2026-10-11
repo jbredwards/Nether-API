@@ -28,16 +28,21 @@ import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.world.PlayerSpawnLogic;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.entity.boss.EntityDragon;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Biomes;
+import net.minecraft.network.play.server.SPacketChangeGameState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
+import net.minecraftforge.event.entity.living.EnderTeleportEvent;
 import net.minecraftforge.event.entity.living.LivingDestroyBlockEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
 
 import javax.annotation.Nonnull;
 
@@ -99,5 +104,32 @@ final class EventHandler
             // This is the Vanilla behavior.
             else world.getWorldInfo().setServerInitialized(true);
         }
+    }
+
+    @SubscribeEvent
+    static void syncRain(@Nonnull final PlayerChangedDimensionEvent event) {
+        syncRain(event.player.getServer().getWorld(event.fromDim).isRaining(), (EntityPlayerMP)event.player);
+    }
+
+    @SubscribeEvent
+    static void syncRain(@Nonnull final PlayerEvent.Clone event) {
+        if(event.getOriginal().dimension != event.getEntityPlayer().dimension) {
+            syncRain(event.getOriginal().world.isRaining(), (EntityPlayerMP)event.getEntityPlayer());
+        }
+    }
+
+    private static void syncRain(final boolean wasRaining, @Nonnull final EntityPlayerMP player) {
+        // Fixes a rare desync that caused nether fog to be much darker than it should be.
+        if(wasRaining != player.world.isRaining()) {
+            player.connection.sendPacket(new SPacketChangeGameState(wasRaining ? 2 : 1, 0));
+            player.connection.sendPacket(new SPacketChangeGameState(7, player.world.rainingStrength));
+            player.connection.sendPacket(new SPacketChangeGameState(8, player.world.thunderingStrength));
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    static void syncTeleport(@Nonnull final EnderTeleportEvent event) {
+        // Fixes janky teleporting when fighting endermen or shulkers.
+        if(NetherAPIConfig.advanced.fixEnderTeleportation && (event.getEntity().world.isRemote || event.getEntity().isDead)) event.setCanceled(true);
     }
 }

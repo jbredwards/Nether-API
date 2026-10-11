@@ -188,7 +188,7 @@ public final class NetherAPI
     // Sync biome ambience config from server
     @SubscribeEvent
     static void syncAmbienceConfig(@Nonnull final FMLNetworkEvent.ServerConnectionFromClientEvent event) {
-        if(NetherAPIConfig.ambienceJsonSync && !event.isLocal()) {
+        if(NetherAPIConfig.advanced.ambienceJsonSync && !event.isLocal()) {
             WRAPPER.sendTo(new MessageAmbienceConfig(AmbienceConfig.read()), ((NetHandlerPlayServer)event.getHandler()).player);
         }
     }

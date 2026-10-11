@@ -326,9 +326,9 @@ public final class JEDWorldProviderTheEnd extends WorldProviderTheEnd implements
     @Nonnull
     @SideOnly(Side.CLIENT)
     @Override
-    public Vec3d getFogColorFor(@Nonnull final World world, final float celestialAngle, final float partialTicks, @Nonnull final Biome biome) {
+    public Vec3d getFogColorFor(@Nonnull final World world, final float celestialAngle, final float partialTicks, @Nonnull final Biome biome, @Nonnull final BlockPos pos) {
         @Nullable final Vec3d fogColor = properties.getFogColor();
-        return fogColor != null ? fogColor : super.getFogColorFor(world, celestialAngle, partialTicks, biome);
+        return fogColor != null ? fogColor : super.getFogColorFor(world, celestialAngle, partialTicks, biome, pos);
     }
 
     @Nonnull

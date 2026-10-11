@@ -17,6 +17,7 @@
 package git.jbredwards.nether_api.api.biome;
 
 import net.minecraftforge.common.BiomeManager;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -25,21 +26,29 @@ import java.util.List;
 /**
  * Having your nether or end biome implement this will allow it to have sub-biomes and edge biomes.
  *
- * @since 1.3.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.3.0")
 public interface INetherAPIBiomeProvider
 {
     /**
-     * @return all possible biomes that can spawn inside this one.
+     * @return All possible biomes that can spawn inside this one.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Nonnull
-    default List<BiomeManager.BiomeEntry> getSubBiomes() { return Collections.emptyList(); }
+    default List<BiomeManager.BiomeEntry> getSubBiomes() {
+        return Collections.emptyList();
+    }
 
     /**
-     * @return all possible biomes that can spawn along the edge of this one.
+     * @return All possible biomes that can spawn along the edge of this one.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Nonnull
-    default List<BiomeManager.BiomeEntry> getEdgeBiomes(int neighborBiomeId) { return Collections.emptyList(); }
+    default List<BiomeManager.BiomeEntry> getEdgeBiomes(int neighborBiomeId) {
+        return Collections.emptyList();
+    }
 }

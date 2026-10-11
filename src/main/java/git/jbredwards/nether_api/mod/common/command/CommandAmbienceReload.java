@@ -60,12 +60,12 @@ public class CommandAmbienceReload extends CommandBase
         if(args.length != 1 || !args[0].equals("reload")) throw new WrongUsageException(getUsage(sender));
 
         @Nullable final JsonElement file = AmbienceConfig.read();
-        if(!NetherAPIConfig.ambienceJsonSync && !server.isDedicatedServer()) {
+        if(!NetherAPIConfig.advanced.ambienceJsonSync && !server.isDedicatedServer()) {
             synchronized(NetherAPI.MODID) { AmbienceConfig.load(file); }
         }
         else {
             if(server.isDedicatedServer()) AmbienceConfig.load(file);
-            if(NetherAPIConfig.ambienceJsonSync) NetherAPI.WRAPPER.sendToAll(new MessageAmbienceConfig(file));
+            if(NetherAPIConfig.advanced.ambienceJsonSync) NetherAPI.WRAPPER.sendToAll(new MessageAmbienceConfig(file));
         }
 
         if(file == null) throw new CommandException("commands." + NetherAPI.MODID + '.' + getName() + ".fail");

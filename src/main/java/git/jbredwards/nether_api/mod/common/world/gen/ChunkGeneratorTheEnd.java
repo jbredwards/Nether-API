@@ -20,7 +20,6 @@ import git.jbredwards.nether_api.api.biome.IEndBiome;
 import git.jbredwards.nether_api.api.structure.ISpawningStructure;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
-import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.registry.NetherAPIRegistry;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderTheEnd;
@@ -103,7 +102,7 @@ public class ChunkGeneratorTheEnd extends ChunkGeneratorEnd implements INetherAP
         setBlocksInPrimer(chunkX, chunkZ, primer);
         buildSurfaces(chunkX, chunkZ, primer);
 
-        if(NetherAPIConfig.endCaves) genEndCaves.generate(world, chunkX, chunkZ, primer);
+        genEndCaves.generate(world, chunkX, chunkZ, primer);
         if(areStructuresEnabled()) {
             if(endCityGen != null) endCityGen.generate(world, chunkX, chunkZ, primer);
             for(@Nonnull final MapGenStructure structure : moddedStructures) structure.generate(world, chunkX, chunkZ, primer);

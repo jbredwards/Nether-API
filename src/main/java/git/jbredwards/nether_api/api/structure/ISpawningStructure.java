@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
- * Having your MapGenStructure implement this will allow it go passively spawn mods (similar to how nether fortresses do).
+ * Having your {@code MapGenStructure} implement this will allow it go passively spawn mods (similar to how nether fortresses do).
  *
  * @see git.jbredwards.nether_api.api.event.BiomeStructureEvent.PrepareSpawnList
  * @author jbred
@@ -36,7 +36,9 @@ import java.util.List;
 public interface ISpawningStructure
 {
     /**
-     * @return all possible spawn entries for the provided creature type. This should also check whether the provided position is within the structure.
+     * @return All possible spawn entries for the provided creature type. This should also check whether the provided position is within the structure.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.0.0")
     @Nonnull

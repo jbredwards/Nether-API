@@ -16,7 +16,6 @@
 
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
-import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import net.minecraft.block.state.IBlockState;
@@ -85,7 +84,7 @@ public final class TransformerWorldClient implements ITransformer
         @SideOnly(Side.CLIENT)
         public static void spawnBiomeAmbientParticle(@Nonnull World world, @Nonnull Random rand, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
             if(Minecraft.getMinecraft().gameSettings.particleSetting < 2 && !state.isFullCube()) {
-                final IParticleFactory[] factories = IAmbienceWorldProvider.getAmbienceOrFallback(world, pos, world.getBiome(pos), IParticleFactory[].class, IAmbienceWorldProvider::getAmbientParticles, IAmbienceBiome::getAmbientParticles, null);
+                final IParticleFactory[] factories = IAmbienceWorldProvider.getAmbientParticles(world, pos, world.getBiome(pos));
                 if(factories == null || factories.length == 0) return;
 
                 else if(factories.length != 1) Collections.shuffle(Arrays.asList(factories), rand);

@@ -19,6 +19,7 @@ package git.jbredwards.nether_api.api.event;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.gen.layer.GenLayer;
 import net.minecraftforge.event.terraingen.WorldTypeEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -32,20 +33,20 @@ import javax.annotation.Nonnull;
  * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#TERRAIN_GEN_BUS MinecraftForge.TERRAIN_GEN_BUS}.
  * <br>
  * <br>
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public abstract class NetherAPIInitBiomeGensEvent extends WorldTypeEvent
 {
     @Nonnull
-    public GenLayer[] biomeGenerators;
-    public final long seed;
-
-    public NetherAPIInitBiomeGensEvent(@Nonnull WorldType worldTypeIn, long seedIn, @Nonnull GenLayer[] originalGeneratorsIn) {
+    @ApiStatus.AvailableSince("1.0.0") public GenLayer[] biomeGenerators;
+    @ApiStatus.AvailableSince("1.0.0") public final long seed;
+    @ApiStatus.AvailableSince("1.0.0")
+    public NetherAPIInitBiomeGensEvent(@Nonnull final WorldType worldTypeIn, final long seedIn, @Nonnull final GenLayer[] originalGeneratorsIn) {
         super(worldTypeIn);
-        seed = seedIn;
-        biomeGenerators = originalGeneratorsIn;
+        this.seed = seedIn;
+        this.biomeGenerators = originalGeneratorsIn;
     }
 
     /**
@@ -58,13 +59,14 @@ public abstract class NetherAPIInitBiomeGensEvent extends WorldTypeEvent
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#TERRAIN_GEN_BUS MinecraftForge.TERRAIN_GEN_BUS}.
      * <br>
      * <br>
-     * @since 1.0.0
      * @author jbred
      *
      */
+    @ApiStatus.AvailableSince("1.0.0")
     public static class End extends NetherAPIInitBiomeGensEvent
     {
-        public End(@Nonnull WorldType worldTypeIn, long seedIn, @Nonnull GenLayer[] originalGeneratorsIn) {
+        @ApiStatus.AvailableSince("1.0.0")
+        public End(@Nonnull final WorldType worldTypeIn, final long seedIn, @Nonnull final GenLayer[] originalGeneratorsIn) {
             super(worldTypeIn, seedIn, originalGeneratorsIn);
         }
     }
@@ -79,13 +81,14 @@ public abstract class NetherAPIInitBiomeGensEvent extends WorldTypeEvent
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#TERRAIN_GEN_BUS MinecraftForge.TERRAIN_GEN_BUS}.
      * <br>
      * <br>
-     * @since 1.0.0
      * @author jbred
      *
      */
+    @ApiStatus.AvailableSince("1.0.0")
     public static class Nether extends NetherAPIInitBiomeGensEvent
     {
-        public Nether(@Nonnull WorldType worldTypeIn, long seedIn, @Nonnull GenLayer[] originalGeneratorsIn) {
+        @ApiStatus.AvailableSince("1.0.0")
+        public Nether(@Nonnull final WorldType worldTypeIn, final long seedIn, @Nonnull final GenLayer[] originalGeneratorsIn) {
             super(worldTypeIn, seedIn, originalGeneratorsIn);
         }
     }

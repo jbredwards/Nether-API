@@ -27,6 +27,7 @@ import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandC
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
@@ -92,8 +93,8 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @Nonnull
     @SideOnly(Side.CLIENT)
     @Override
-    public Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome) {
-        return biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : getDefaultFogColor(celestialAngle, partialTicks);
+    public Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome, @Nonnull BlockPos pos) {
+        return biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : getDefaultFogColor(celestialAngle, partialTicks, biome, pos);
     }
 
     @Nonnull

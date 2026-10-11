@@ -22,6 +22,7 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -36,21 +37,21 @@ import javax.annotation.Nonnull;
  * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS MinecraftForge.EVENT_BUS}.
  * <br>
  * <br>
- * @since 1.3.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.3.0")
 @Cancelable
 @SideOnly(Side.CLIENT)
 public abstract class NetherAPIFogColorEvent extends Event
 {
-    @Nonnull public final Biome biome;
-    @Nonnull public final World world;
-    public final float celestialAngle;
-    public final float partialTicks;
-
-    public double fogR, fogG, fogB; // RGB values (must be between 0 and 1)
-    protected NetherAPIFogColorEvent(@Nonnull Biome biomeIn, @Nonnull World worldIn, float celestialAngleIn, float partialTicksIn) {
+    @ApiStatus.AvailableSince("1.3.0") @Nonnull public final Biome biome;
+    @ApiStatus.AvailableSince("1.3.0") @Nonnull public final World world;
+    @ApiStatus.AvailableSince("1.3.0") public final float celestialAngle;
+    @ApiStatus.AvailableSince("1.3.0") public final float partialTicks;
+    @ApiStatus.AvailableSince("1.3.0") public double fogR, fogG, fogB; // RGB values (must be between 0 and 1)
+    @ApiStatus.AvailableSince("1.3.0")
+    protected NetherAPIFogColorEvent(@Nonnull final Biome biomeIn, @Nonnull final World worldIn, final float celestialAngleIn, final float partialTicksIn) {
         biome = biomeIn;
         world = worldIn;
         celestialAngle = celestialAngleIn;
@@ -68,15 +69,16 @@ public abstract class NetherAPIFogColorEvent extends Event
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS MinecraftForge.EVENT_BUS}.
      * <br>
      * <br>
-     * @since 1.3.0
      * @author jbred
      *
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Cancelable
     @SideOnly(Side.CLIENT)
     public static class End extends NetherAPIFogColorEvent
     {
-        public End(@Nonnull Biome biomeIn, @Nonnull World worldIn, float celestialAngleIn, float partialTicksIn) {
+        @ApiStatus.AvailableSince("1.3.0")
+        public End(@Nonnull final Biome biomeIn, @Nonnull final World worldIn, final float celestialAngleIn, final float partialTicksIn) {
             super(biomeIn, worldIn, celestialAngleIn, partialTicksIn);
         }
     }
@@ -92,15 +94,16 @@ public abstract class NetherAPIFogColorEvent extends Event
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS MinecraftForge.EVENT_BUS}.
      * <br>
      * <br>
-     * @since 1.3.0
      * @author jbred
      *
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Cancelable
     @SideOnly(Side.CLIENT)
     public static class Nether extends NetherAPIFogColorEvent
     {
-        public Nether(@Nonnull Biome biomeIn, @Nonnull World worldIn, float celestialAngleIn, float partialTicksIn) {
+        @ApiStatus.AvailableSince("1.3.0")
+        public Nether(@Nonnull final Biome biomeIn, @Nonnull final World worldIn, final float celestialAngleIn, final float partialTicksIn) {
             super(biomeIn, worldIn, celestialAngleIn, partialTicksIn);
         }
     }

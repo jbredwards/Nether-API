@@ -97,11 +97,9 @@ final class AmbienceDeserializer
                 .registerTypeAdapter(IParticleFactory.class, (JsonDeserializer<IParticleFactory>)(json, type, ctx) -> {
                     @Nonnull final String id = json.isJsonObject() ? JsonUtils.getString(json.getAsJsonObject(), "id") : JsonUtils.getString(json, "particle");
                     @Nullable final EnumParticleTypes particle = EnumParticleTypes.getByName(id);
-
                     if(particle == null) throw new JsonParseException("Expected id to be a particle, was unknown string '" + id + "'");
-                    else if(!json.isJsonObject()) return ParticleFactoryUtils.getParticleFactorySafe(particle);
 
-                    final float chance = JsonUtils.getFloat(json.getAsJsonObject(), "chance", 1);
+                    final float chance = json.isJsonObject() ? JsonUtils.getFloat(json.getAsJsonObject(), "chance", 0.001f) : 0.001f;
                     @Nullable final int[] params = json.isJsonObject() ? JsonUtils.deserializeClass(json.getAsJsonObject(), "params", null, ctx, int[].class) : null;
                     return ParticleFactoryUtils.particleFactoryWithChance(particle, () -> chance, params);
                 })

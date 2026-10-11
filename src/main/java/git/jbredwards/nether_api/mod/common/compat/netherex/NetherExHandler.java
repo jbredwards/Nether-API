@@ -101,7 +101,8 @@ public final class NetherExHandler
             if(event.original.getBlock() == Blocks.NETHER_BRICK_STAIRS) event.setReplacement(NetherExBlocks.LIVELY_NETHER_BRICK_STAIRS.getDefaultState());
         }
 
-        else if(event.getBiome() == NetherExBiomes.RUTHLESS_SANDS) {
+        else if(event.getBiome() == NetherExBiomes.RUTHLESS_SANDS
+        || NetherAPIConfig.NetherEx.fortressGloomyForSoulSand && event.getBiome().topBlock.getBlock() == Blocks.SOUL_SAND) {
             if(event.original.getBlock() == Blocks.NETHER_BRICK) event.setReplacement(NetherExBlocks.GLOOMY_NETHER_BRICK.getDefaultState());
             if(event.original.getBlock() == Blocks.NETHER_BRICK_FENCE) event.setReplacement(NetherExBlocks.GLOOMY_NETHER_BRICK_FENCE.getDefaultState());
             if(event.original.getBlock() == Blocks.NETHER_BRICK_STAIRS) event.setReplacement(NetherExBlocks.GLOOMY_NETHER_BRICK_STAIRS.getDefaultState());

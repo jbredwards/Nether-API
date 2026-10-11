@@ -18,6 +18,7 @@ package git.jbredwards.nether_api.api.structure;
 
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import net.minecraft.world.gen.structure.MapGenStructure;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import java.util.function.Function;
@@ -25,21 +26,26 @@ import java.util.function.Function;
 /**
  * Used to register structures that can make use of {@link INetherAPIChunkGenerator} instances.
  *
- * @since 1.3.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.3.0")
 public interface INetherAPIStructureEntry
 {
     /**
-     * @return the name of the structure used by the /locate command (should match the result of calling the structure's {@link MapGenStructure#getStructureName()} method).
+     * Expected to match the structure's {@link MapGenStructure#getStructureName() registry name}.
+     * @return The name of the structure used by the /locate command.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Nonnull
     String getCommandName();
 
     /**
-     * @return the structure factory associated with this entry.
+     * @return The structure factory associated with this entry.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.3.0")
     @Nonnull
     Function<INetherAPIChunkGenerator, MapGenStructure> getStructureFactory();
 }

@@ -60,7 +60,7 @@ public class GuiButtonAmbienceReload extends GuiConfigEntries.CategoryEntry
 
     @Override
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial) {
-        btnReload.enabled = !NetherAPIConfig.ambienceJsonSync || !owningScreen.isWorldRunning || mc.isGamePaused();
+        btnReload.enabled = !NetherAPIConfig.advanced.ambienceJsonSync || !owningScreen.isWorldRunning || mc.isGamePaused();
         btnReload.x = owningEntryList.scrollBarX - 44;
         btnReload.y = y;
         btnReload.drawButton(mc, mouseX, mouseY, partial);

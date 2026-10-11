@@ -21,6 +21,7 @@ import git.jbredwards.nether_api.api.structure.ISpawningStructure;
 import git.jbredwards.nether_api.api.util.NetherGenerationUtils;
 import git.jbredwards.nether_api.api.world.INetherAPIChunkGenerator;
 import git.jbredwards.nether_api.mod.NetherAPI;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.netherex.TransformerInputHandler;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BetterNetherHandler;
 import git.jbredwards.nether_api.mod.common.compat.netherex.NetherExHandler;
 import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandControlHandler;
@@ -68,8 +69,10 @@ public class ChunkGeneratorNether extends ChunkGeneratorHell implements INetherA
 
     public ChunkGeneratorNether(@Nonnull World worldIn, boolean generateStructures, long seed) {
         super(worldIn, generateStructures, seed);
+        if(magmaGen instanceof WorldGenMinable) ((WorldGenMinable)magmaGen).predicate = state -> state.getBlock() == Blocks.NETHERRACK
+                || state.isFullCube() && (state.getMaterial() == Material.GROUND || state.getMaterial() == Material.SAND) || TransformerInputHandler.Hooks.NETHERRACK_CANDIDATES.contains(state);
+
         terrainNoiseGen = new NoiseGeneratorPerlin(rand, 4);
-        magmaGen = new WorldGenMinable(Blocks.MAGMA.getDefaultState(), 33, state -> state == NETHERRACK || state.isFullCube() && state.getMaterial() != Material.ROCK);
         moddedStructures = NetherAPIRegistry.NETHER.getStructures().stream().map(entry -> entry.getStructureFactory().apply(this)).toArray(MapGenStructure[]::new);
     }
 

@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.GenericEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,22 +38,22 @@ import javax.annotation.Nullable;
  * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS MinecraftForge.EVENT_BUS}.
  * <br>
  * <br>
- * @since 1.3.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.3.0")
 @Cancelable
 public class BiomeAmbienceEvent<T> extends GenericEvent<T>
 {
-    @Nonnull public final Biome biome;
-    @Nonnull public final World world;
-    @Nonnull public final BlockPos pos;
-    @Nullable public T ambience;
-
-    public BiomeAmbienceEvent(@Nonnull Class<T> typeIn, @Nonnull Biome biomeIn, @Nonnull World worldIn, @Nonnull BlockPos posIn) {
+    @ApiStatus.AvailableSince("1.3.0") @Nonnull public final Biome biome;
+    @ApiStatus.AvailableSince("1.3.0") @Nonnull public final World world;
+    @ApiStatus.AvailableSince("1.3.0") @Nonnull public final BlockPos pos;
+    @ApiStatus.AvailableSince("1.3.0") @Nullable public T ambience;
+    @ApiStatus.AvailableSince("1.3.0")
+    public BiomeAmbienceEvent(@Nonnull final Class<T> typeIn, @Nonnull final Biome biomeIn, @Nonnull final World worldIn, @Nonnull final BlockPos posIn) {
         super(typeIn);
-        biome = biomeIn;
-        world = worldIn;
-        pos = posIn;
+        this.biome = biomeIn;
+        this.world = worldIn;
+        this.pos = posIn;
     }
 }

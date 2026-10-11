@@ -18,6 +18,7 @@ package git.jbredwards.nether_api.mod.asm.transformers.modded.dsurround;
 
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.world.IFogWorldProvider;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.objectweb.asm.tree.InsnNode;
@@ -61,7 +62,8 @@ public final class TransformerBiomeFogColorCalculator implements ITransformer
                 method.instructions.insertBefore(insn, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/client/event/EntityViewRenderEvent$FogColors", "getRenderPartialTicks", "()D", false));
                 method.instructions.insertBefore(insn, new InsnNode(D2F));
                 method.instructions.insertBefore(insn, new InsnNode(ICONST_0));
-                method.instructions.insertBefore(insn, genHookMethod("getColor", "(Lorg/orecruncher/dsurround/registry/biome/BiomeInfo;Lnet/minecraft/world/World;FZ)Lorg/orecruncher/lib/Color;"));
+                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 10));
+                method.instructions.insertBefore(insn, genHookMethod("getColor", "(Lorg/orecruncher/dsurround/registry/biome/BiomeInfo;Lnet/minecraft/world/World;FZLnet/minecraft/util/math/BlockPos;)Lorg/orecruncher/lib/Color;"));
                 method.instructions.insertBefore(insn, new VarInsnNode(ASTORE, 14));
             }
             /*
@@ -86,9 +88,9 @@ public final class TransformerBiomeFogColorCalculator implements ITransformer
     public static final class Hooks
     {
         @Nullable
-        public static Color getColor(@Nonnull final BiomeInfo info, @Nonnull final World world, final float partialTicks, final boolean particle) {
+        public static Color getColor(@Nonnull final BiomeInfo info, @Nonnull final World world, final float partialTicks, final boolean particle, @Nonnull final BlockPos pos) {
             if(world.provider instanceof IFogWorldProvider) {
-                @Nonnull final Vec3d biomeColor = ((IFogWorldProvider)world.provider).getFogColorFor(world, world.getCelestialAngle(partialTicks), partialTicks, info.getBiome());
+                @Nonnull final Vec3d biomeColor = ((IFogWorldProvider)world.provider).getFogColorFor(world, world.getCelestialAngle(partialTicks), partialTicks, info.getBiome(), pos);
                 @Nonnull final Color color = new Color(biomeColor.x, biomeColor.y, biomeColor.z);
 
                 return particle ? color.luminance(0.5f) : color;

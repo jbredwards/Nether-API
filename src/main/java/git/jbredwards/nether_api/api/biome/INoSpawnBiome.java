@@ -16,6 +16,8 @@
 
 package git.jbredwards.nether_api.api.biome;
 
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * Players cannot randomly spawn into biomes that implement this class.
  * For example: players can randomly spawn into a forest biome but not an ocean.
@@ -23,8 +25,18 @@ package git.jbredwards.nether_api.api.biome;
  * Note: this is currently only used for biome providers that extend
  * {@link git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNetherAPI BiomeProviderNetherAPI}.
  *
- * @since 1.3.0
  * @author jbred
  *
  */
-public interface INoSpawnBiome { }
+@ApiStatus.AvailableSince("1.3.0")
+public interface INoSpawnBiome
+{
+    /**
+     * @return Whether this biome denies player spawning.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("1.5.0")
+    default boolean denyPlayerSpawn() {
+        return true;
+    }
+}

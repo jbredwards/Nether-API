@@ -234,8 +234,8 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
     @Nonnull
     @SideOnly(Side.CLIENT)
     @Override
-    public Vec3d getBiomeFogColor(final float celestialAngle, final float partialTicks, @Nonnull final Biome biome) {
-        return biome instanceof IEndBiome ? ((IEndBiome)biome).getFogColor(celestialAngle, partialTicks) : getDefaultFogColor(celestialAngle, partialTicks);
+    public Vec3d getBiomeFogColor(final float celestialAngle, final float partialTicks, @Nonnull final Biome biome, @Nonnull final BlockPos pos) {
+        return biome instanceof IEndBiome ? ((IEndBiome)biome).getFogColor(celestialAngle, partialTicks) : getDefaultFogColor(celestialAngle, partialTicks, biome, pos);
     }
 
     @Nonnull

@@ -18,7 +18,6 @@ package git.jbredwards.nether_api.mod.asm.transformers.modded.biomesoplenty;
 
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent;
@@ -67,7 +66,11 @@ public final class TransformerBiomesOPlentyDecorator implements ITransformer
             if(!contains) return false;
 
             final World world = event instanceof DecorateBiomeEvent ? ((DecorateBiomeEvent)event).getWorld() : ((OreGenEvent)event).getWorld();
-            return NetherAPIConfig.BOP.dependentBOPHellBiomes || world.provider.getDimension() != DimensionType.NETHER.getId();
+            switch(world.provider.getDimensionType()) {
+                case NETHER: return NetherAPIConfig.BOP.dependentBOPHellBiomes;
+                case THE_END: return NetherAPIConfig.BOP.dependentBOPEndBiomes;
+                default: return true;
+            }
         }
     }
 }

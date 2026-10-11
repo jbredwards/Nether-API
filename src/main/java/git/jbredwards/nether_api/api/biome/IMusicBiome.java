@@ -14,8 +14,9 @@
  * <https://www.github.com/jbredwards/mod-permissions-license>.
  */
 
-package git.jbredwards.nether_api.api.audio;
+package git.jbredwards.nether_api.api.biome;
 
+import git.jbredwards.nether_api.api.audio.IMusicType;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.ApiStatus;
@@ -24,7 +25,8 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 
 /**
- * Having your biome class implement this allows it to have custom music.
+ * Having your biome class implement this allows it to have custom music.<br>
+ * This interface is not exclusive to dimensional biomes!
  *
  * @see git.jbredwards.nether_api.api.biome.IEndBiome
  * @see git.jbredwards.nether_api.api.biome.INetherBiome
@@ -36,6 +38,7 @@ public interface IMusicBiome
 {
     /**
      * @return The ambient music that plays while players are in this biome.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
@@ -44,6 +47,7 @@ public interface IMusicBiome
 
     /**
      * @return The boss music that plays while players are in this biome.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
@@ -52,6 +56,7 @@ public interface IMusicBiome
 
     /**
      * @return The creative mode music that plays while players are in this biome.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
@@ -61,6 +66,7 @@ public interface IMusicBiome
     /**
      * @return A {@code IMusicBiome} instance that uses the provided music types.
      * @throws NullPointerException If any music types are null.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
@@ -95,20 +101,22 @@ public interface IMusicBiome
     /**
      * @return A {@code IMusicBiome} instance that uses one music type.
      * @throws NullPointerException If the music type is null.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
     static IMusicBiome of(@Nonnull final IMusicType type) {
-        return of(type, type, type);
+        return IMusicBiome.of(type, type, type);
     }
 
     /**
      * @return A {@code IMusicBiome} instance that shares its creative and survival music.
      * @throws NullPointerException If any music types are null.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.5.0")
     @Nonnull
     static IMusicBiome of(@Nonnull final IMusicType survivalType, @Nonnull final IMusicType bossType) {
-        return of(survivalType, bossType, survivalType);
+        return IMusicBiome.of(survivalType, bossType, survivalType);
     }
 }

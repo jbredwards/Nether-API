@@ -78,7 +78,8 @@ public final class NetherAPIProperties
             () -> WorldProviderTheEnd.OBSIDIAN_PLATFORM, value -> WorldProviderTheEnd.OBSIDIAN_PLATFORM = value);
 
     /**
-     * Tells NetherEx that the provided block states can be turned into NetherEx's netherrack path.
+     * Tells NetherEx that the provided block states can be turned into NetherEx's netherrack path.<br>
+     * <b>This method does not require NetherEx to be installed.</b>
      * @throws NullPointerException If states is null or has any null entries.
      * @author jbred
      */

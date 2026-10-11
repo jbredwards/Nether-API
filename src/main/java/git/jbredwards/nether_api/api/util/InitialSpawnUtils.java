@@ -71,8 +71,8 @@ public final class InitialSpawnUtils
      * @throws NullPointerException If any parameters are null.
      * @author jbred
      */
-    @ApiStatus.Experimental
     @ApiStatus.AvailableSince("1.5.0")
+    @ApiStatus.Experimental
     public static void setInitialSpawnDimensionFactory(@Nonnull final IntSet possibilities, @Nonnull final Function<GameProfile, Integer> factory) {
         PlayerSpawnLogic.INITIAL_SPAWN_PER_PLAYER_POSSIBILITIES = Objects.requireNonNull(possibilities);
         PlayerSpawnLogic.INITIAL_SPAWN_PER_PLAYER = Objects.requireNonNull(factory);

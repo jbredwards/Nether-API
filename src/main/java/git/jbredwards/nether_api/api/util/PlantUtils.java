@@ -31,31 +31,35 @@ import javax.annotation.Nonnull;
 /**
  * Compatibility utilities for modded plants and soils.
  *
- * @since 1.4.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.4.0")
 public final class PlantUtils
 {
     /**
      * This PlantType is for any plants that can be planted on "End Stone"-like blocks.
      * <p>At runtime this is automatically applied to Vanilla's Chorus Plants.</p>
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull public static final EnumPlantType END_PLANT_TYPE = EnumPlantType.getPlantType("ender");
 
     /**
      * This PlantType is for any plants that can be planted on both "Netherrack"-like blocks and "Soul Sand"-like blocks.
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull public static final EnumPlantType NETHER_PLANT_TYPE = EnumPlantType.getPlantType(NetherAPI.MODID + ":nether");
 
     /**
      * This PlantType is for any plants that can be planted on "Netherrack"-like blocks.
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull public static final EnumPlantType NETHERRACK_PLANT_TYPE = EnumPlantType.getPlantType(NetherAPI.MODID + ":netherrack");
 
     /**
      * This PlantType is for any plants that can be planted on "Soul Sand"-like blocks.
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull public static final EnumPlantType SOUL_SAND_PLANT_TYPE = EnumPlantType.Nether;
 
     /**
@@ -69,14 +73,20 @@ public final class PlantUtils
      * }
      * </pre></blockquote>
      * @return True if this soil type sustains the {@link IPlantable}.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.4.0")
     public static boolean sustainsNether(@Nonnull final EnumPlantType soilType, @Nonnull final IBlockAccess world, @Nonnull final BlockPos pos, @Nonnull final EnumFacing direction, @Nonnull final IPlantable plantable) {
         return sustainsNether(soilType, plantable.getPlantType(world, pos.offset(direction)));
     }
 
     /**
      * @return True if this soil type sustains the {@link EnumPlantType}.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.4.0")
     public static boolean sustainsNether(@Nonnull final EnumPlantType soilType, @Nonnull final EnumPlantType plantType) {
         return plantType == soilType || (soilType == NETHER_PLANT_TYPE ? plantType == NETHERRACK_PLANT_TYPE || plantType == SOUL_SAND_PLANT_TYPE : plantType == NETHER_PLANT_TYPE);
     }
@@ -84,7 +94,10 @@ public final class PlantUtils
     /**
      * @return A new IPlantable instance using the plantType. This is useful when checking if a soil block can sustain
      * an {@link EnumPlantType}, without access to an {@link IPlantable}.
+     * @throws NullPointerException If plantType is null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull
     public static IPlantable createPlantable(@Nonnull final EnumPlantType plantType) {
         return createPlantable(plantType, Blocks.AIR.getDefaultState());
@@ -93,7 +106,10 @@ public final class PlantUtils
     /**
      * @return A new IPlantable instance using the plant type and plant blockstate. This is useful when checking if a
      * soil block can sustain an {@link EnumPlantType}, without access to an {@link IPlantable}.
+     * @throws NullPointerException If any parameters are null.
+     * @author jbred
      */
+    @ApiStatus.AvailableSince("1.4.0")
     @Nonnull
     public static IPlantable createPlantable(@Nonnull final EnumPlantType plantType, @Nonnull final IBlockState plant) {
         return new IPlantable() {
@@ -113,6 +129,7 @@ public final class PlantUtils
 
     /**
      * Internal. Initializes the new {@code EnumPlantType} instances.
+     * @author jbred
      */
     @ApiStatus.Internal
     public static void init() {

@@ -59,7 +59,7 @@ public abstract class BiomeProviderNetherAPI extends BiomeProvider
         biomeIndexLayer = biomeGenerators[1];
         biomesToSpawnIn = registry.getBiomeEntries().stream()
                 .map(entry -> entry.biome)
-                .filter(biome -> !(biome instanceof INoSpawnBiome))
+                .filter(biome -> !(biome instanceof INoSpawnBiome) || !((INoSpawnBiome)biome).denyPlayerSpawn())
                 .collect(ImmutableList.toImmutableList());
     }
 

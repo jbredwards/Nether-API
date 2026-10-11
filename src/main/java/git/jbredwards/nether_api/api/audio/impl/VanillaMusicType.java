@@ -42,33 +42,33 @@ public class VanillaMusicType implements IMusicType
 
     @ApiStatus.AvailableSince("1.0.0")
     @SideOnly(Side.CLIENT)
-    public VanillaMusicType(@Nullable MusicType musicTypeIn) {
+    public VanillaMusicType(@Nullable final MusicType musicTypeIn) {
         this(musicTypeIn, false, false);
     }
 
     @ApiStatus.AvailableSince("1.4.0")
     @SideOnly(Side.CLIENT)
-    public VanillaMusicType(@Nullable MusicType musicTypeIn, boolean replacesCurrentIn, boolean isLocalIn) {
-        musicType = Objects.requireNonNull(musicTypeIn, "MusicType cannot be null!");
-        replacesCurrent = replacesCurrentIn;
-        isLocal = isLocalIn;
+    public VanillaMusicType(@Nullable final MusicType musicTypeIn, final boolean replacesCurrentIn, final boolean isLocalIn) {
+        this.musicType = Objects.requireNonNull(musicTypeIn, "MusicType cannot be null!");
+        this.replacesCurrent = replacesCurrentIn;
+        this.isLocal = isLocalIn;
     }
 
     @Nonnull
     @SideOnly(Side.CLIENT)
     @Override
     public MusicType getMusicType() {
-        return musicType;
+        return this.musicType;
     }
 
     @SideOnly(Side.CLIENT)
     @Override
-    public boolean replacesCurrentMusic(@Nonnull MusicType currentlyPlaying) {
-        return replacesCurrent;
+    public boolean replacesCurrentMusic(@Nonnull final MusicType currentlyPlaying) {
+        return this.replacesCurrent;
     }
 
     @Override
     public boolean isBiomeLocal() {
-        return isLocal;
+        return this.isLocal;
     }
 }

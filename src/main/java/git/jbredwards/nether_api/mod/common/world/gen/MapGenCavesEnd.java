@@ -33,7 +33,7 @@ public class MapGenCavesEnd extends MapGenCavesHell
 {
     @Override
     public void generate(@Nonnull final World worldIn, final int x, final int z, @Nonnull final ChunkPrimer primer) {
-        if(NetherAPIConfig.endCavesOnStartIsland || (long)x * (long)x + (long)z * (long)z > 2048L) super.generate(worldIn, x, z, primer);
+        if((long)x * (long)x + (long)z * (long)z > 2048L ? NetherAPIConfig.endCaves : NetherAPIConfig.endCavesOnStartIsland) super.generate(worldIn, x, z, primer);
     }
 
     @Override

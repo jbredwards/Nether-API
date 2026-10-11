@@ -84,7 +84,7 @@ public class MessageAmbienceConfig implements IMessage, IMessageHandler<MessageA
     @Nullable
     @Override
     public IMessage onMessage(@Nonnull final MessageAmbienceConfig message, @Nonnull final MessageContext ctx) {
-        if(ctx.side.isClient() && NetherAPIConfig.ambienceJsonSync) onMessageClient(message.file);
+        if(ctx.side.isClient() && NetherAPIConfig.advanced.ambienceJsonSync) onMessageClient(message.file);
         return null;
     }
 

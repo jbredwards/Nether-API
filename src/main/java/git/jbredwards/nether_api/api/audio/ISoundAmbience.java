@@ -53,7 +53,7 @@ public interface ISoundAmbience
     double getChancePerTick();
 
     /**
-     * @return A new
+     * @return A new {@code ISoundAmbience} instance with Vanilla ambience properties.
      * @throws NullPointerException If soundEvent is null.
      * @author jbred
      */
@@ -64,7 +64,7 @@ public interface ISoundAmbience
     }
 
     /**
-     * @return
+     * @return A new {@code ISoundAmbience} instance with custom ambience properties.
      * @throws NullPointerException If soundEvent is null.
      * @author jbred
      */

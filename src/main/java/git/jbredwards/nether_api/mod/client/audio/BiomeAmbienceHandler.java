@@ -18,8 +18,6 @@ package git.jbredwards.nether_api.mod.client.audio;
 
 import git.jbredwards.nether_api.api.audio.IDarkSoundAmbience;
 import git.jbredwards.nether_api.api.audio.ISoundAmbience;
-import git.jbredwards.nether_api.api.audio.impl.DarkSoundAmbience;
-import git.jbredwards.nether_api.api.biome.IAmbienceBiome;
 import git.jbredwards.nether_api.api.world.IAmbienceWorldProvider;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.client.Minecraft;
@@ -57,7 +55,7 @@ final class BiomeAmbienceHandler
 
     @Nullable
     static Biome currentBiome;
-    static float caveAmbienceChance;
+    static double caveAmbienceChance;
 
     @SubscribeEvent
     static void onPlayerTick(@Nonnull TickEvent.ClientTickEvent event) {
@@ -74,7 +72,7 @@ final class BiomeAmbienceHandler
                     currentBiome = biome;
                     activeBiomeAmbientSounds.values().forEach(FadingSound::fadeOut);
 
-                    final SoundEvent ambientSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world, pos, biome, SoundEvent.class, IAmbienceWorldProvider::getAmbientSound, IAmbienceBiome::getAmbientSound, null);
+                    final SoundEvent ambientSound = IAmbienceWorldProvider.getAmbientSound(mc.world, pos, biome);
                     if(ambientSound != null) activeBiomeAmbientSounds.compute(biome, (biomeIn, sound) -> {
                         if(sound == null) {
                             sound = new FadingSound(mc.player, ambientSound, SoundCategory.AMBIENT);
@@ -93,14 +91,14 @@ final class BiomeAmbienceHandler
                 }
 
                 //random biome ambient sound
-                final ISoundAmbience ambientSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world, pos, biome, ISoundAmbience.class, IAmbienceWorldProvider::getRandomAmbientSound, IAmbienceBiome::getRandomAmbientSound, null);
+                final ISoundAmbience ambientSound = IAmbienceWorldProvider.getRandomAmbientSound(mc.world, pos, biome);
                 if(ambientSound != null && Math.random() < ambientSound.getChancePerTick()) {
                     final ISound sound = new PositionedSoundRecord(ambientSound.getSoundEvent().getSoundName(), SoundCategory.AMBIENT, 1, 1, false, 0, ISound.AttenuationType.NONE, 0, 0, 0);
                     mc.getSoundHandler().playSound(sound);
                 }
 
                 //random dark biome ambient sound
-                final IDarkSoundAmbience caveSound = IAmbienceWorldProvider.getAmbienceOrFallback(mc.world, pos, biome, IDarkSoundAmbience.class, IAmbienceWorldProvider::getDarkAmbienceSound, IAmbienceBiome::getDarkAmbienceSound, DarkSoundAmbience.DEFAULT_CAVE);
+                final IDarkSoundAmbience caveSound = IAmbienceWorldProvider.getDarkAmbienceSound(mc.world, pos, biome);
                 if(caveSound != null) {
                     final double searchX = posEyes.x + MathHelper.getInt(mc.player.getRNG(), -caveSound.getLightSearchRadius(), caveSound.getLightSearchRadius());
                     final double searchY = posEyes.y + MathHelper.getInt(mc.player.getRNG(), -caveSound.getLightSearchRadius(), caveSound.getLightSearchRadius());

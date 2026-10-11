@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.Event;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -33,22 +34,22 @@ import javax.annotation.Nonnull;
  * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS MinecraftForge.EVENT_BUS}.
  * <br>
  * <br>
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public abstract class NetherAPIRegistryEvent extends Event
 {
     /**
      * This is specific to the dimension.
      */
-    @Nonnull public final INetherAPIRegistry registry;
-    @Nonnull public final World world;
-
-    public NetherAPIRegistryEvent(@Nonnull INetherAPIRegistry registryIn, @Nonnull World worldIn) {
+    @ApiStatus.AvailableSince("1.0.0") @Nonnull public final INetherAPIRegistry registry;
+    @ApiStatus.AvailableSince("1.0.0") @Nonnull public final World world;
+    @ApiStatus.AvailableSince("1.0.0")
+    public NetherAPIRegistryEvent(@Nonnull final INetherAPIRegistry registryIn, @Nonnull final World worldIn) {
         Preconditions.checkState(registryIn.isEmpty()); // Ensure registry is empty before accepting new entries
-        registry = registryIn;
-        world = worldIn;
+        this.registry = registryIn;
+        this.world = worldIn;
     }
 
     /**
@@ -61,13 +62,14 @@ public abstract class NetherAPIRegistryEvent extends Event
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS MinecraftForge.EVENT_BUS}.
      * <br>
      * <br>
-     * @since 1.0.0
      * @author jbred
      *
      */
+    @ApiStatus.AvailableSince("1.0.0")
     public static class End extends NetherAPIRegistryEvent
     {
-        public End(@Nonnull INetherAPIRegistry registryIn, @Nonnull World worldIn) {
+        @ApiStatus.AvailableSince("1.0.0")
+        public End(@Nonnull final INetherAPIRegistry registryIn, @Nonnull final World worldIn) {
             super(registryIn, worldIn);
         }
     }
@@ -82,13 +84,14 @@ public abstract class NetherAPIRegistryEvent extends Event
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS MinecraftForge.EVENT_BUS}.
      * <br>
      * <br>
-     * @since 1.0.0
      * @author jbred
      *
      */
+    @ApiStatus.AvailableSince("1.0.0")
     public static class Nether extends NetherAPIRegistryEvent
     {
-        public Nether(@Nonnull INetherAPIRegistry registryIn, @Nonnull World worldIn) {
+        @ApiStatus.AvailableSince("1.0.0")
+        public Nether(@Nonnull final INetherAPIRegistry registryIn, @Nonnull final World worldIn) {
             super(registryIn, worldIn);
         }
     }

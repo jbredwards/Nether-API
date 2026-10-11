@@ -40,19 +40,19 @@ public class DarkSoundAmbience extends SoundAmbience implements IDarkSoundAmbien
     protected final double soundOffset;
 
     @ApiStatus.AvailableSince("1.0.0")
-    public DarkSoundAmbience(@Nonnull SoundEvent soundEventIn, double chancePerTickIn, int lightSearchRadiusIn, double soundOffsetIn) {
+    public DarkSoundAmbience(@Nonnull final SoundEvent soundEventIn, final double chancePerTickIn, final int lightSearchRadiusIn, final double soundOffsetIn) {
         super(soundEventIn, chancePerTickIn);
-        lightSearchRadius = lightSearchRadiusIn;
-        soundOffset = soundOffsetIn;
+        this.lightSearchRadius = lightSearchRadiusIn;
+        this.soundOffset = soundOffsetIn;
     }
 
     @Override
     public int getLightSearchRadius() {
-        return lightSearchRadius;
+        return this.lightSearchRadius;
     }
 
     @Override
     public double getSoundOffset() {
-        return soundOffset;
+        return this.soundOffset;
     }
 }

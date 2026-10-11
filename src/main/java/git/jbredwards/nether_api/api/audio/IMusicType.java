@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 
 /**
  * Allows biomes to have their own music, used by
- * {@link git.jbredwards.nether_api.api.audio.IMusicBiome IMusicBiome}.
+ * {@link git.jbredwards.nether_api.api.biome.IMusicBiome IMusicBiome}.
  *
  * @author jbred
  *
@@ -40,6 +40,7 @@ public interface IMusicType
      * returned by this method.
      *
      * @return The MusicType that gets played.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.0.0")
     @Nonnull
@@ -48,6 +49,7 @@ public interface IMusicType
 
     /**
      * @return Whether this should replace the currently playing music.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.0.0")
     @SideOnly(Side.CLIENT)
@@ -55,6 +57,7 @@ public interface IMusicType
 
     /**
      * @return Whether this should only play while the player remains within the same biome.
+     * @author jbred
      */
     @ApiStatus.AvailableSince("1.4.0")
     default boolean isBiomeLocal() {

@@ -17,21 +17,39 @@
 package git.jbredwards.nether_api.api.biome;
 
 import net.minecraft.util.math.BlockPos;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
 /**
  * Biomes should implement this if they want lava to be tinted a different color.
  *
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public interface ILavaTintBiome
 {
     /**
-     * @return the tint color of lava in this biome.
-     * @since 1.3.0
+     * Has a default implementation since v1.5.0.
+     *
+     * @return The tint color of lava in this biome.
+     * @author jbred
      */
-    int getBiomeLavaColor(@Nonnull final BlockPos lavaPos);
+    @ApiStatus.AvailableSince("1.3.0")
+    default int getBiomeLavaColor(@Nonnull final BlockPos lavaPos) {
+        return getBiomeLavaColor();
+    }
+
+    /**
+     * Has a default implementation since v1.5.0.
+     *
+     * @return The tint color of lava in this biome.
+     * @author jbred
+     */
+    @ApiStatus.AvailableSince("[1.0.0,1.2.0],[1.5.0,)")
+    @ApiStatus.OverrideOnly
+    default int getBiomeLavaColor() {
+        return -1;
+    }
 }

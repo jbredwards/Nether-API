@@ -17,6 +17,8 @@
 package git.jbredwards.nether_api.mod.common.world;
 
 import git.jbredwards.nether_api.api.event.NetherAPIFogColorEvent;
+import git.jbredwards.nether_api.mod.NetherAPI;
+import git.jbredwards.nether_api.mod.common.compat.biomesoplenty.BiomesOPlentyHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.util.math.BlockPos;
@@ -59,7 +61,7 @@ public interface IFogWorldProvider
                 pos.setPos(pos.getX(), pos.getY(), originZ + offsetZ - FogHelper.RADIUS);
 
                 totalWeight += weight;
-                color = color.add(getFogColorFor(world, celestialAngle, partialTicks, world.getBiome(pos)).scale(weight));
+                color = color.add(getFogColorFor(world, celestialAngle, partialTicks, world.getBiome(pos), pos).scale(weight));
             }
         }
 
@@ -68,18 +70,29 @@ public interface IFogWorldProvider
 
     @Nonnull
     @SideOnly(Side.CLIENT)
-    default Vec3d getFogColorFor(@Nonnull World world, float celestialAngle, float partialTicks, @Nonnull Biome biome) {
+    default Vec3d getFogColorFor(@Nonnull World world, float celestialAngle, float partialTicks, @Nonnull Biome biome, @Nonnull BlockPos pos) {
         final NetherAPIFogColorEvent event = createEvent(biome, world, celestialAngle, partialTicks);
         final Vec3d defaultFogColor = getDefaultFogColor(celestialAngle, partialTicks);
         event.fogR = defaultFogColor.x;
         event.fogG = defaultFogColor.y;
         event.fogB = defaultFogColor.z;
-        return MinecraftForge.EVENT_BUS.post(event) ? new Vec3d(event.fogR, event.fogG, event.fogB) : getBiomeFogColor(celestialAngle, partialTicks, biome);
+        return MinecraftForge.EVENT_BUS.post(event) ? new Vec3d(event.fogR, event.fogG, event.fogB) : getBiomeFogColor(celestialAngle, partialTicks, biome, pos);
     }
 
     @Nonnull
     @SideOnly(Side.CLIENT)
-    Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome);
+    default Vec3d getDefaultFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome, @Nonnull BlockPos pos) {
+        if(NetherAPI.isBiomesOPlentyLoaded) {
+            final Vec3d color = BiomesOPlentyHandler.getBiomeFogColor(biome, pos);
+            if(color != null) return color;
+        }
+
+        return getDefaultFogColor(celestialAngle, partialTicks);
+    }
+
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome, @Nonnull BlockPos pos);
 
     @Nonnull
     @SideOnly(Side.CLIENT)

@@ -30,6 +30,7 @@ import git.jbredwards.nether_api.mod.asm.transformers.modded.hexed.TransformerNe
 import git.jbredwards.nether_api.mod.asm.transformers.modded.jitl.*;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.justenoughdimensions.TransformerDimensionTypeEntry;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.justenoughdimensions.TransformerWorldInfoUtils;
+import git.jbredwards.nether_api.mod.asm.transformers.modded.libraryex.TransformerBlockModFluid;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.libraryex.TransformerLibraryExCascadingFix;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.natura.TransformerBlockNetherSapling;
 import git.jbredwards.nether_api.mod.asm.transformers.modded.natura.TransformerBlockTaintedSoil;
@@ -133,6 +134,13 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 register(new TransformerBlockNetherMycelium(),
                         "paulevs.betternether.blocks.BlockNetherMycelium",
                         "paulevs.betternether.blocks.BlockNetherrackMoss");
+                // Fix BetterNether cacti not having the correct entity path node type.
+                register(new TransformerCactusPathfinding(),
+                        "biomesoplenty.common.block.BlockBOPBramblePlant",
+                        "fluke.stygian.block.BlockEndCactus",
+                        "paulevs.betternether.blocks.BlockAgave",
+                        "paulevs.betternether.blocks.BlockBarrelCactus",
+                        "paulevs.betternether.blocks.BlockNetherCactus");
                 // Don't let BetterNether forks place black apple plants in the air.
                 register(new TransformerStructureBlackApple(),
                         "paulevs.betternether.structures.plants.StructureBlackApple");
@@ -234,6 +242,10 @@ public final class ASMHandler implements IFMLLoadingPlugin
             }
             // LibraryEx:
             {
+                // Assign map color from the block properties.
+                register(new TransformerBlockModFluid(),
+                        "logictechcorp.libraryex.block.BlockModFiniteFluid",
+                        "logictechcorp.libraryex.block.BlockModInfiniteFluid");
                 // Fix cascading world gen problems with LibraryEx.
                 register(new TransformerLibraryExCascadingFix(),
                         "logictechcorp.libraryex.utility.StructureHelper");
@@ -377,6 +389,10 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Fix dragon egg teleport particle desync and teleporting into the air.
                 register(new TransformerBlockDragonEgg(),
                         "net.minecraft.block.BlockDragonEgg");
+                // Don't render white fog for fluids without a color.
+                register(new TransformerBlockFluidBase(),
+                        "net.minecraftforge.fluids.BlockFluidBase",
+                        "org.orecruncher.dsurround.registry.biome.BiomeUtil");
                 // Allow BetterNether's 3d mushroom feature to have more render options.
                 register(new TransformerBlockMushroom(),
                         "net.minecraft.block.BlockMushroom");

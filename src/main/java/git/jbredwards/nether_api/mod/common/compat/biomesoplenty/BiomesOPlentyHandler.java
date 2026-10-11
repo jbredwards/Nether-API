@@ -22,6 +22,7 @@ import biomesoplenty.api.block.BOPBlocks;
 import biomesoplenty.api.block.BlockQueries;
 import biomesoplenty.api.block.IBlockPosQuery;
 import biomesoplenty.api.enums.BOPClimates;
+import biomesoplenty.common.biome.BOPBiome;
 import biomesoplenty.common.block.BlockBOPGrass;
 import biomesoplenty.common.world.WorldTypeBOP;
 import git.jbredwards.nether_api.api.registry.INetherAPIRegistry;
@@ -31,11 +32,14 @@ import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.EnumPlantType;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  *
@@ -56,6 +60,16 @@ public final class BiomesOPlentyHandler
             final IExtendedBiome extended = BOPBiomes.REG_INSTANCE.getExtendedBiome(biome);
             if(extended != null) registry.registerBiome(biome, extended.getWeightMap().getOrDefault(BOPClimates.HELL, 0));
         });
+    }
+
+    @Nullable
+    public static Vec3d getBiomeFogColor(@Nonnull final Biome biome, @Nonnull final BlockPos pos) {
+        if(biome instanceof BOPBiome) {
+            final int color = ((BOPBiome)biome).getFogColor(pos);
+            return new Vec3d((color >> 16 & 255) / 255.0, (color >> 8 & 255) / 255.0, (color & 255) / 255.0);
+        }
+
+        return null;
     }
 
     private static boolean canSurvive(@Nonnull final IBlockAccess world, @Nonnull final BlockPos pos, @Nonnull final EnumPlantType type) {

@@ -17,6 +17,7 @@
 package git.jbredwards.nether_api.mod.asm.transformers.modded.dsurround;
 
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
@@ -40,10 +41,12 @@ public final class TransformerStormRenderer implements ITransformer
              *
              * New code:
              * // Support Nether API fog color events.
-             * color = Hooks.getColor(biome, FMLClientHandler.instance().getWorldClient(), partialTicks, true);
+             * color = Hooks.getColor(biome, FMLClientHandler.instance().getWorldClient(), partialTicks, true, this.mutable);
              */
             if(insn.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)insn).name.equals("getDustColor")) {
-                method.instructions.insert(insn, genHookMethod("getColor", "(Lorg/orecruncher/dsurround/registry/biome/BiomeInfo;Lnet/minecraft/world/World;FZ)Lorg/orecruncher/lib/Color;"));
+                method.instructions.insert(insn, genHookMethod("getColor", "(Lorg/orecruncher/dsurround/registry/biome/BiomeInfo;Lnet/minecraft/world/World;FZLnet/minecraft/util/math/BlockPos;)Lorg/orecruncher/lib/Color;"));
+                method.instructions.insert(insn, new FieldInsnNode(GETFIELD, "org/orecruncher/dsurround/client/renderer/weather/StormRenderer", "mutable", "Lnet/minecraft/util/math/BlockPos$MutableBlockPos;"));
+                method.instructions.insert(insn, new VarInsnNode(ALOAD, 0));
                 method.instructions.insert(insn, new InsnNode(ICONST_1));
                 method.instructions.insert(insn, new VarInsnNode(FLOAD, 2));
                 method.instructions.insert(insn, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/fml/client/FMLClientHandler", "getWorldClient", "()Lnet/minecraft/client/multiplayer/WorldClient;", false));

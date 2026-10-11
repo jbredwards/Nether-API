@@ -51,7 +51,7 @@ public final class TransformerMapGenNetherBridge implements ITransformer
     @Nonnull
     @Override
     public byte[] transform(@Nonnull final String name, @Nonnull final String transformedName, @Nonnull final byte[] basicClass) {
-        return transform(basicClass, classNode -> {
+        return transform(basicClass, true, classNode -> {
             /*
              * New code:
              * // Consistent mob spawning logic for structures.

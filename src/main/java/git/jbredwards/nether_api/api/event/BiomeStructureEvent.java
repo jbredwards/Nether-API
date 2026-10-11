@@ -41,6 +41,7 @@ import java.util.function.Supplier;
  * unless stated otherwise in their Javadocs.
  * <br>
  * <br>
+ * @see git.jbredwards.nether_api.api.structure.IBiomeStructure
  * @author jbred
  **/
 @ApiStatus.AvailableSince("1.5.0")
@@ -54,8 +55,8 @@ public abstract class BiomeStructureEvent extends BiomeEvent
     }
 
     /**
-     * Fires the {@link GetBlockID} event if {@code replacement} isn't cached internally.
-     * Returns {@code original} if the block is air, a monster spawner, or if the event encounters an error.
+     * Fires the {@link GetBlockID} event if its result isn't cached internally.
+     * <br>Returns {@code original} if the block is air, a monster spawner, or if the event encounters an error.
      * @throws NullPointerException If any parameters are null.
      * @author jbred
      */
@@ -66,7 +67,7 @@ public abstract class BiomeStructureEvent extends BiomeEvent
     }
 
     /**
-     * Fires the {@link PrepareSpawnList} event its result isn't cached internally.
+     * Fires the {@link PrepareSpawnList} event if its result isn't cached internally.
      * @throws NullPointerException If any parameters are null.
      * @author jbred
      */
@@ -79,7 +80,7 @@ public abstract class BiomeStructureEvent extends BiomeEvent
     /**
      * This event is fired when the structure generator attempts to choose a block ID based on its biome.
      * Currently, the only Vanilla structure that supports this event is "Fortress". It's generally recommended
-     * for modded structures registered using Nether API to use this event, but it's not required.<br>
+     * for modded structures registered using Nether API to support this event, but it's not required.<br>
      * <br>
      * This event is {@link net.minecraftforge.fml.common.eventhandler.Cancelable Cancelable}.
      * Cancelling this event will cause the replacement to be applied.
@@ -120,7 +121,7 @@ public abstract class BiomeStructureEvent extends BiomeEvent
     /**
      * This event is fired when the structure generator attempts to choose an entity ID (for monster spawners) based on its biome.
      * Currently, the only Vanilla structure that supports this event is "Fortress". It's generally recommended
-     * for modded structures registered using Nether API to use this event, but it's not required.<br>
+     * for modded structures registered using Nether API to support this event, but it's not required.<br>
      * <br>
      * This event is {@link net.minecraftforge.fml.common.eventhandler.Cancelable Cancelable}.
      * Cancelling this event will prevent the original entity ID from being applied.
@@ -152,7 +153,7 @@ public abstract class BiomeStructureEvent extends BiomeEvent
     /**
      * This event is fired when the structure generator attempts to create the list of naturally spawning entities based on its biome.
      * Currently, the only Vanilla structure that supports this event is "Fortress". It's generally recommended
-     * for modded structures registered using Nether API to use this event, but it's not required.<br>
+     * for modded structures registered using Nether API to support this event, but it's not required.<br>
      * <br>
      * This event is {@link net.minecraftforge.fml.common.eventhandler.Cancelable Cancelable}.
      * Cancelling this event has no effect on the spawn list.

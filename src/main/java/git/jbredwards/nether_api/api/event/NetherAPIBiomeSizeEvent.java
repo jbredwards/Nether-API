@@ -18,6 +18,7 @@ package git.jbredwards.nether_api.api.event;
 
 import net.minecraft.world.WorldType;
 import net.minecraftforge.event.terraingen.WorldTypeEvent;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -31,16 +32,17 @@ import javax.annotation.Nonnull;
  * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#TERRAIN_GEN_BUS MinecraftForge.TERRAIN_GEN_BUS}.
  * <br>
  * <br>
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public abstract class NetherAPIBiomeSizeEvent extends WorldTypeEvent
 {
-    public int biomeSize;
-    public NetherAPIBiomeSizeEvent(@Nonnull WorldType worldTypeIn, int biomeSizeIn) {
+    @ApiStatus.AvailableSince("1.0.0") public int biomeSize;
+    @ApiStatus.AvailableSince("1.0.0")
+    public NetherAPIBiomeSizeEvent(@Nonnull final WorldType worldTypeIn, final int biomeSizeIn) {
         super(worldTypeIn);
-        biomeSize = biomeSizeIn;
+        this.biomeSize = biomeSizeIn;
     }
 
     /**
@@ -53,13 +55,16 @@ public abstract class NetherAPIBiomeSizeEvent extends WorldTypeEvent
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#TERRAIN_GEN_BUS MinecraftForge.TERRAIN_GEN_BUS}.
      * <br>
      * <br>
-     * @since 1.0.0
      * @author jbred
      *
      */
+    @ApiStatus.AvailableSince("1.0.0")
     public static class End extends NetherAPIBiomeSizeEvent
     {
-        public End(@Nonnull WorldType worldTypeIn, int biomeSizeIn) { super(worldTypeIn, biomeSizeIn); }
+        @ApiStatus.AvailableSince("1.0.0")
+        public End(@Nonnull final WorldType worldTypeIn, final int biomeSizeIn) {
+            super(worldTypeIn, biomeSizeIn);
+        }
     }
 
     /**
@@ -72,12 +77,15 @@ public abstract class NetherAPIBiomeSizeEvent extends WorldTypeEvent
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#TERRAIN_GEN_BUS MinecraftForge.TERRAIN_GEN_BUS}.
      * <br>
      * <br>
-     * @since 1.0.0
      * @author jbred
      *
      */
+    @ApiStatus.AvailableSince("1.0.0")
     public static class Nether extends NetherAPIBiomeSizeEvent
     {
-        public Nether(@Nonnull WorldType worldTypeIn, int biomeSizeIn) { super(worldTypeIn, biomeSizeIn); }
+        @ApiStatus.AvailableSince("1.0.0")
+        public Nether(@Nonnull final WorldType worldTypeIn, final int biomeSizeIn) {
+            super(worldTypeIn, biomeSizeIn);
+        }
     }
 }

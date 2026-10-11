@@ -16,8 +16,8 @@
 
 package git.jbredwards.nether_api.mod.client.audio;
 
-import git.jbredwards.nether_api.api.audio.IMusicBiome;
 import git.jbredwards.nether_api.api.audio.IMusicType;
+import git.jbredwards.nether_api.api.biome.IMusicBiome;
 import git.jbredwards.nether_api.mod.NetherAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MusicTicker;

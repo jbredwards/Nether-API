@@ -18,6 +18,7 @@ package git.jbredwards.nether_api.api.block;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.chunk.ChunkPrimer;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 
@@ -25,14 +26,16 @@ import javax.annotation.Nonnull;
  * Having your Block (or Biome) implement this allows it to have custom behavior when a nether cave generates through it.
  * One use for this would be to allow nether caves to generate through your blocks.
  *
- * @since 1.0.0
  * @author jbred
  *
  */
+@ApiStatus.AvailableSince("1.0.0")
 public interface INetherCarvable
 {
     /**
      * Fired when a nether cave tries to generate over this block.
+     * @author jbred
      */
-    boolean canNetherCarveThrough(@Nonnull IBlockState state, @Nonnull ChunkPrimer primer, int x, int y, int z);
+    @ApiStatus.AvailableSince("1.0.0")
+    boolean canNetherCarveThrough(@Nonnull final IBlockState state, @Nonnull final ChunkPrimer primer, final int x, final int y,final int z);
 }
