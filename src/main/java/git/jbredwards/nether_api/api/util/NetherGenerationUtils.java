@@ -44,7 +44,11 @@ public final class NetherGenerationUtils
      * @author jbred
      */
     @ApiStatus.AvailableSince("1.0.0")
-    public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn, @Nonnull IBlockState liquidBlockIn) {
+    public static void buildSurfaceAndSoulSandGravel(@Nonnull final World world, @Nonnull final Random rand,
+                                                     @Nonnull final ChunkPrimer primer, final int x, final int z,
+                                                     @Nonnull final double[] soulSandNoise, @Nonnull final double[] gravelNoise, @Nonnull final double[] depthBuffer,
+                                                     @Nonnull final IBlockState stateToFill,
+                                                     @Nonnull final IBlockState topBlockIn, @Nonnull final IBlockState fillerBlockIn, @Nonnull final IBlockState liquidBlockIn) {
         buildSurfaceAndSoulSandGravel(world, rand, primer, x, z, soulSandNoise, gravelNoise, depthBuffer, stateToFill, topBlockIn, fillerBlockIn, liquidBlockIn, Blocks.GRAVEL.getDefaultState(), Blocks.SOUL_SAND.getDefaultState());
     }
 
@@ -54,7 +58,12 @@ public final class NetherGenerationUtils
      * @author jbred
      */
     @ApiStatus.AvailableSince("1.3.0")
-    public static void buildSurfaceAndSoulSandGravel(@Nonnull World world, @Nonnull Random rand, @Nonnull ChunkPrimer primer, int x, int z, double[] soulSandNoise, double[] gravelNoise, double[] depthBuffer, @Nonnull IBlockState stateToFill, @Nonnull IBlockState topBlockIn, @Nonnull IBlockState fillerBlockIn, @Nonnull IBlockState liquidBlockIn, @Nonnull IBlockState gravelIn, @Nonnull IBlockState sandIn) {
+    public static void buildSurfaceAndSoulSandGravel(@Nonnull final World world, @Nonnull final Random rand,
+                                                     @Nonnull final ChunkPrimer primer, final int x, final int z,
+                                                     @Nonnull final double[] soulSandNoise, @Nonnull final double[] gravelNoise, @Nonnull final double[] depthBuffer,
+                                                     @Nonnull final IBlockState stateToFill,
+                                                     @Nonnull final IBlockState topBlockIn, @Nonnull final IBlockState fillerBlockIn, @Nonnull final IBlockState liquidBlockIn,
+                                                     @Nonnull final IBlockState gravelIn, @Nonnull final IBlockState sandIn) {
         final boolean soulSand = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesSoulSandGenerate() || sandIn.getBlock() != Blocks.SOUL_SAND) && soulSandNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
         final boolean gravel = (!NetherAPI.isNetherExLoaded || NetherExHandler.doesGravelGenerate() || gravelIn.getBlock() != Blocks.GRAVEL) && gravelNoise[x << 4 | z] + rand.nextDouble() * 0.2 > 0;
         final int depth = (int)(depthBuffer[x << 4 | z] / 3 + 3 + rand.nextDouble() * 0.25);
