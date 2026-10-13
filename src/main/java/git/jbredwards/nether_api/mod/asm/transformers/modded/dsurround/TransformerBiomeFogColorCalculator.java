@@ -18,11 +18,12 @@ package git.jbredwards.nether_api.mod.asm.transformers.modded.dsurround;
 
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.world.IFogWorldProvider;
+import io.netty.util.internal.IntegerHolder;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import net.minecraftforge.client.event.EntityViewRenderEvent;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.orecruncher.dsurround.registry.biome.BiomeInfo;
 import org.orecruncher.lib.Color;
@@ -40,31 +41,40 @@ public final class TransformerBiomeFogColorCalculator implements ITransformer
     @Nonnull
     @Override
     public byte[] transform(@Nonnull final String name, @Nonnull final String transformedName, @Nonnull final byte[] basicClass) {
+        @Nonnull final IntegerHolder index = new IntegerHolder();
         return transformMethod(basicClass, method -> method.name.equals("calculate"), (method, insn) -> {
             /*
              * Old code:
-             * if (color != null)
-             * {
-             *     ...
-             * }
+             * this.doScan = this.doScan || this.posX != playerX || this.posZ != playerZ;
              *
              * New code:
-             * // Support Nether API fog color events.
-             * if ((color = Hooks.getColor(biome, world, (float)event.getRenderPartialTicks(), false) != null)
-             * {
-             *     ...
-             * }
+             * // Copy colors from Vanilla if the world provider controls fog color.
+             * this.weightBiomeFog = Hooks.setWeightBiomeFog(this.weightBiomeFog, world, distance);
+             * this.biomeFogColor = Hooks.setBiomeFogColor(this.biomeFogColor, world, event, this.weightBiomeFog);
+             * this.doScan = Hooks.setDoScan(this.doScan || this.posX != playerX || this.posZ != playerZ);
              */
-            if(insn.getOpcode() == ALOAD && ((VarInsnNode)insn).var == 14) {
-                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 13));
+            if(insn.getOpcode() == PUTFIELD && ((FieldInsnNode)insn).name.equals("doScan") && index.value ++== 0) {
+                // this.weightBiomeFog = Hooks.setWeightBiomeFog(this.weightBiomeFog, world, distance);
+                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
+                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
+                method.instructions.insertBefore(insn, new FieldInsnNode(GETFIELD, "org/orecruncher/dsurround/client/handlers/fog/BiomeFogColorCalculator", "weightBiomeFog", "D"));
+                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 3));
+                method.instructions.insertBefore(insn, new VarInsnNode(ILOAD, 9));
+                method.instructions.insertBefore(insn, genHookMethod("setWeightBiomeFog", "(DLnet/minecraft/world/World;I)D"));
+                method.instructions.insertBefore(insn, new FieldInsnNode(PUTFIELD, "org/orecruncher/dsurround/client/handlers/fog/BiomeFogColorCalculator", "weightBiomeFog", "D"));
+                // this.biomeFogColor = Hooks.setBiomeFogColor(this.biomeFogColor, world, event);
+                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
+                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
+                method.instructions.insertBefore(insn, new FieldInsnNode(GETFIELD, "org/orecruncher/dsurround/client/handlers/fog/BiomeFogColorCalculator", "biomeFogColor", "Lorg/orecruncher/lib/Color;"));
                 method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 3));
                 method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 1));
-                method.instructions.insertBefore(insn, new MethodInsnNode(INVOKEVIRTUAL, "net/minecraftforge/client/event/EntityViewRenderEvent$FogColors", "getRenderPartialTicks", "()D", false));
-                method.instructions.insertBefore(insn, new InsnNode(D2F));
-                method.instructions.insertBefore(insn, new InsnNode(ICONST_0));
-                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 10));
-                method.instructions.insertBefore(insn, genHookMethod("getColor", "(Lorg/orecruncher/dsurround/registry/biome/BiomeInfo;Lnet/minecraft/world/World;FZLnet/minecraft/util/math/BlockPos;)Lorg/orecruncher/lib/Color;"));
-                method.instructions.insertBefore(insn, new VarInsnNode(ASTORE, 14));
+                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
+                method.instructions.insertBefore(insn, new FieldInsnNode(GETFIELD, "org/orecruncher/dsurround/client/handlers/fog/BiomeFogColorCalculator", "weightBiomeFog", "D"));
+                method.instructions.insertBefore(insn, genHookMethod("setBiomeFogColor", "(Lorg/orecruncher/lib/Color;Lnet/minecraft/world/World;Lnet/minecraftforge/client/event/EntityViewRenderEvent$FogColors;D)Lorg/orecruncher/lib/Color;"));
+                method.instructions.insertBefore(insn, new FieldInsnNode(PUTFIELD, "org/orecruncher/dsurround/client/handlers/fog/BiomeFogColorCalculator", "biomeFogColor", "Lorg/orecruncher/lib/Color;"));
+                // this.doScan = Hooks.setDoScan(this.doScan || this.posX != playerX || this.posZ != playerZ);
+                method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 3));
+                method.instructions.insertBefore(insn, genHookMethod("setDoScan", "(ZLnet/minecraft/world/World;)Z"));
             }
             /*
              * Old code:
@@ -87,6 +97,7 @@ public final class TransformerBiomeFogColorCalculator implements ITransformer
     @SuppressWarnings("unused")
     public static final class Hooks
     {
+        // Used by TransformerStormRenderer.
         @Nullable
         public static Color getColor(@Nonnull final BiomeInfo info, @Nonnull final World world, final float partialTicks, final boolean particle, @Nonnull final BlockPos pos) {
             if(world.provider instanceof IFogWorldProvider) {
@@ -102,6 +113,19 @@ public final class TransformerBiomeFogColorCalculator implements ITransformer
 
         public static float getColorScale(final float scale, @Nonnull final World world) {
             return world.provider.isSurfaceWorld() ? scale : 1;
+        }
+
+        @Nonnull
+        public static Color setBiomeFogColor(@Nonnull final Color biomeFogColor, @Nonnull final World world, @Nonnull final EntityViewRenderEvent.FogColors event, final double scale) {
+            return world.provider instanceof IFogWorldProvider ? new Color(event.getRed(), event.getGreen(), event.getBlue()).scale((float)scale) : biomeFogColor;
+        }
+
+        public static boolean setDoScan(final boolean doScan, @Nonnull final World world) {
+            return doScan && !(world.provider instanceof IFogWorldProvider);
+        }
+
+        public static double setWeightBiomeFog(final double weightBiomeFog, @Nonnull final World world, final int distance) {
+            return world.provider instanceof IFogWorldProvider ? ((distance << 1 | 1) * (distance << 1 | 1)) : weightBiomeFog;
         }
     }
 }
