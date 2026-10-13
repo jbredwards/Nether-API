@@ -20,11 +20,13 @@ import git.jbredwards.nether_api.mod.NetherAPI;
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
 import git.jbredwards.nether_api.mod.common.compat.betternether.BiomeBetterNether;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.common.property.Properties;
@@ -69,7 +71,7 @@ public final class TransformerBlockMushroom implements ITransformer
         @Nonnull
         @SideOnly(Side.CLIENT)
         public static BlockStateContainer createBlockState(@Nonnull final Block block) {
-            return new BlockStateContainer.Builder(block).add(IS_BIOME_3D).build();
+            return new ExtendedBlockState(block, new IProperty[0], new IUnlistedProperty[]{IS_BIOME_3D});
         }
 
         @Nonnull
