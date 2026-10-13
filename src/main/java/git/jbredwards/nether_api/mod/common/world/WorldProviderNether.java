@@ -32,6 +32,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
@@ -120,5 +121,17 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @Nullable
     @SideOnly(Side.CLIENT)
     @Override
-    public float[] calcSunriseSunsetColors(float celestialAngle, float partialTicks) { return null; }
+    public float[] calcSunriseSunsetColors(float celestialAngle, float partialTicks) {
+        return null;
+    }
+
+    @Override
+    public boolean canDoLightning(@Nonnull final Chunk chunk) {
+        return hasSkyLight() && super.canDoLightning(chunk);
+    }
+
+    @Override
+    public boolean canDoRainSnowIce(@Nonnull final Chunk chunk) {
+        return !doesWaterVaporize() && hasSkyLight() && super.canDoRainSnowIce(chunk);
+    }
 }
