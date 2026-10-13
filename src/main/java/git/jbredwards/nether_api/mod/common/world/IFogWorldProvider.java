@@ -76,23 +76,19 @@ public interface IFogWorldProvider
         event.fogR = defaultFogColor.x;
         event.fogG = defaultFogColor.y;
         event.fogB = defaultFogColor.z;
-        return MinecraftForge.EVENT_BUS.post(event) ? new Vec3d(event.fogR, event.fogG, event.fogB) : getBiomeFogColor(celestialAngle, partialTicks, biome, pos);
-    }
 
-    @Nonnull
-    @SideOnly(Side.CLIENT)
-    default Vec3d getDefaultFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome, @Nonnull BlockPos pos) {
-        if(NetherAPI.isBiomesOPlentyLoaded) {
+        if(MinecraftForge.EVENT_BUS.post(event)) return new Vec3d(event.fogR, event.fogG, event.fogB);
+        else if(NetherAPI.isBiomesOPlentyLoaded) {
             final Vec3d color = BiomesOPlentyHandler.getBiomeFogColor(biome, pos);
             if(color != null) return color;
         }
 
-        return getDefaultFogColor(celestialAngle, partialTicks);
+        return getBiomeFogColor(celestialAngle, partialTicks, biome);
     }
 
     @Nonnull
     @SideOnly(Side.CLIENT)
-    Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome, @Nonnull BlockPos pos);
+    Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome);
 
     @Nonnull
     @SideOnly(Side.CLIENT)

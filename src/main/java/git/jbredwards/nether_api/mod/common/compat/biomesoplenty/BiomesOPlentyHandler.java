@@ -65,8 +65,13 @@ public final class BiomesOPlentyHandler
     @Nullable
     public static Vec3d getBiomeFogColor(@Nonnull final Biome biome, @Nonnull final BlockPos pos) {
         if(biome instanceof BOPBiome) {
-            final int color = ((BOPBiome)biome).getFogColor(pos);
-            return new Vec3d((color >> 16 & 255) / 255.0, (color >> 8 & 255) / 255.0, (color & 255) / 255.0);
+            final int fogColor = ((BOPBiome)biome).getFogColor(pos);
+            if(fogColor != -1) { // custom fog color set via config
+                final double r = (double)(fogColor >> 16 & 0xFF) / 255;
+                final double g = (double)(fogColor >> 8 & 0xFF) / 255;
+                final double b = (double)(fogColor & 0xFF) / 255;
+                return new Vec3d(r, g, b);
+            }
         }
 
         return null;

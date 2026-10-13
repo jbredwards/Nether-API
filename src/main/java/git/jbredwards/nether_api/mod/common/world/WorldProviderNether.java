@@ -27,7 +27,6 @@ import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandC
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderNether;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorNether;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
@@ -69,6 +68,16 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     }
 
     @Override
+    public boolean canDoLightning(@Nonnull final Chunk chunk) {
+        return hasSkyLight() && super.canDoLightning(chunk);
+    }
+
+    @Override
+    public boolean canDoRainSnowIce(@Nonnull final Chunk chunk) {
+        return !doesWaterVaporize() && hasSkyLight() && super.canDoRainSnowIce(chunk);
+    }
+
+    @Override
     public int getActualHeight() { return NetherAPIConfig.tallNether ? 256 : super.getActualHeight(); }
 
     // --------------
@@ -94,8 +103,8 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @Nonnull
     @SideOnly(Side.CLIENT)
     @Override
-    public Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome, @Nonnull BlockPos pos) {
-        return biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : getDefaultFogColor(celestialAngle, partialTicks, biome, pos);
+    public Vec3d getBiomeFogColor(float celestialAngle, float partialTicks, @Nonnull Biome biome) {
+        return biome instanceof INetherBiome ? ((INetherBiome)biome).getFogColor(celestialAngle, partialTicks) : getDefaultFogColor(celestialAngle, partialTicks);
     }
 
     @Nonnull
@@ -121,17 +130,5 @@ public class WorldProviderNether extends WorldProviderHell implements IAmbienceW
     @Nullable
     @SideOnly(Side.CLIENT)
     @Override
-    public float[] calcSunriseSunsetColors(float celestialAngle, float partialTicks) {
-        return null;
-    }
-
-    @Override
-    public boolean canDoLightning(@Nonnull final Chunk chunk) {
-        return hasSkyLight() && super.canDoLightning(chunk);
-    }
-
-    @Override
-    public boolean canDoRainSnowIce(@Nonnull final Chunk chunk) {
-        return !doesWaterVaporize() && hasSkyLight() && super.canDoRainSnowIce(chunk);
-    }
+    public float[] calcSunriseSunsetColors(float celestialAngle, float partialTicks) { return null; }
 }
