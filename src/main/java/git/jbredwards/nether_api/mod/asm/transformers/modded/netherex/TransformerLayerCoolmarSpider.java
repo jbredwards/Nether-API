@@ -32,7 +32,7 @@ public final class TransformerLayerCoolmarSpider implements ITransformer
     @Nonnull
     @Override
     public byte[] transform(@Nonnull final String name, @Nonnull final String transformedName, @Nonnull final byte[] basicClass) {
-        return transformMethod(basicClass, method -> method.name.equals(DEOBFUSCATED ? "doRenderLayer" : "func_177141_a"), (method, insn) -> {
+        return transformMethod(basicClass, method -> method.name.equals("doRenderLayer"), (method, insn) -> {
             /*
              * New code:
              * // Fix Coolmar Spider rendering.
