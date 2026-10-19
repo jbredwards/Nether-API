@@ -21,6 +21,7 @@ import git.jbredwards.nether_api.mod.common.world.WorldProviderNether;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd;
 import git.jbredwards.nether_api.mod.common.world.WorldProviderTheEnd.ExitPortal;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.world.gen.feature.WorldGenSpikes;
 import net.minecraft.world.gen.feature.WorldGenerator;
@@ -85,8 +86,8 @@ public final class NetherAPIProperties
      */
     @ApiStatus.AvailableSince("1.5.0")
     public static void registerNetherExPathable(@Nonnull final IBlockState... states) {
-        for(@Nonnull final IBlockState state : states) {
-            TransformerInputHandler.Hooks.NETHERRACK_CANDIDATES.add(Objects.requireNonNull(state));
+        for(@Nonnull final IBlockState state : states) if(state.getBlock() != Blocks.AIR) {
+            TransformerInputHandler.Hooks.NETHERRACK_CANDIDATES.add(state);
         }
     }
 

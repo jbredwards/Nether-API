@@ -150,7 +150,7 @@ public final class BetterNetherHandler
     @SubscribeEvent
     static void registerMappers(@Nonnull final ModelRegistryEvent event) {
         // Fix BetterNether's Quartz Stained Glass Pane block models.
-        if(isModern() && ConfigLoader.mustInitBlock("BLOCK_QUARTZ_STAINED_GLASS_PANE")) ModelLoader.setCustomStateMapper(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE, new StateMapperBase() {
+        if(isModern() && hasQuartzStainedGlassPane()) ModelLoader.setCustomStateMapper(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE, new StateMapperBase() {
             @Nonnull
             @Override
             protected ModelResourceLocation getModelResourceLocation(@Nonnull final IBlockState state) {
@@ -163,7 +163,7 @@ public final class BetterNetherHandler
     @SubscribeEvent
     static void registerModels(@Nonnull final ModelBakeEvent event) {
         // Fix BetterNether's Quartz Stained Glass Pane item models.
-        if(isModern() && ConfigLoader.mustInitBlock("BLOCK_QUARTZ_STAINED_GLASS_PANE")) for(@Nonnull final EnumDyeColor color : EnumDyeColor.values()) {
+        if(isModern() && hasQuartzStainedGlassPane()) for(@Nonnull final EnumDyeColor color : EnumDyeColor.values()) {
             @Nonnull final IModelState transforms = ForgeBlockStateV1.Transforms.get("forge:default-item").orElseGet(TRSRTransformation::identity);
             event.getModelRegistry().putObject(new ModelResourceLocation("betternether:quartz_stained_glass_pane", "color=" + color.getDyeColorName()), ItemLayerModel.INSTANCE
                     .retexture(ImmutableMap.of("layer0", "betternether:blocks/quartz_stained_glass_" + color.getDyeColorName()))
@@ -229,5 +229,9 @@ public final class BetterNetherHandler
         }
 
         return null;
+    }
+
+    private static boolean hasQuartzStainedGlassPane() {
+        return BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE != Blocks.AIR;
     }
 }
