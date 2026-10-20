@@ -195,10 +195,10 @@ public final class BetterNetherHandler
         if(isModern()) ReflectionHelper.<Set<Block>, ConfigLoader>getPrivateValue(ConfigLoader.class, null, "NETHER_TERRAIN").add(Blocks.NETHERRACK);
 
         // add recipes for Quartz Stained Glass Panes
-        final boolean hasBlock = BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS != Blocks.AIR;
+        final boolean hasBlock = BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS != null;
         if(hasBlock) OreDictionary.registerOre("blockQuartzGlass", new ItemStack(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS, 1, OreDictionary.WILDCARD_VALUE));
         if(isModern()) {
-            final boolean hasPane = BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE != Blocks.AIR;
+            final boolean hasPane = hasQuartzStainedGlassPane();
             if(hasPane) OreDictionary.registerOre("paneQuartzGlass", new ItemStack(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE, 1, OreDictionary.WILDCARD_VALUE));
             if(hasPane && hasBlock) for(int i = 0; i < 16; i++) GameRegistry.addShapedRecipe(new ResourceLocation(NetherAPI.MODID, "betternether/quartz_stained_glass_pane/" + i),
                     null, new ItemStack(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE, 16, i), "###", "###", '#', new ItemStack(BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS, 1, i));
@@ -231,7 +231,8 @@ public final class BetterNetherHandler
         return null;
     }
 
+    // exists because "BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE" is only present in BetterNether RotN
     private static boolean hasQuartzStainedGlassPane() {
-        return BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE != Blocks.AIR;
+        return BlocksRegister.BLOCK_QUARTZ_STAINED_GLASS_PANE != null;
     }
 }
