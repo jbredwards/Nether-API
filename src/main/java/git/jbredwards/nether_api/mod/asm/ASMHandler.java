@@ -107,6 +107,15 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Prevent BetterNether from resetting its enabled biomes config cache.
                 register(new TransformerBetterNetherConfigLoader(),
                         "paulevs.betternether.config.ConfigLoader");
+                // Move hardcoded block drops to Forge system.
+                register(new TransformerBetterNetherDrops(),
+                        "paulevs.betternether.blocks.BlockBoneMushroom",
+                        "paulevs.betternether.blocks.BlockEyeBase",
+                        "paulevs.betternether.blocks.BlockLucisMushroom",
+                        "paulevs.betternether.blocks.BlockMagmaFlower",
+                        "paulevs.betternether.blocks.BlockOrangeMushroom",
+                        "paulevs.betternether.blocks.BlockStalagnateBase",
+                        "paulevs.betternether.blocks.BlockStalagnateBottom");
                 // Fix BetterNether firefly spawning code.
                 register(new TransformerBetterNetherFirefly(),
                         "paulevs.betternether.entities.EntityFirefly");
