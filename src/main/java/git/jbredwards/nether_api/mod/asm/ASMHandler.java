@@ -156,6 +156,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Don't let eye vines carve through terrain.
                 register(new TransformerStructureEye(),
                         "paulevs.betternether.structures.plants.StructureEye");
+                // Don't generate lucis mushroom if it'll intersect with another lucis mushroom
+                register(new TransformerStructureLucis(),
+                        "paulevs.betternether.structures.plants.StructureLucis");
                 // Fix BetterNether RotN lucis mushroom rotation.
                 register(new TransformerBetterNetherRotNLucisMushroom(),
                         "paulevs.betternether.blocks.BlockLucisMushroom",
