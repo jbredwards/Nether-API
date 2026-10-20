@@ -24,6 +24,7 @@ import org.objectweb.asm.commons.GeneratorAdapter;
 import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
+import java.util.ListIterator;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -173,8 +174,17 @@ public interface ITransformer extends IClassTransformer, Opcodes
     }
 
     default void transformOverwrite(@Nonnull final ClassNode classNode, @Nonnull final MethodNode method, @Nonnull final Consumer<GeneratorAdapter> generator) {
-        classNode.methods.removeIf(candidate -> candidate.name.equals(method.name) && candidate.desc.equals(method.desc));
-        classNode.methods.add(method);
+        for(@Nonnull final ListIterator<MethodNode> it = classNode.methods.listIterator(); true;) {
+            if(!it.hasNext()) {
+                it.add(method);
+                break;
+            }
+            @Nonnull final MethodNode candidate = it.next();
+            if(candidate.name.equals(method.name) && candidate.desc.equals(method.desc)) {
+                it.set(method);
+                break;
+            }
+        }
 
         @Nonnull final GeneratorAdapter adapter = new GeneratorAdapter(method, method.access, method.name, method.desc);
         generator.accept(adapter);
