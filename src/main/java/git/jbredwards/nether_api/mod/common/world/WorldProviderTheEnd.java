@@ -27,6 +27,8 @@ import git.jbredwards.nether_api.mod.common.compat.voidislandcontrol.VoidIslandC
 import git.jbredwards.nether_api.mod.common.config.NetherAPIConfig;
 import git.jbredwards.nether_api.mod.common.world.biome.BiomeProviderTheEnd;
 import git.jbredwards.nether_api.mod.common.world.gen.ChunkGeneratorTheEnd;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -176,7 +178,8 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
 
                 // ensure the exit portal pos is on the ground, and not on top of any previously existing portal
                 @Nonnull final Chunk chunk = world.getChunk(exitPortalLocation);
-                while(chunk.getBlockState(exitPortalLocation).getBlock() == Blocks.BEDROCK) exitPortalLocation = exitPortalLocation.down();
+                @Nonnull final Biome biome = world.getBiome(exitPortalLocation);
+                while(isInvalidExitPortalSurface(biome, chunk, exitPortalLocation)) exitPortalLocation = exitPortalLocation.down();
 
                 // prevent portals from spawning into the void
                 if(exitPortalLocation.getY() < 2) exitPortalLocation = new BlockPos(exitPortalLocation.getX(), exitPortalMinY, exitPortalLocation.getZ());
@@ -209,6 +212,13 @@ public class WorldProviderTheEnd extends WorldProviderEnd implements IAmbienceWo
     public BlockPos getRandomizedSpawnPoint() {
         OBSIDIAN_PLATFORM.generate(world, new Random(world.getSeed()), getSpawnCoordinate());
         return super.getRandomizedSpawnPoint();
+    }
+
+    protected boolean isInvalidExitPortalSurface(@Nonnull final Biome biome, @Nonnull final Chunk chunk, @Nonnull final BlockPos pos) {
+        @Nonnull final IBlockState state = chunk.getBlockState(pos);
+        return pos.getY() > chunk.getWorld().getSeaLevel()
+                ? biome.topBlock != state && biome.fillerBlock != state
+                : state.getBlock() == Blocks.BEDROCK || state.getMaterial() == Material.AIR;
     }
 
     // --------------
