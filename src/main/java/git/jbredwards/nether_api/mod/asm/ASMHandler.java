@@ -435,6 +435,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 register(new TransformerMapGenNetherBridge(),
                         "net.minecraft.world.gen.structure.MapGenNetherBridge",
                         "net.minecraft.world.gen.structure.MapGenNetherBridge$Start");
+                // Add accessor for protected methods needed by nether fortress transforms.
+                register(new TransformerMapGenStructure(),
+                        "net.minecraft.world.gen.structure.MapGenStructure");
                 // Allow more than just the Overworld to be set as an initial spawn dimension.
                 register(new TransformerNetHandlerPlayClient(),
                         "net.minecraft.client.network.NetHandlerPlayClient",

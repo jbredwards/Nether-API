@@ -253,10 +253,10 @@ public final class TransformerMapGenNetherBridge implements ITransformer
 
         @Nonnull
         public static List<Biome.SpawnListEntry> getPossibleCreatures(@Nonnull final MapGenNetherBridge instance, @Nonnull final EnumCreatureType type, @Nonnull final World world, @Nonnull final BlockPos pos) {
-            instance.initializeStructureData(world);
+            ((TransformerMapGenStructure.Accessor)instance).nether_api$initializeStructureData(world);
             final boolean checkGround;
 
-            @Nullable StructureStart start = instance.getStructureAt(pos);
+            @Nullable StructureStart start = ((TransformerMapGenStructure.Accessor)instance).nether_api$getStructureAt(pos);
             if(start != null) checkGround = false;
             else {
                 checkGround = true;
