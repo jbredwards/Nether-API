@@ -386,8 +386,9 @@ public final class ASMHandler implements IFMLLoadingPlugin
                 // Use seed-coord-based random and un-hardcode obsidian spike generation.
                 register(new TransformerBiomeEndDecorator(),
                         "net.minecraft.world.biome.BiomeEndDecorator");
-                // All BiomeHell instances use netherrack as their top and filler blocks.
+                // All BiomeHell and BiomeEnd instances use better blocks as their top and filler blocks.
                 register(new TransformerBiomeHell(),
+                        "net.minecraft.world.biome.BiomeEnd",
                         "net.minecraft.world.biome.BiomeHell");
                 // Add support for new EnumPlantTypes to Vanilla soil blocks.
                 register(new TransformerBlock(),

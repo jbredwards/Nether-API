@@ -17,14 +17,16 @@
 package git.jbredwards.nether_api.mod.asm.transformers.vanilla;
 
 import git.jbredwards.nether_api.mod.asm.transformers.ITransformer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeHell;
 import org.objectweb.asm.tree.*;
 
 import javax.annotation.Nonnull;
 
 /**
- * All BiomeHell instances now use netherrack as their top and filler blocks by default
+ * All BiomeHell and BiomeEnd instances now use better blocks as their top and filler blocks by default
  * @author jbred
  *
  */
@@ -50,7 +52,7 @@ public final class TransformerBiomeHell implements ITransformer
              */
             if(insn.getOpcode() == RETURN) {
                 method.instructions.insertBefore(insn, new VarInsnNode(ALOAD, 0));
-                method.instructions.insertBefore(insn, genHookMethod("setDefaultTopAndFillerBlocks", "(Lnet/minecraft/world/biome/BiomeHell;)V"));
+                method.instructions.insertBefore(insn, genHookMethod("setDefaultTopAndFillerBlocks", "(Lnet/minecraft/world/biome/Biome;)V"));
                 return BreakType.METHODS;
             }
 
@@ -61,9 +63,10 @@ public final class TransformerBiomeHell implements ITransformer
     @SuppressWarnings("unused")
     public static final class Hooks
     {
-        public static void setDefaultTopAndFillerBlocks(@Nonnull BiomeHell biome) {
-            biome.topBlock = Blocks.NETHERRACK.getDefaultState();
-            biome.fillerBlock = Blocks.NETHERRACK.getDefaultState();
+        public static void setDefaultTopAndFillerBlocks(@Nonnull Biome biome) {
+            @Nonnull final IBlockState state = (biome instanceof BiomeHell ? Blocks.NETHERRACK : Blocks.END_STONE).getDefaultState();
+            biome.topBlock = state;
+            biome.fillerBlock = state;
         }
     }
 }
